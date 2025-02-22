@@ -1,9 +1,6 @@
-import { User } from "./../../node_modules/.prisma/client/index.d";
-import { Router, Response } from "express";
-// import prisma from "../configs/db";
+import { Router } from "express";
 import { login, register } from "../services/userService";
-import verifyToken from "../middlewares/verifyToken";
-import { ExtendedRequest } from "../utils/types";
+
 
 const router = Router();
 
@@ -26,6 +23,7 @@ router.post("/login", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
 
 
 
