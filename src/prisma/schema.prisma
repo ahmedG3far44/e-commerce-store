@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @unique @default(uuid())
+  firstName     String
+  lastName      String
+  email         String    @unique
+  password      String
+  OrdersList    Order[]
+  addressesList Address[]
+}
+
+model Address {
+  id       String @id @unique @default(uuid())
+  city     String
+  area     String
+  street   String
+  building String
+  floor    String
+  phone    Int?
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id])
+}
+
+model Product {
+  id          String  @id @unique @default(uuid())
+  title       String
+  description String?
+  category    String?
+  image       String
+  price       Float
+  stock       Int
+
+  CartItem CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id       String @id @unique @default(uuid())
+  userId   String
+  quantity Int
+
+  productId String
+  cartId    String?
+  product   Product @relation(fields: [productId], references: [id])
+  Cart      Cart?   @relation(fields: [cartId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum CartStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model Cart {
+  id          String     @id @unique @default(uuid())
+  items       CartItem[]
+  Order       Order[]
+  status      CartStatus @default(ACTIVE)
+  totalAmount Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id          String      @id @unique @default(uuid())
+  address     String
+  status      OrderStatus @default(PENDING)
+  userAddress String
+
+  cartId String
+  userId String
+  cart   Cart   @relation(fields: [cartId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+}
