@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ExtendedRequest } from "../utils/types";
 import {
   addProductToCart,
+  checkout,
   clearCart,
   deleteItemFromCart,
   getActiveCart,
@@ -73,7 +74,7 @@ router.delete(
 router.delete("/cart/items", verifyToken, async (req: ExtendedRequest, res) => {
   try {
     const userId = req.user?.id!;
-    const result = await clearCart ({
+    const result = await clearCart({
       userId,
     });
     res.status(result.statusCode).send(result.data);
@@ -81,5 +82,23 @@ router.delete("/cart/items", verifyToken, async (req: ExtendedRequest, res) => {
     res.status(500).send(err.message);
   }
 });
+
+router.post(
+  "/cart/checkout",
+  verifyToken,
+  async (req: ExtendedRequest, res) => {
+    try {
+      const userId = req.user?.id!;
+      const { address } = req.body;
+      const result = await checkout({
+        userId,
+        address,
+      });
+      res.status(result.statusCode).send(result.data);
+    } catch (err: any) {
+      res.status(500).send(err.message);
+    }
+  }
+);
 
 export default router;

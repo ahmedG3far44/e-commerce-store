@@ -1,21 +1,27 @@
+import { string } from "zod";
 import cartModel from "./../models/cart";
 import product from "../models/product";
 import userModel from "../models/user";
 import productModel from "../models/product";
+import orderModel from "../models/order";
 
-interface GetActiveCartParams {
+interface CreateCartParams {
   userId: string;
 }
 
-const createUserCart = async ({ userId }: GetActiveCartParams) => {
+const createUserCart = async ({ userId }: CreateCartParams) => {
   let cart = await cartModel.create({ userId });
   await cart.save();
   return cart;
 };
 
+interface GetActiveCartParams {
+  userId: string;
+}
+
 export const getActiveCart = async ({ userId }: GetActiveCartParams) => {
   try {
-    let cart = await cartModel.findOne({ userId });
+    let cart = await cartModel.findOne({ userId, status: "ACTIVE" });
     if (!cart) {
       cart = await createUserCart({ userId });
       return cart;
@@ -191,6 +197,60 @@ export const clearCart = async ({ userId }: ClearCartParams) => {
     const clearedCart = await cart.save();
 
     return { data: clearedCart, statusCode: 200 };
+  } catch (err) {
+    return { data: err, statusCode: 400 };
+  }
+};
+
+interface CheckoutCartParams {
+  userId: string;
+  address: string;
+}
+export const checkout = async ({ userId, address }: CheckoutCartParams) => {
+  try {
+    const cart = await getActiveCart({ userId });
+    
+    if ("statusCode" in cart) {
+      return cart;
+    }
+
+    if (!cart.items.length) {
+      return { data: "can't checkout cart is empty", statusCode: 400 };
+    }
+
+    let orderItems = [];
+
+    for (const item of cart.items) {
+
+      const product = await productModel.findById(item.productId);
+      orderItems.push({
+        productTitle: product?.title,
+        productDescription: product?.description,
+        productImages: product?.images,
+        productPrice: item.price,
+        quantity: item.quantity,
+      });
+
+    }
+
+    const order = await orderModel.create({
+      orderItems,
+      address,
+      userId,
+      totalOrderPrice: cart.totalAmount,
+    });
+
+    
+
+    const userOrder = await order.save();
+
+    const updateCartStatus = await cartModel.findByIdAndUpdate(userId, {
+      status: "COMPLETED",
+    });
+
+    await updateCartStatus?.save();
+
+    return { data: userOrder, statusCode: 201 };
   } catch (err) {
     return { data: err, statusCode: 400 };
   }
