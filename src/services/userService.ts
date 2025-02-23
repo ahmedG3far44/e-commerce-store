@@ -1,6 +1,7 @@
 import user from "../models/user";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import orderModel from "../models/order";
 
 interface RegisterParams {
   firstName: string;
@@ -31,7 +32,7 @@ export const register = async ({
   });
 
   await newUser.save();
-  
+
   const userPayload = {
     id: newUser.id,
     firstName,
@@ -78,6 +79,18 @@ export const login = async ({ email, password }: LoginParams) => {
     data: { user: { ...userPayload, addresses }, token },
     statusCode: 200,
   };
+};
+
+interface getUserOrdersParams {
+  userId: string;
+}
+export const getUserOrders = async ({ userId }: getUserOrdersParams) => {
+  try {
+    const orders = await orderModel.find({ userId });
+    return { data: { orders }, statusCode: 200 };
+  } catch (err) {
+    return { data: err, statusCode: 400 };
+  }
 };
 
 export interface GenerateTokenParams {

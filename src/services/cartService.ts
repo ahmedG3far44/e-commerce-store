@@ -209,7 +209,7 @@ interface CheckoutCartParams {
 export const checkout = async ({ userId, address }: CheckoutCartParams) => {
   try {
     const cart = await getActiveCart({ userId });
-    
+
     if ("statusCode" in cart) {
       return cart;
     }
@@ -221,16 +221,14 @@ export const checkout = async ({ userId, address }: CheckoutCartParams) => {
     let orderItems = [];
 
     for (const item of cart.items) {
-
       const product = await productModel.findById(item.productId);
       orderItems.push({
-        productTitle: product?.title,
-        productDescription: product?.description,
-        productImages: product?.images,
+        productTitle: product?.title || "",
+        productDescription: product?.description || null,
+        productImages: product?.images?.[0] || "",
         productPrice: item.price,
         quantity: item.quantity,
       });
-
     }
 
     const order = await orderModel.create({
@@ -240,8 +238,6 @@ export const checkout = async ({ userId, address }: CheckoutCartParams) => {
       totalOrderPrice: cart.totalAmount,
     });
 
-    
-
     const userOrder = await order.save();
 
     const updateCartStatus = await cartModel.findByIdAndUpdate(userId, {
@@ -249,6 +245,8 @@ export const checkout = async ({ userId, address }: CheckoutCartParams) => {
     });
 
     await updateCartStatus?.save();
+
+    await clearCart({ userId });
 
     return { data: userOrder, statusCode: 201 };
   } catch (err) {

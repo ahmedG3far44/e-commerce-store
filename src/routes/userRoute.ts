@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { login, register } from "../services/userService";
-
+import { getUserOrders, login, register } from "../services/userService";
+import verifyToken from "../middlewares/verifyToken";
+import { ExtendedRequest } from "../utils/types";
 
 const router = Router();
 
@@ -24,7 +25,14 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
-
+router.get("/orders", verifyToken, async (req: ExtendedRequest, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await getUserOrders({ userId });
+    res.status(result.statusCode).send(result.data);
+  } catch (err: any) {
+    res.status(500).send(err.message);
+  }
+});
 
 export default router;
