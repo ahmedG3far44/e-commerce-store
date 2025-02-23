@@ -8,8 +8,7 @@ const router = Router();
 router.post("/product", async (req: ExtendedRequest, res) => {
   try {
     const product = req.body;
-    // const userId = req.user?.id;
-    const result = await addNewProduct({ product });
+    const result = await addNewProduct({ productData: product });
     res.status(result.statusCode).send(result.data);
   } catch (err: any) {
     res.status(500).send(err.message);
@@ -21,7 +20,7 @@ router.put("/product/:id", verifyToken, async (req: ExtendedRequest, res) => {
     const product = req.body;
     const { id } = req.params;
     const userId = req.user?.id;
-    const result = await updateNewProduct({productId:id, product });
+    const result = await updateNewProduct({ productId: id, product });
     res.status(result.statusCode).send(result.data);
   } catch (err: any) {
     res.status(500).send(err.message);

@@ -1,7 +1,7 @@
 import { ExtendedRequest } from "./../utils/types";
 import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { ITokenPayload } from "../services/userService";
+import { GenerateTokenParams } from "../services/userService";
 
 const verifyToken = async (
   req: ExtendedRequest,
@@ -16,7 +16,7 @@ const verifyToken = async (
     const validUser = jwt.verify(
       token,
       process.env.JWT_SECRET as string
-    ) as ITokenPayload;
+    ) as GenerateTokenParams;
     if (!validUser) {
       res.status(403).send("Authorized token not valid");
     }

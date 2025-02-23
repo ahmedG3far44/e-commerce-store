@@ -7,7 +7,11 @@ export const productSchema = z.object({
     .max(100, "too long product title"),
   description: z.string().optional(),
   category: z.string().optional(),
-  image: z.string().url("not valid product image url!!"),
+  images: z
+    .string()
+    .url("not valid product image url!!")
+    .array()
+    .min(1, "not valid  product images!!"),
   price: z.number(),
   stock: z.number().int(),
 });

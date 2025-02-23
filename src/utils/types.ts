@@ -14,10 +14,14 @@ export interface IProduct {
   stock: number;
 }
 
-// id          String @id @unique @default(uuid())
-// title       String
-// description String
-// category    String
-// image       String
-// price       Float
-// stock       Int
+export interface IProductItem {
+  productId: string;
+  product: IProduct;
+  quantity: number;
+}
+export interface ICart {
+  items: IProductItem[];
+  status: string;
+  totalAmount: number;
+  userId: string;
+}

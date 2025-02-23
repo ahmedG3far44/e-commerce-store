@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import rootRoute from "./routes/rootRoute";
-import prisma from "./configs/db";
+import mongoose from "mongoose";
 
 // config env variables
 dotenv.config();
@@ -19,14 +19,17 @@ app.use(
 );
 
 // db connection
-prisma
-  .$connect()
+
+
+mongoose
+  .connect(process.env.DATABASE_URL!)
   .then(() => {
     console.log("db connected success!");
   })
   .catch(() => {
-    console.log("db connect failed!!");
+    console.log("db connection failed!!");
   });
+
 
 // middlewares
 app.use(express.json());

@@ -1,8 +1,8 @@
-import prisma from "../configs/db";
+import user from "../models/user";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-interface IUserRegister {
+interface RegisterParams {
   firstName: string;
   lastName: string;
   email: string;
@@ -14,51 +14,45 @@ export const register = async ({
   lastName,
   email,
   password,
-}: IUserRegister) => {
-  const findUser = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+}: RegisterParams) => {
+  const findUser = await user.findOne({ email });
 
   if (findUser) {
     return { data: "user is already exist!!", statusCode: 400 };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await prisma.user.create({
-    data: {
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-    },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      email: true,
-    },
+
+  const newUser = await user.insertOne({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
   });
-  console.log("a new user was created");
-  console.log(newUser);
-  //   const { id, firstName, lastName, email } = newUser;
 
-  const token = generateToken({ id: newUser.id, firstName, lastName, email });
+  await newUser.save();
+  
+  const userPayload = {
+    id: newUser.id,
+    firstName,
+    lastName,
+    email,
+    isAdmin: newUser.isAdmin,
+  };
+  const token = generateToken(userPayload);
 
-  return { data: { ...newUser, token }, statusCode: 201 };
+  return {
+    data: { user: { ...userPayload, addresses: newUser.addresses }, token },
+    statusCode: 201,
+  };
 };
 
-interface IUserLogin {
+interface LoginParams {
   email: string;
   password: string;
 }
-export const login = async ({ email, password }: IUserLogin) => {
-  const findUser = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+export const login = async ({ email, password }: LoginParams) => {
+  const findUser = await user.findOne({ email });
 
   if (!findUser) {
     return { data: "this user not found!!", statusCode: 400 };
@@ -67,26 +61,33 @@ export const login = async ({ email, password }: IUserLogin) => {
   const correctPasswords = await bcrypt.compare(password, findUser.password);
 
   if (!correctPasswords) {
-    return { data: "wrong password or email", statusCode: 400 };
+    return { data: "your email or password is wrong!!", statusCode: 400 };
   }
-  const { id, firstName, lastName } = findUser;
+  const { id, firstName, lastName, isAdmin, addresses } = findUser;
 
-  const token = generateToken({
+  const userPayload = {
     id,
     firstName,
     lastName,
-    email: findUser.email,
-  });
-  return { data: { ...findUser, token }, statusCode: 200 };
+    email,
+    isAdmin,
+  };
+
+  const token = generateToken(userPayload);
+  return {
+    data: { user: { ...userPayload, addresses }, token },
+    statusCode: 200,
+  };
 };
 
-export interface ITokenPayload {
+export interface GenerateTokenParams {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
+  isAdmin: boolean;
 }
-const generateToken = (payload: ITokenPayload) => {
+const generateToken = (payload: GenerateTokenParams) => {
   const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
     expiresIn: "24h",
   });

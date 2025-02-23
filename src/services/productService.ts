@@ -1,33 +1,25 @@
-import prisma from "../configs/db";
 import { IProduct } from "../utils/types";
 import { productSchema } from "../utils/validationSchema";
+import product from "../models/product";
+import productModel from "../models/product";
 
-interface IAddProduct {
-  product: IProduct;
+interface AddProductParams {
+  productData: string;
 }
-export const addNewProduct = async ({ product }: IAddProduct) => {
+export const addNewProduct = async ({ productData }: AddProductParams) => {
   try {
-    const validProductData = productSchema.safeParse(product);
+    const validProductData = productSchema.safeParse(productData);
 
     if (!validProductData.success) {
-      return { data: "the product data are not valid", statusCode: 400 };
+      return {
+        data: `the product data are not valid => ${validProductData.error.message}`,
+        statusCode: 400,
+      };
     }
-    const { title, description, category, image, price, stock } =
-      validProductData.data;
 
+    const newProduct = await product.insertOne({ ...validProductData.data });
+    await newProduct.save();
 
-    const newProduct = await prisma.product.create({
-      data: {
-        title,
-        description: description!,
-        category: category!,
-        image,
-        price,
-        stock,
-      },
-    });
-
-    
     return { data: newProduct, statusCode: 201 };
   } catch (err) {
     return { data: "can't create a product", statusCode: 400 };
@@ -43,11 +35,7 @@ export const updateNewProduct = async ({
   product,
 }: IUpdateProduct) => {
   try {
-    const existProduct = await prisma.product.findUnique({
-      where: {
-        id: productId,
-      },
-    });
+    const existProduct = await productModel.findById(productId);
 
     if (!existProduct) {
       return { data: "this product not found!!", statusCode: 400 };
@@ -59,25 +47,27 @@ export const updateNewProduct = async ({
       return { data: "the product data are not valid", statusCode: 400 };
     }
 
-    const { title, description, category, image, price, stock } =
-      validProductData.data;
-
-    const updatedProduct = await prisma.product.update({
-      where: {
-        id: productId,
-      },
-      data: {
-        title,
-        description: description!,
-        category: category!,
-        image,
-        price,
-        stock,
-      },
+    const updatedProduct = await productModel.findByIdAndUpdate(productId, {
+      ...validProductData.data,
     });
+    if (!updatedProduct) {
+      return { data: "can't update product info", statusCode: 400 };
+    }
+    await updatedProduct.save();
 
-    return { data: updatedProduct, statusCode: 200 };
+    return { data: updatedProduct, statusCode: 203 };
   } catch (err) {
     return { data: "can't update product info", statusCode: 400 };
+  }
+};
+
+interface GetProductByIdParams {
+  productId: string;
+}
+export const getProductById = async ({ productId }: GetProductByIdParams) => {
+  try {
+    return { data: "product", statusCode: 200 };
+  } catch (err) {
+    return { data: "can't get product by Id", statusCode: 400 };
   }
 };
