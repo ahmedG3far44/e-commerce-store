@@ -14,7 +14,7 @@ const env = process.env.NODE_ENV as string;
 // cors configs
 app.use(
   cors({
-    origin: [process.env.ALLOWED_ORIGINS!],
+    origin: [process.env.ALLOWED_ORIGINS!, "*"],
   })
 );
 
