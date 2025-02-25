@@ -8,17 +8,15 @@ const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const [token, setToken] = useState<string | null>(
     window.localStorage.getItem("token")
   );
-  const [isAuthenticated, setAuthenticated] = useState<string | null>(
-    window.localStorage.getItem("isAuthenticated")
-  );
+  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
 
   const logUser = ({ username, token }: LoginParams) => {
     setUsername(username);
     setToken(token);
-    setAuthenticated("true");
+
     localStorage.setItem("username", username || "");
     localStorage.setItem("token", token || "");
-    localStorage.setItem("isAuthenticated", isAuthenticated || "");
+    setAuthenticated(true);
   };
 
   const logOut = () => {
@@ -27,7 +25,7 @@ const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     localStorage.removeItem("isAuthenticated");
     setUsername("");
     setToken("");
-    setAuthenticated("");
+    setAuthenticated(false);
   };
 
   return (

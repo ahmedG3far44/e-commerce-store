@@ -4,7 +4,7 @@ import { redirect } from "react-router-dom";
 import Button from "./Button";
 
 function Header() {
-  const { username, token, logOut } = useAuth();
+  const { username, logOut } = useAuth();
 
   const handelLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -17,7 +17,6 @@ function Header() {
       console.log("ended");
     }
   };
-  console.log("access user info => ", username, token);
   return (
     <Container>
       <header className="flex justify-between items-center gap-8">

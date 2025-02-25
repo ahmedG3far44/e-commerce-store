@@ -2,7 +2,6 @@ import { useState } from "react";
 import { register } from "../utils/handlers";
 import { Navigate } from "react-router-dom";
 import useAuth from "../context/AuthContext";
-// import { useQuery } from "@tanstack/react-query";
 
 interface UserRegisterInputsType {
   firstName: string;

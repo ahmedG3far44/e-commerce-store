@@ -1,13 +1,8 @@
-import { Navigate } from "react-router-dom";
 import useAuth from "../context/AuthContext";
 import Container from "../components/Container";
 
 function ProfilePage() {
   const { username } = useAuth();
-
-  if (!username) {
-    return <Navigate to="/login" replace />;
-  }
 
   return (
     <Container>

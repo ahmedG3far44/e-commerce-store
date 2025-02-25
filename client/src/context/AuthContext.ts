@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 export interface AuthContextType {
   username: string | null;
   token: string | null;
-  isAuthenticated: string | null;
+  isAuthenticated: boolean;
   logUser: (params: LoginParams) => void;
   logOut: () => void;
 }
@@ -16,7 +16,7 @@ export interface LoginParams {
 export const AuthContext = createContext<AuthContextType>({
   username: "",
   token: "",
-  isAuthenticated: "",
+  isAuthenticated: false,
   logUser: () => {},
   logOut: () => {},
 });
