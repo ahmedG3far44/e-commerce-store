@@ -51,10 +51,10 @@ function LoginPage() {
   return (
     <div className="flex justify-center items-center w-full min-h-[calc(100vh-300px)]">
       <form
-        className="w-[400px] flex flex-col justify-center items-center gap-4 bg-gray-100 p-4 rounded-md shadow-md "
+        className="w-[400px] flex flex-col justify-center items-center gap-4 bg-zinc-100 border border-zinc-300 p-4 rounded-md shadow-md "
         onSubmit={handleLogin}
       >
-        <h1 className="text-2xl font-bold">User Login</h1>
+        <h1 className="text-2xl font-bold">Login To Your Account</h1>
         <input
           onChange={handleChange}
           value={userLogin.email}
@@ -62,7 +62,7 @@ function LoginPage() {
           name="email"
           placeholder="email"
           id="email"
-          className="p-2 border rounded-md bg-gray-100 w-full"
+          className="p-2  rounded-md border border-blue-200  bg-zinc-50 w-full"
           required
           readOnly={pending}
         />
@@ -73,7 +73,7 @@ function LoginPage() {
           type="password"
           name="password"
           id="password"
-          className="p-2 border rounded-md bg-gray-100 w-full"
+          className="p-2  rounded-md border border-blue-200  bg-zinc-50 w-full"
           required
           readOnly={pending}
         />

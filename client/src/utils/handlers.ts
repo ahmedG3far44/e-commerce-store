@@ -72,12 +72,40 @@ export const logout = async () => {
 export const getAllProducts = async () => {
   try {
     const response = await fetch(`${BASE_URL}/product`);
-    if (response.ok) {
+    if (!response.ok) {
       throw new Error("can't get a product please check your connection!!");
     }
     const products = await response.json();
+    // console.log(products);
     return products;
   } catch (err) {
     console.error(err);
+    // alert(err);
+    return err;
+  }
+};
+
+export const getUserCartItem = async ({ token }: { token: string }) => {
+  try {
+    
+    if (!token) return;
+
+    const response = await fetch(`${BASE_URL}/cart`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("can't cart of user please check your connection!!");
+    }
+    const userCart = await response.json();
+    // console.log(products);
+    return userCart;
+  } catch (err) {
+    console.error(err);
+    // alert(err);
+    return err;
   }
 };

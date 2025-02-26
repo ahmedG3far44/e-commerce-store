@@ -53,7 +53,7 @@ function SignUpPage() {
   return (
     <div className="flex justify-center items-center w-full min-h-[calc(100vh-300px)]">
       <form
-        className="w-[400px] flex flex-col justify-center items-center gap-4 bg-gray-200 border p-4 rounded-md shadow-md "
+        className="w-[400px] flex flex-col justify-center items-center gap-4 bg-zinc-100 border border-zinc-300 p-4 rounded-md shadow-md "
         onSubmit={handleRegister}
       >
         <h1 className="text-2xl font-bold">Register a new User</h1>
@@ -62,9 +62,9 @@ function SignUpPage() {
           value={userRegister.firstName}
           type="text"
           name="firstName"
-          placeholder="firstName"
+          placeholder="Your First Name"
           id="firstName"
-          className="p-2 border rounded-md bg-gray-100 w-full"
+          className="p-2 border rounded-md border-blue-200 bg-gray-50 w-full"
           required
           readOnly={pending}
         />
@@ -73,9 +73,9 @@ function SignUpPage() {
           value={userRegister.lastName}
           type="text"
           name="lastName"
-          placeholder="lastName"
+          placeholder="Your Last Name"
           id="lastName"
-          className="p-2 border rounded-md bg-gray-100 w-full"
+          className="p-2 border rounded-md border-blue-200 bg-gray-50 w-full"
           required
           readOnly={pending}
         />
@@ -86,7 +86,7 @@ function SignUpPage() {
           name="email"
           placeholder="email"
           id="email"
-          className="p-2 border rounded-md bg-gray-100 w-full"
+          className="p-2 border rounded-md border-blue-200 bg-gray-50 w-full"
           required
           readOnly={pending}
         />
@@ -97,7 +97,7 @@ function SignUpPage() {
           type="password"
           name="password"
           id="password"
-          className="p-2 border rounded-md bg-gray-100 w-full"
+          className="p-2 border rounded-md border-blue-200 bg-gray-50 w-full"
           required
           readOnly={pending}
         />

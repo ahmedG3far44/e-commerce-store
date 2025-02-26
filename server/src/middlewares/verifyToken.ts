@@ -18,12 +18,12 @@ const verifyToken = async (
       process.env.JWT_SECRET as string
     ) as GenerateTokenParams;
     if (!validUser) {
-      res.status(403).send("Authorized token not valid");
+      res.status(403).json("Authorized token not valid");
     }
     req.user = validUser;
     next();
   } catch (err) {
-    res.status(500).send("network connection error");
+    res.status(500).json("network connection error or your token is not valid");
   }
 };
 

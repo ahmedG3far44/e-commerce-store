@@ -1,19 +1,36 @@
 import { createContext, useContext } from "react";
 
-interface ParamsType {
+export interface AddAndUpdateItemsToCartParamsType {
   productId: string;
   quantity: number;
+  token: string;
 }
-interface ParamsDeleteType {
+export interface DeleteItemCartParamsType {
   productId: string;
+  token: string;
+}
+export interface ClearCartParamsType {
+  token: string;
 }
 interface CartContextType {
   cartItems: string[];
   totalAmount: number;
-  addItemToCart: ({ productId, quantity }: ParamsType) => void;
-  updateItemInCart: ({ productId, quantity }: ParamsType) => void;
-  deleteOneItemFromCart: ({ productId }: ParamsDeleteType) => void;
-  clearAllItemsFromCart: () => void;
+  addItemToCart: ({
+    productId,
+    quantity,
+    token,
+  }: AddAndUpdateItemsToCartParamsType) => void;
+  updateItemInCart: ({
+    productId,
+    quantity,
+    token,
+  }: AddAndUpdateItemsToCartParamsType) => void;
+  deleteOneItemFromCart: ({
+    productId,
+    token,
+  }: DeleteItemCartParamsType) => void;
+  clearAllItemsFromCart: ({ token }: ClearCartParamsType) => void;
+  getUserCart: ({ token }: ClearCartParamsType) => void;
 }
 
 export const CartContext = createContext<CartContextType>({
@@ -23,6 +40,7 @@ export const CartContext = createContext<CartContextType>({
   updateItemInCart: () => {},
   deleteOneItemFromCart: () => {},
   clearAllItemsFromCart: () => {},
+  getUserCart: () => {},
 });
 
 const useCart = () => useContext(CartContext);

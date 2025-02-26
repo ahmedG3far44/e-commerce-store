@@ -17,9 +17,10 @@ router.get("/cart", verifyToken, async (req: ExtendedRequest, res) => {
   try {
     const userId = req.user?.id!;
     const cart = await getActiveCart({ userId });
-    res.status(200).send(cart);
+    res.status(200).json(cart);
   } catch (err: any) {
-    res.status(500).send(err.message);
+    // console.log(err);
+    res.status(500).json(err.message);
   }
 });
 
@@ -32,9 +33,9 @@ router.post("/cart/items", verifyToken, async (req: ExtendedRequest, res) => {
       userId,
       quantity,
     });
-    res.status(result.statusCode).send(result.data);
+    res.status(result.statusCode).json(result.data);
   } catch (err: any) {
-    res.status(500).send(err.message);
+    res.status(500).json(err.message);
   }
 });
 
@@ -47,9 +48,9 @@ router.put("/cart/items", verifyToken, async (req: ExtendedRequest, res) => {
       userId,
       quantity,
     });
-    res.status(result.statusCode).send(result.data);
+    res.status(result.statusCode).json(result.data);
   } catch (err: any) {
-    res.status(500).send(err.message);
+    res.status(500).json(err.message);
   }
 });
 
@@ -64,9 +65,9 @@ router.delete(
         productId,
         userId,
       });
-      res.status(result.statusCode).send(result.data);
+      res.status(result.statusCode).json(result.data);
     } catch (err: any) {
-      res.status(500).send(err.message);
+      res.status(500).json(err.message);
     }
   }
 );
