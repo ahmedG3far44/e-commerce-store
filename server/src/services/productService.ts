@@ -3,6 +3,14 @@ import { productSchema } from "../utils/validationSchema";
 import product from "../models/product";
 import productModel from "../models/product";
 
+export const getAllProducts = async () => {
+  try {
+    const products = await productModel.find();
+    return { data: products, statusCode: 200 };
+  } catch (err: any) {
+    return { data: err.message, statusCode: 400 };
+  }
+};
 interface AddProductParams {
   productData: string;
 }
