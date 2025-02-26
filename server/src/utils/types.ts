@@ -1,15 +1,15 @@
 import { Request } from "express";
-import { ITokenPayload } from "../services/userService";
+import { GenerateTokenParams } from "../services/userService";
 
 export interface ExtendedRequest extends Request {
-  user?: ITokenPayload;
+  user?: GenerateTokenParams | undefined;
 }
 
 export interface IProduct {
   title: string;
   description: string | null;
   category: string | null;
-  image: string;
+  image: string | null;
   price: number;
   stock: number;
 }

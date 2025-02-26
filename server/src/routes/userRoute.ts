@@ -27,7 +27,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/orders", verifyToken, async (req: ExtendedRequest, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id!;
     const result = await getUserOrders({ userId });
     res.status(result.statusCode).send(result.data);
   } catch (err: any) {

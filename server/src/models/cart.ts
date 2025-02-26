@@ -1,15 +1,27 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { IProductItem } from "./../utils/types";
 
-interface ICartItemList {
-  quantity: number;
-  price: number;
-  productId: string;
-}
+// interface ICartProduct {
+//   quantity: number;
+//   product: IProduct;
+//   productId: string;
+// }
+
 const cartItemListSchema = new Schema(
   {
     productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
     quantity: { type: Number, required: true },
-    price: { type: Number, required: true },
+    product: {
+      type: {
+        title: { type: String, required: true },
+        description: { type: String },
+        category: { type: String },
+        image: { type: String },
+        price: { type: Number, required: true },
+        stock: { type: Number, required: true },
+      },
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -17,7 +29,7 @@ const cartItemListSchema = new Schema(
 );
 
 interface ICart extends Document {
-  items: ICartItemList[];
+  items: IProductItem[];
   totalAmount: number;
   status: "ACTIVE" | "COMPLETED";
   userId: string;
@@ -35,10 +47,7 @@ const cartSchema = new Schema(
   }
 );
 
- const itemsModel = mongoose.model<ICartItemList>(
-  "items",
-  cartItemListSchema
-);
+// const itemsModel = mongoose.model<ICartItemList>("items", cartItemListSchema);
 
 const cartModel = mongoose.model<ICart>("cart", cartSchema);
 

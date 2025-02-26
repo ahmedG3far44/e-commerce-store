@@ -4,6 +4,7 @@ import product from "../models/product";
 import userModel from "../models/user";
 import productModel from "../models/product";
 import orderModel from "../models/order";
+import { IProduct, IProductItem } from "../utils/types";
 
 interface CreateCartParams {
   userId: string;
@@ -68,12 +69,25 @@ export const addProductToCart = async ({
     if (isAddedToCart) {
       return { data: "this product is already on cart!!", statusCode: 400 };
     }
+    const { _id, title, description, images, price, stock, category } = product;
 
-    cart.items.push({
-      price: product.price,
-      quantity,
+    let image = "";
+    !!images?.length ? (image = images[0]) : "";
+
+    const newProduct: IProductItem = {
       productId,
-    });
+      product: {
+        title,
+        description,
+        category: category || null,
+        image,
+        price,
+        stock,
+      },
+      quantity,
+    };
+
+    cart.items.push(newProduct);
 
     cart.totalAmount += product.price * quantity;
 
@@ -131,9 +145,9 @@ export const updateItemsInCart = async ({
   }
 };
 
-const calculateItemsInCartTotalPrice = (totalItems: any[]): number => {
+const calculateItemsInCartTotalPrice = (totalItems: IProductItem[]): number => {
   return totalItems.reduce((acc, current) => {
-    return acc + current.price * current.quantity;
+    return acc + current.product.price * current.quantity;
   }, 0);
 };
 
@@ -219,15 +233,30 @@ export const checkout = async ({ userId, address }: CheckoutCartParams) => {
     }
 
     let orderItems = [];
+    let updatedProductStock;
 
     for (const item of cart.items) {
       const product = await productModel.findById(item.productId);
-      orderItems.push({
+      if (!product) {
+        return { data: "error products order not found!!", statusCode: 400 };
+      }
+
+      const productOrder = {
         productTitle: product?.title || "",
         productDescription: product?.description || null,
         productImages: product?.images?.[0] || "",
-        productPrice: item.price,
+        productPrice: product?.price,
         quantity: item.quantity,
+      };
+
+      orderItems.push(productOrder);
+
+      if (product?.stock < item.quantity) {
+        return { data: "there is no enough stock in ", statusCode: 400 };
+      }
+
+      updatedProductStock = await productModel.findByIdAndUpdate(product?.id, {
+        stock: (product?.stock - item?.quantity) as number,
       });
     }
 
@@ -238,14 +267,13 @@ export const checkout = async ({ userId, address }: CheckoutCartParams) => {
       totalOrderPrice: cart.totalAmount,
     });
 
-    const userOrder = await order.save();
-
     const updateCartStatus = await cartModel.findByIdAndUpdate(userId, {
       status: "COMPLETED",
     });
 
+    const userOrder = await order.save();
     await updateCartStatus?.save();
-
+    await updatedProductStock?.save();
     await clearCart({ userId });
 
     return { data: userOrder, statusCode: 201 };
