@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { register } from "../utils/handlers";
 import { Navigate } from "react-router-dom";
-import useAuth from "../context/AuthContext";
+import useAuth from "../context/auth/AuthContext";
 
 interface UserRegisterInputsType {
   firstName: string;

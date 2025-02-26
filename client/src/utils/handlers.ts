@@ -1,3 +1,5 @@
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 interface loginUserParams {
   email: string;
   password: string;
@@ -5,7 +7,7 @@ interface loginUserParams {
 
 export const login = async ({ email, password }: loginUserParams) => {
   try {
-    const response = await fetch(`http://localhost:4000/api/user/login`, {
+    const response = await fetch(`${BASE_URL}/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +45,7 @@ export const register = async ({
   password,
 }: RegisterUserParams) => {
   try {
-    const response = await fetch(`http://localhost:4000/api/user/register`, {
+    const response = await fetch(`${BASE_URL}/user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,4 +67,17 @@ export const register = async ({
 export const logout = async () => {
   window.localStorage.clear();
   return;
+};
+
+export const getAllProducts = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/product`);
+    if (response.ok) {
+      throw new Error("can't get a product please check your connection!!");
+    }
+    const products = await response.json();
+    return products;
+  } catch (err) {
+    console.error(err);
+  }
 };

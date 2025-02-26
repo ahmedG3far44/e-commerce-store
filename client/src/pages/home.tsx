@@ -1,10 +1,12 @@
 import Container from "../components/Container";
+import Header from "../components/Header";
 import ProductCart from "../components/ProductCart";
 import products from "../utils/products";
 
 function HomePage() {
   return (
     <Container>
+      <Header  />
       <div className="w-full flex max-sm:flex-col justify-center items-center flex-wrap gap-4 ">
         {products?.length ? (
           products.map((product, index) => (

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { login } from "../utils/handlers";
 import { Navigate } from "react-router-dom";
-import useAuth from "../context/AuthContext";
+import useAuth from "../context/auth/AuthContext";
 
 // import { useQuery } from "@tanstack/react-query";
 
