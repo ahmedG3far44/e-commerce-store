@@ -1,7 +1,6 @@
 import Container from "../components/Container";
 import Header from "../components/Header";
 import ProductCart from "../components/ProductCart";
-// import products from "../utils/products";
 import { useEffect, useState } from "react";
 import { getAllProducts } from "../utils/handlers";
 

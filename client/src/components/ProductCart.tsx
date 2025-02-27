@@ -3,6 +3,7 @@ import { TbShoppingCartPlus } from "react-icons/tb";
 import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export interface ProductCartProps {
   productId: string;
@@ -53,11 +54,16 @@ function ProductCart({
           </div>
 
           <button
-            onClick={() => {
+            onClick={async () => {
               if (!token) {
                 navigate("/login");
               } else {
-                addItemToCart({ productId, token, quantity: 1 });
+                addItemToCart({
+                  productId,
+                  token,
+                  quantity: 1,
+                });
+                toast.success("A new product was added to cart!!");
               }
             }}
             className=" flex justify-center items-center w-[100px] px-2 py-1 rounded-md bg-blue-500 cursor-pointer text-white hover:bg-blue-700 duration-150"

@@ -10,7 +10,7 @@ function ShoppingCart({ itemsCartNumber }: { itemsCartNumber: number }) {
     <div
       onClick={handelNavigateToCart}
       role="button"
-      className="relative hover:bg-gray-100 p-1 rounded-md duration-150 cursor-pointer"
+      className="relative hover:bg-gray-100 p-1 rounded-md duration-150 cursor-pointer mr-20"
     >
       {itemsCartNumber > 0 && (
         <span className="absolute -right-2 -top-1 w-5 h-5 p-2 text-sm flex justify-center items-center rounded-full bg-blue-500 text-white">

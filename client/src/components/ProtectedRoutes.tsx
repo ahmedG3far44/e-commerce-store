@@ -4,9 +4,9 @@ import Header from "./Header";
 import Container from "./Container";
 
 function ProtectedRoutes() {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-  if (!token) return <Navigate to={"/login"} replace></Navigate>;
+  if (!isAuthenticated) return <Navigate to={"/login"} replace></Navigate>;
 
   return (
     <Container>

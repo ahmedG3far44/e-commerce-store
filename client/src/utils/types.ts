@@ -1,21 +1,90 @@
 export interface IProduct {
-    title: string;
-    description: string | null;
-    category: string | null;
-    image: string | null;
-    price: number;
-    stock: number;
-  }
-  
-  export interface IProductItem {
-    productId: string;
-    product: IProduct;
-    quantity: number;
-  }
-  export interface ICart {
-    items: IProductItem[];
-    status: string;
-    totalAmount: number;
-    userId: string;
-  }
-  
+  title: string;
+  description: string | null;
+  category: string | null;
+  image: string | null;
+  price: number;
+  stock: number;
+}
+
+export interface IProductItem {
+  productId: string;
+  product: IProduct;
+  quantity: number;
+}
+export interface ICart {
+  items: IProductItem[];
+  status: string;
+  totalAmount: number;
+  userId: string;
+}
+
+export interface User {
+  firstName: string;
+  lastName: string;
+  email: string;
+  isAdmin: boolean;
+  addresses?: string[];
+}
+
+export interface AddAndUpdateItemsToCartParamsType {
+  productId: string;
+  quantity: number;
+  token: string;
+}
+export interface DeleteItemCartParamsType {
+  productId: string;
+  token: string;
+}
+export interface ClearCartParamsType {
+  token: string;
+}
+export interface CartContextType {
+  cartItems: IProductItem[];
+  totalAmount: number;
+  addItemToCart: ({
+    productId,
+    quantity,
+    token,
+  }: AddAndUpdateItemsToCartParamsType) => void;
+  updateItemInCart: ({
+    productId,
+    quantity,
+    token,
+  }: AddAndUpdateItemsToCartParamsType) => void;
+  deleteOneItemFromCart: ({
+    productId,
+    token,
+  }: DeleteItemCartParamsType) => void;
+  clearAllItemsFromCart: ({ token }: ClearCartParamsType) => void;
+  getUserCart: ({ token }: ClearCartParamsType) => void;
+  createOrder: ({ token, address }: { token: string; address: string }) => void;
+}
+
+export interface RegisterUserParams {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export interface loginUserParams {
+  email: string;
+  password: string;
+}
+
+export interface OnlyTokenParams {
+  token: string;
+}
+
+export interface TokenWithAddressParams {
+  token: string;
+  address: string;
+}
+
+export interface OrderList {
+  _id: string;
+  address: string;
+  orderItems: string[];
+  totalOrderPrice: number;
+}

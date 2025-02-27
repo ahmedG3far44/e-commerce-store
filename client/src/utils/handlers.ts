@@ -1,9 +1,12 @@
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  loginUserParams,
+  OnlyTokenParams,
+  RegisterUserParams,
+  TokenWithAddressParams,
+} from "./types";
 
-interface loginUserParams {
-  email: string;
-  password: string;
-}
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const login = async ({ email, password }: loginUserParams) => {
   try {
@@ -24,19 +27,14 @@ export const login = async ({ email, password }: loginUserParams) => {
     }
     const { user, token } = data;
 
-    return { username: user.email, token };
+    console.log(user);
+
+    return { user, token };
   } catch (err) {
     console.error(err);
     throw err;
   }
 };
-
-interface RegisterUserParams {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
 
 export const register = async ({
   firstName,
@@ -58,7 +56,7 @@ export const register = async ({
     const data = await response.json();
     const { user, token } = data;
 
-    return { username: user.email, token };
+    return { user, token };
   } catch (err) {
     console.error(err);
     throw err;
@@ -76,18 +74,17 @@ export const getAllProducts = async () => {
       throw new Error("can't get a product please check your connection!!");
     }
     const products = await response.json();
-    // console.log(products);
+
     return products;
   } catch (err) {
     console.error(err);
-    // alert(err);
+
     return err;
   }
 };
 
-export const getUserCartItem = async ({ token }: { token: string }) => {
+export const getUserCartItem = async ({ token }: OnlyTokenParams) => {
   try {
-    
     if (!token) return;
 
     const response = await fetch(`${BASE_URL}/cart`, {
@@ -100,12 +97,62 @@ export const getUserCartItem = async ({ token }: { token: string }) => {
     if (!response.ok) {
       throw new Error("can't cart of user please check your connection!!");
     }
+
     const userCart = await response.json();
-    // console.log(products);
+
     return userCart;
   } catch (err) {
     console.error(err);
-    // alert(err);
+
     return err;
+  }
+};
+
+export const getAllUserOrders = async ({ token }: OnlyTokenParams) => {
+  try {
+    const response = await fetch(`${BASE_URL}/user/orders`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("can't get user orders,  please check your connection!!");
+    }
+    const { orders } = await response.json();
+    console.log(orders);
+    return orders;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+};
+
+export const createOrder = async ({
+  token,
+  address,
+}: TokenWithAddressParams) => {
+  try {
+    if (!token) return;
+
+    const response = await fetch(`${BASE_URL}/cart/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ address }),
+    });
+
+    if (!response.ok) {
+      throw new Error("can't create order, please check your connection!!");
+    }
+
+    const order = await response.json();
+
+    return order;
+  } catch (err: any) {
+    console.error(err?.message);
+    return err?.message;
   }
 };

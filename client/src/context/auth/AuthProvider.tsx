@@ -1,36 +1,40 @@
 import { FC, PropsWithChildren, useState } from "react";
-import { AuthContext, LoginParams } from "./AuthContext";
+import { AuthContext } from "./AuthContext";
+import { User } from "../../utils/types";
+
 
 const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [username, setUsername] = useState<string | null>(
-    window.localStorage.getItem("username")
+  const [user, setUser] = useState<User | null>(
+    JSON.parse(window.localStorage.getItem("user")!)
   );
   const [token, setToken] = useState<string | null>(
     window.localStorage.getItem("token")
   );
-  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setAuthenticated] = useState<boolean>(
+    JSON.parse(window.localStorage.getItem("isAuthenticated")!)
+  );
 
-  const logUser = ({ username, token }: LoginParams) => {
-    setUsername(username);
+  const logUser = ({ user, token }: { user: User; token: string }) => {
     setToken(token);
-
-    localStorage.setItem("username", username || "");
-    localStorage.setItem("token", token || "");
+    setUser({ ...user });
     setAuthenticated(true);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", token || "");
+    localStorage.setItem("isAuthenticated", "true");
   };
 
   const logOut = () => {
-    localStorage.removeItem("username");
+    localStorage.removeItem("user");
     localStorage.removeItem("token");
     localStorage.removeItem("isAuthenticated");
-    setUsername("");
+    setUser(null);
     setToken("");
     setAuthenticated(false);
   };
 
   return (
     <AuthContext.Provider
-      value={{ username, token, isAuthenticated, logUser, logOut }}
+      value={{ token, isAuthenticated, user, logUser, logOut }}
     >
       {children}
     </AuthContext.Provider>

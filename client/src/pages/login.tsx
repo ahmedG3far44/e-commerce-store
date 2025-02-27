@@ -1,26 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { login } from "../utils/handlers";
 import { Navigate } from "react-router-dom";
 import useAuth from "../context/auth/AuthContext";
-
-// import { useQuery } from "@tanstack/react-query";
-
-interface UserInputsType {
-  email: string;
-  password: string;
-}
+import { loginUserParams } from "../utils/types";
 
 function LoginPage() {
-  const { username, logUser } = useAuth();
+  const { isAuthenticated, logUser } = useAuth();
 
-  const [userLogin, setUserLogin] = useState<UserInputsType>({
+  const [userLogin, setUserLogin] = useState<loginUserParams>({
     email: "",
     password: "",
   });
   const [pending, setPending] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  if (username) {
+  if (isAuthenticated) {
     return <Navigate to="/profile" replace />;
   }
 
@@ -37,8 +32,11 @@ function LoginPage() {
     setPending(true);
     try {
       const data = await login(userLogin);
-      const { username, token } = data;
-      logUser({ username, token });
+      console.log(data);
+      const { user, token } = data;
+
+      logUser({ user, token });
+
       return <Navigate to="/profile" replace />;
     } catch (err: any) {
       setError(err?.message);
@@ -49,7 +47,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center w-full min-h-[calc(100vh-300px)]">
+    <div className="bg-blue-500/30 flex justify-center items-center w-screen min-h-screen">
       <form
         className="w-[400px] flex flex-col justify-center items-center gap-4 bg-zinc-100 border border-zinc-300 p-4 rounded-md shadow-md "
         onSubmit={handleLogin}

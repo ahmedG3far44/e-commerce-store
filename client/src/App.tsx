@@ -13,6 +13,9 @@ import CartProvider from "./context/cart/CartProvider";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminRoutes from "./components/AdminRoutes";
 import Dashboard from "./pages/dashboard";
+import OrdersHistory from "./pages/orders";
+import SuccessOrder from "./pages/success-order";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +24,7 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <QueryClientProvider client={queryClient}>
+          <Toaster position="top-center" reverseOrder={false} />
           <BrowserRouter>
             <Routes>
               <Route index path="/" element={<HomePage />} />
@@ -32,6 +36,8 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/orders-history" element={<OrdersHistory />} />
+                <Route path="/success" element={<SuccessOrder />} />
               </Route>
 
               <Route element={<AdminRoutes />}>

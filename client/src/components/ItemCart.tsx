@@ -3,6 +3,7 @@ import noValidImage from "../../public/no-image.jpg";
 import useAuth from "../context/auth/AuthContext";
 import useCart from "../context/cart/CartContext";
 import handelDates from "../utils/handelDates";
+import toast from "react-hot-toast";
 
 interface ItemCart {
   productId: string;
@@ -76,6 +77,7 @@ function ItemCart({
               onClick={() => {
                 setNewQuantity((quantity += 1));
                 handelUpdateQuantity(newQuantity);
+                toast.success("updated the quantity!!");
               }}
             >
               +
@@ -93,6 +95,7 @@ function ItemCart({
                 onClick={() => {
                   setNewQuantity((quantity -= 1));
                   handelUpdateQuantity(newQuantity);
+                  toast.success("updated the quantity!!");
                 }}
               >
                 -
@@ -107,7 +110,10 @@ function ItemCart({
       </div>
       {checkoutState && (
         <button
-          onClick={() => deleteOneItemFromCart({ token, productId })}
+          onClick={() => {
+            deleteOneItemFromCart({ token, productId });
+            toast.success("item removed from cart!!");
+          }}
           className="px-4 py-2 rounded-md bg-rose-500 text-white hover:bg-rose-800"
         >
           Remove Item

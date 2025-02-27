@@ -1,8 +1,10 @@
-import { useEffect } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
 import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
 import ItemCart from "../components/ItemCart";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 function CartPage() {
   const { token } = useAuth();
@@ -12,6 +14,7 @@ function CartPage() {
 
   useEffect(() => {
     if (!token) return;
+
     getUserCart({ token });
   }, [token]);
 
@@ -26,7 +29,6 @@ function CartPage() {
       </div>
       {cartItems.length > 0 ? (
         cartItems.map(({ product, productId, quantity, updatedAt }) => {
-          // if (!product || !productId || !quantity) return;
           const { title, description, category, image, price, stock } = product;
           return (
             <ItemCart
@@ -35,8 +37,8 @@ function CartPage() {
               title={title}
               category={category}
               stock={stock}
-              description={description}
-              image={image}
+              description={description || ""}
+              image={image || ""}
               price={price}
               quantity={quantity}
               updatedAt={updatedAt}
@@ -54,7 +56,11 @@ function CartPage() {
           <div>
             <button
               className="w-[150px] px-4 py-2 rounded-md cursor-pointer border-blue-500  border bg-blue-200 text-blue-700 hover:bg-blue-500 hover:text-white duration-150"
-              onClick={() => token && clearAllItemsFromCart({ token })}
+              onClick={() => {
+                if (!token) return;
+                clearAllItemsFromCart({ token });
+                toast.success("all items are cleared from cart!!");
+              }}
             >
               clear all items
             </button>

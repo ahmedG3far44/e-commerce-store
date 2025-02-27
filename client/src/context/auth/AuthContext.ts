@@ -1,20 +1,26 @@
 import { createContext, useContext } from "react";
+import { User } from "../../utils/types";
 
 export interface AuthContextType {
-  username: string | null;
+  user: User | null;
   token: string | null;
   isAuthenticated: boolean;
-  logUser: (params: LoginParams) => void;
+  logUser: ({ user, token }: { user: User; token: string }) => void;
   logOut: () => void;
 }
 
 export interface LoginParams {
-  username: string | null;
+  user: User | null;
   token: string | null;
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  username: "",
+  user: {
+    firstName: "",
+    lastName: "",
+    email: "",
+    isAdmin: false,
+  },
   token: "",
   isAuthenticated: false,
   logUser: () => {},

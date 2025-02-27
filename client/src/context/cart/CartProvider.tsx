@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import {
   AddAndUpdateItemsToCartParamsType,
-  CartContext,
   ClearCartParamsType,
   DeleteItemCartParamsType,
-} from "./CartContext";
+} from "../../utils/types";
 import { FC, PropsWithChildren } from "react";
 import { IProductItem } from "../../utils/types";
+import { CartContext } from "./CartContext";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -181,6 +182,42 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       return err;
     }
   };
+
+  const createOrder = async ({
+    token,
+    address,
+  }: {
+    token: string;
+    address: string;
+  }) => {
+    try {
+      if (!token) {
+        throw new Error("Unauthorized action, your token is not valid!!");
+      }
+
+      const response = await fetch(`${BASE_URL}/cart/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ address }),
+      });
+      if (!response.ok) {
+        throw new Error("can't create order, please check your connection!!");
+      }
+      const order = await response.json();
+      console.log(order);
+
+      setCartItems([]);
+      setTotalAmount(0);
+      return order;
+    } catch (err: any) {
+      console.error(err?.message);
+      return err?.message;
+    }
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -191,6 +228,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         updateItemInCart,
         deleteOneItemFromCart,
         clearAllItemsFromCart,
+        createOrder,
       }}
     >
       {children}
