@@ -4,7 +4,6 @@ import useAuth from "../context/auth/AuthContext";
 import ItemCart from "../components/ItemCart";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 
 function CartPage() {
   const { token } = useAuth();
@@ -59,7 +58,6 @@ function CartPage() {
               onClick={() => {
                 if (!token) return;
                 clearAllItemsFromCart({ token });
-                toast.success("all items are cleared from cart!!");
               }}
             >
               clear all items

@@ -16,6 +16,7 @@ import Dashboard from "./pages/dashboard";
 import OrdersHistory from "./pages/orders";
 import SuccessOrder from "./pages/success-order";
 import { Toaster } from "react-hot-toast";
+import ProductDetails from "./pages/product-details";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route index path="/" element={<HomePage />} />
+              <Route path="/:id" element={<ProductDetails />} />
 
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />

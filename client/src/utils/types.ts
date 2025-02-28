@@ -85,6 +85,21 @@ export interface TokenWithAddressParams {
 export interface OrderList {
   _id: string;
   address: string;
-  orderItems: string[];
+  orderItems: OrderItemProps[];
   totalOrderPrice: number;
+}
+
+export interface OrderHistoryProps {
+  totalAmount: number;
+  address: string;
+  items: OrderItemProps[];
+}
+
+export interface OrderItemProps {
+  _id: string;
+  productTitle: string;
+  productDescription: string;
+  productImages?: string;
+  quantity: number;
+  productPrice: number;
 }

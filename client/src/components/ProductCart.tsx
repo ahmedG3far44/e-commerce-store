@@ -3,7 +3,6 @@ import { TbShoppingCartPlus } from "react-icons/tb";
 import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
 export interface ProductCartProps {
   productId: string;
@@ -37,7 +36,9 @@ function ProductCart({
       </div>
 
       <div className="flex-1 mt-auto w-full min-h-1/2 flex flex-col justify-start items-start gap-2">
-        <h1 className="text-xl font-bold text-zinc-800">{title}</h1>
+        <h1 className="text-xl font-bold text-zinc-800 hover:underline">
+          <a href={`/${productId}`}>{title}</a>
+        </h1>
         <span className="w-fit py-1 px-4 rounded-2xl text-sm  bg-blue-50 border-blue-600 text-blue-600">
           {category}
         </span>
@@ -63,7 +64,6 @@ function ProductCart({
                   token,
                   quantity: 1,
                 });
-                toast.success("A new product was added to cart!!");
               }
             }}
             className=" flex justify-center items-center w-[100px] px-2 py-1 rounded-md bg-blue-500 cursor-pointer text-white hover:bg-blue-700 duration-150"

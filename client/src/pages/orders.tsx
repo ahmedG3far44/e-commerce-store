@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllUserOrders } from "../utils/handlers";
 import useAuth from "../context/auth/AuthContext";
 import { OrderList } from "../utils/types";
-
+import ShowOrdersHistory from "../components/ShowOrdersHistory";
 
 function OrdersHistory() {
   const { token } = useAuth();
@@ -22,20 +22,25 @@ function OrdersHistory() {
       });
   }, [token]);
   return (
-    <div>
-      <h1>get user order history</h1>
+    <div className="w-full">
+      <h1 className="text-2xl text-gray-700 font-semibold">
+        Orders History List{" "}
+        <span className="text-blue-500 mx-4">{ordersList.length} Orders</span>
+      </h1>
       {error && (
         <p className="p-2 rounded-md border bg-rose-100 border-rose-600 text-rose-500">
           {error}
         </p>
       )}
-      <div>
+      <div className="w-full min-w-full flex flex-col-reverse justify-start items-start gap-4 bg-zinc-50 border border-zinc-200 p-4 rounded-md my-4">
         {ordersList.map((order) => {
           return (
-            <div key={order?._id}>
-              to <span>{order?.address}</span>
-              <span>{order?.totalOrderPrice}</span>
-            </div>
+            <ShowOrdersHistory
+              key={order._id}
+              address={order.address}
+              totalAmount={order.totalOrderPrice}
+              items={order.orderItems}
+            />
           );
         })}
       </div>

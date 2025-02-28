@@ -86,7 +86,7 @@ interface getUserOrdersParams {
 }
 export const getUserOrders = async ({ userId }: getUserOrdersParams) => {
   try {
-    const orders = await orderModel.find({ userId });
+    const orders = await orderModel.find({ userId }).sort();
     return { data: { orders }, statusCode: 200 };
   } catch (err) {
     return { data: err, statusCode: 400 };

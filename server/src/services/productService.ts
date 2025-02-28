@@ -74,7 +74,12 @@ interface GetProductByIdParams {
 }
 export const getProductById = async ({ productId }: GetProductByIdParams) => {
   try {
-    return { data: "product", statusCode: 200 };
+    const productDetails = await productModel.findById({ _id: productId });
+
+    if (!productDetails) {
+      return { data: "The product doesn't found!!", statusCode: 400 };
+    }
+    return { data: productDetails, statusCode: 200 };
   } catch (err) {
     return { data: "can't get product by Id", statusCode: 400 };
   }

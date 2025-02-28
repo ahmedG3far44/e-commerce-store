@@ -8,6 +8,7 @@ import {
 import { FC, PropsWithChildren } from "react";
 import { IProductItem } from "../../utils/types";
 import { CartContext } from "./CartContext";
+import toast from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -36,8 +37,6 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const cart = await response.json();
 
-      console.log(cart);
-
       if (!cart) {
         throw new Error(
           "can't get user items cart. please check your connections!!"
@@ -45,8 +44,6 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       }
 
       const cartItems = cart.items;
-
-      console.log(cartItems);
 
       setCartItems([...cart.items]);
       setTotalAmount(cart.totalAmount);
@@ -74,19 +71,19 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         body: JSON.stringify({ productId, quantity }),
       });
       if (!response.ok) {
-        throw new Error(
-          "adding product to cart failed. please check your connection!!"
-        );
+        console.log(response);
+        throw new Error("This product is already added before!!");
       }
       const cart = await response.json();
 
-      // set new items array
-      // set new total amount price
       setCartItems([...cart.items]);
       setTotalAmount(cart.totalAmount);
+
+      toast.success("A new product was added!!");
       return cart;
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error(err?.message);
+      toast.error(err?.message);
       return err;
     }
   };
@@ -96,30 +93,38 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     quantity,
     token,
   }: AddAndUpdateItemsToCartParamsType) => {
-    if (!token) {
-      throw new Error("Unauthorized action, your token is not valid!!");
+    try {
+      if (!token) {
+        throw new Error("Unauthorized action, your token is not valid!!");
+      }
+
+      const response = await fetch(`${BASE_URL}/cart/items`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId, quantity }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          "updating product in cart failed. please check your connection!!"
+        );
+      }
+      const cart = await response.json();
+
+      setCartItems([...cart.items]);
+      setTotalAmount(cart.totalAmount);
+
+      toast.success(`quantity of product ${productId} updated success!!`);
+
+      return cart;
+    } catch (err: any) {
+      console.error(err?.message);
+      toast.error(err?.message);
+      return err;
     }
-
-    const response = await fetch(`${BASE_URL}/cart/items`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ productId, quantity }),
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        "updating product in cart failed. please check your connection!!"
-      );
-    }
-    const cart = await response.json();
-
-    setCartItems([...cart.items]);
-    setTotalAmount(cart.totalAmount);
-
-    return cart;
   };
   const deleteOneItemFromCart = async ({
     productId,
@@ -146,10 +151,11 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       setCartItems([...cart.items]);
       setTotalAmount(cart.totalAmount);
-
+      toast.success(`product ${productId} was deleted!!`);
       return cart;
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error(err?.message);
+      toast.error(err?.message);
       return err;
     }
   };
@@ -172,13 +178,15 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       }
 
       const cart = await response.json();
-      console.log(cart);
 
       setCartItems([]);
       setTotalAmount(0);
+
+      toast.success(`cart was cleared!!`);
       return cart;
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      toast.error(err?.message);
       return err;
     }
   };
@@ -207,13 +215,15 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         throw new Error("can't create order, please check your connection!!");
       }
       const order = await response.json();
-      console.log(order);
 
       setCartItems([]);
       setTotalAmount(0);
+
+      toast.success(`congrats your order is confirmed success!!`);
       return order;
     } catch (err: any) {
       console.error(err?.message);
+      toast.error(err?.message);
       return err?.message;
     }
   };
