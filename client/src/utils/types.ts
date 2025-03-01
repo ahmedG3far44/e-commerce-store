@@ -86,13 +86,21 @@ export interface OrderList {
   _id: string;
   address: string;
   orderItems: OrderItemProps[];
+  status: OrderStatus;
   totalOrderPrice: number;
 }
 
 export interface OrderHistoryProps {
   totalAmount: number;
   address: string;
+  status: OrderStatus;
   items: OrderItemProps[];
+}
+
+export enum OrderStatus {
+  PENDING,
+  SHIPPED,
+  DELIVERED,
 }
 
 export interface OrderItemProps {

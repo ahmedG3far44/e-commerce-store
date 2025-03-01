@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { FaShoppingBasket } from "react-icons/fa";
 
 function Logo() {
   const navigate = useNavigate();
@@ -11,7 +10,7 @@ function Logo() {
     >
       <h1 className="text-3xl font-bold flex justify-center items-center gap-4">
         <span className="text-blue-500">
-          <FaShoppingBasket size={40} />
+          <img src={"../../public/icon.png"} width={40} height={40} />
         </span>{" "}
         <span className="text-blue-500">Online Store</span>
       </h1>

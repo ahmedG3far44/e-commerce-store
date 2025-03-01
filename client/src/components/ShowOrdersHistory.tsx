@@ -7,9 +7,14 @@ import { LiaShippingFastSolid } from "react-icons/lia";
 import { MdOutlineWatchLater } from "react-icons/md";
 import { IoMdDoneAll } from "react-icons/io";
 
-function ShowOrdersHistory({ totalAmount, address, items }: OrderHistoryProps) {
+function ShowOrdersHistory({
+  totalAmount,
+  address,
+  items,
+  status,
+}: OrderHistoryProps) {
   const [isOpen, setOpen] = useState(false);
-  const [status] = useState("COMPLETED");
+  // const [status] = useState("COMPLETED");
 
   return (
     <div className="w-full">
@@ -27,25 +32,25 @@ function ShowOrdersHistory({ totalAmount, address, items }: OrderHistoryProps) {
         <div className="ml-auto self-end mr-10">
           <span
             className={` font-semibold 
-            ${status === "PENDING" && "text-gray-500"}
-            ${status === "SHIPPED" && "text-orange-600"}
-            ${status === "COMPLETED" && "text-green-500"}
+            ${status.toString() === "PENDING" && "text-gray-500"}
+            ${status.toString() === "SHIPPED" && "text-orange-600"}
+            ${status.toString() === "COMPLETED" && "text-green-500"}
             
             `}
           >
-            {status === "PENDING" && (
-              <span className="flex justify-center items-center gap-1">
-                {status} <MdOutlineWatchLater size={20} />{" "}
+            {status.toString() === "PENDING" && (
+              <span className="flex justify-center items-center gap-2">
+                {status} <MdOutlineWatchLater size={16} />{" "}
               </span>
             )}
-            {status === "SHIPPED" && (
-              <span className="flex justify-center items-center gap-1">
-                {status} <LiaShippingFastSolid size={20} />{" "}
+            {status.toString() === "SHIPPED" && (
+              <span className="flex justify-center items-center gap-2">
+                {status} <LiaShippingFastSolid size={16} />{" "}
               </span>
             )}
-            {status === "COMPLETED" && (
-              <span className="flex justify-center items-center gap-1">
-                {status} <IoMdDoneAll size={20} />{" "}
+            {status.toString() === "COMPLETED" && (
+              <span className="flex justify-center items-center gap-2">
+                {status} <IoMdDoneAll size={16} />{" "}
               </span>
             )}
           </span>
@@ -55,12 +60,12 @@ function ShowOrdersHistory({ totalAmount, address, items }: OrderHistoryProps) {
           <span>
             Total Price:{" "}
             <span className="text-blue-500 text-xl font-semibold">
-              {totalAmount}{" "}
+              {totalAmount.toFixed(2)}{" "}
               <span className="text-[10px] text-zinc-500">EGP</span>
             </span>
           </span>
           <span className={isOpen ? " " : "rotate-180"}>
-            <MdKeyboardArrowUp size={20} />
+            <MdKeyboardArrowUp size={18} />
           </span>
         </div>
       </div>

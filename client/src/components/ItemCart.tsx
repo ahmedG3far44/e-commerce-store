@@ -50,7 +50,7 @@ function ItemCart({
           <img
             className="w-full h-full object-cover"
             src={image ? image : noValidImage}
-            alt={title + description}
+            alt={title + " " + description}
           />
         </div>
 
@@ -59,9 +59,7 @@ function ItemCart({
           {checkoutState && (
             <p className="text-sm line-clamp-3 text-gray-600">{description}</p>
           )}
-          <span className="text-sm text-zinc-500 ">
-            Last update: {handelDates(date)}
-          </span>
+          <span className="text-sm text-zinc-500 ">{handelDates(date)}</span>
         </div>
 
         <span className="text-md font-semibold text-blue-500">{category}</span>

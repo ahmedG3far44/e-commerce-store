@@ -17,6 +17,9 @@ import OrdersHistory from "./pages/orders";
 import SuccessOrder from "./pages/success-order";
 import { Toaster } from "react-hot-toast";
 import ProductDetails from "./pages/product-details";
+import AdminOrders from "./components/admin/AdminOrders";
+import AdminProducts from "./components/admin/AdminProducts";
+import AdminUsers from "./components/admin/AdminUsers";
 
 const queryClient = new QueryClient();
 
@@ -44,12 +47,9 @@ function App() {
 
               <Route element={<AdminRoutes />}>
                 <Route path="/dashboard" element={<Dashboard />}>
-                  <Route
-                    path="products"
-                    element={<h1>Dashboard/Products </h1>}
-                  />
-                  <Route path="orders" element={<h1>Dashboard/Orders</h1>} />
-                  <Route path="users" element={<h1>Dashboard/Users</h1>} />
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="users" element={<AdminUsers />} />
                 </Route>
               </Route>
 

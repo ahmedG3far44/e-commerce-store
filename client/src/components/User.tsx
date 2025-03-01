@@ -33,12 +33,30 @@ function User() {
       </div>
       {isOpen && (
         <ul className=" min-w-40 p-2  flex flex-col justify-start items-start  rounded-md bg-zinc-100 border-zinc-400 shadow-md transition-all">
-          <li className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150">
-            <a href="/profile">Profile</a>
-          </li>
-          <li className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150">
-            <a href="/orders-history"> Order History</a>
-          </li>
+          {user?.isAdmin ? (
+            <a
+              className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150"
+              href="/dashboard"
+            >
+              <li>Dashboard</li>
+            </a>
+          ) : (
+            <>
+              {" "}
+              <a
+                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150"
+                href="/profile"
+              >
+                <li>Profile</li>
+              </a>
+              <a
+                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150"
+                href="/orders-history"
+              >
+                <li>Order History</li>
+              </a>
+            </>
+          )}
           <li className="p-2 text-sm text-gray-600 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150">
             {user?.email}
           </li>

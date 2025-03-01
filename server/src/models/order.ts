@@ -21,11 +21,15 @@ interface IOrder extends Document {
   totalOrderPrice: number;
   userId: ObjectId | string;
 }
+
+ const OrderStatusEnum = ["PENDING", "SHIPPED", "DELIVERED"];
+
 const orderSchema = new Schema(
   {
     orderItems: { type: [orderItemsSchema] },
     address: { type: String, required: true },
     totalOrderPrice: { type: Number, required: true },
+    status: { type: String, enum: OrderStatusEnum, default: "PENDING" },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   {

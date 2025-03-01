@@ -39,6 +39,7 @@ function OrdersHistory() {
               key={order._id}
               address={order.address}
               totalAmount={order.totalOrderPrice}
+              status={order.status}
               items={order.orderItems}
             />
           );

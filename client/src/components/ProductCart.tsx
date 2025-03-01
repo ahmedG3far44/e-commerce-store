@@ -23,7 +23,7 @@ function ProductCart({
   stock,
 }: ProductCartProps) {
   const { addItemToCart } = useCart();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
   return (
     <div className="w-full h-[400px] md:w-1/2 lg:w-[350px] p-4 rounded-md border border-gray-200 flex flex-col justify-start items-start gap-2">
@@ -51,27 +51,32 @@ function ProductCart({
           </div>
 
           <div className="text-sm font-semibold">
-            <span className="text-red-400">In Stock {stock}</span>
+            <span className="text-red-400">
+              {stock <= 0 ? "out of stock" : stock + " " + "in stock"}
+            </span>
           </div>
 
-          <button
-            onClick={async () => {
-              if (!token) {
-                navigate("/login");
-              } else {
-                addItemToCart({
-                  productId,
-                  token,
-                  quantity: 1,
-                });
-              }
-            }}
-            className=" flex justify-center items-center w-[100px] px-2 py-1 rounded-md bg-blue-500 cursor-pointer text-white hover:bg-blue-700 duration-150"
-          >
-            <span>
-              <TbShoppingCartPlus size={20} color="text-blue-500" />
-            </span>
-          </button>
+          {!user?.isAdmin && (
+            <button
+              disabled={stock === 0 ? true : false}
+              onClick={async () => {
+                if (!token) {
+                  navigate("/login");
+                } else {
+                  addItemToCart({
+                    productId,
+                    token,
+                    quantity: 1,
+                  });
+                }
+              }}
+              className=" flex justify-center items-center w-[100px] disabled:bg-gray-400 disabled:cursor-not-allowed px-2 py-1 rounded-md bg-blue-500 cursor-pointer text-white hover:bg-blue-700 duration-150"
+            >
+              <span>
+                <TbShoppingCartPlus size={20} color="text-blue-500" />
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </div>

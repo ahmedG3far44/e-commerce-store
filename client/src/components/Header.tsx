@@ -6,7 +6,7 @@ import Logo from "./Logo";
 import User from "./User";
 
 function Header() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { cartItems } = useCart();
 
   return (
@@ -17,7 +17,7 @@ function Header() {
         <div>
           {isAuthenticated ? (
             <div className="w-full flex justify-around items-center gap-8">
-              <ShoppingCart itemsCartNumber={cartItems.length} />
+              {!user?.isAdmin &&<ShoppingCart itemsCartNumber={cartItems.length} />}
 
               <User />
             </div>
