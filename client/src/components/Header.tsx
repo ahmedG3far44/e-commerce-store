@@ -1,26 +1,21 @@
 import useAuth from "../context/auth/AuthContext";
 import Button from "./Button";
-import ShoppingCart from "./ShoppingCart";
-import useCart from "../context/cart/CartContext";
+
 import Logo from "./Logo";
 import User from "./User";
 
 function Header() {
-  const { isAuthenticated, user } = useAuth();
-  const { cartItems } = useCart();
+  const { isAuthenticated } = useAuth();
+  // const { cartItems } = useCart();
 
   return (
     <header className="bg-white m-auto w-full md:w-full flex justify-between items-center sticky left-0 top-0  border-b border-b-zinc-100 ">
-      <div className="w-3/4 m-auto flex justify-between items-center gap-8 ">
+      <div className="w-3/4 max-sm:w-full m-auto flex justify-between items-center gap-8 ">
         <Logo />
 
-        <div>
+        <div className="w-full">
           {isAuthenticated ? (
-            <div className="w-full flex justify-around items-center gap-8">
-              {!user?.isAdmin &&<ShoppingCart itemsCartNumber={cartItems.length} />}
-
-              <User />
-            </div>
+            <User />
           ) : (
             <div className="flex justify-center items-center gap-4">
               <Button variant="primary" to="/login">

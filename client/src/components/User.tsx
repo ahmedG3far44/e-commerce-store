@@ -3,9 +3,14 @@ import guestImg from "../../public/guestImg.jpg";
 import useAuth from "../context/auth/AuthContext";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import useCart from "../context/cart/CartContext";
+import ShoppingCart from "./ShoppingCart";
+import { CgProfile } from "react-icons/cg";
+import { LuHistory } from "react-icons/lu";
 
 function User() {
   const { user, logOut } = useAuth();
+  const { cartItems } = useCart();
   const [isOpen, setOpen] = useState(false);
   const navigate = useNavigate();
   const handelLogout = () => {
@@ -17,16 +22,20 @@ function User() {
       <div
         onClick={() => setOpen(!isOpen)}
         role="button"
-        className=" p-2 rounded-md shadow-none hover:bg-zinc-50 cursor-pointer"
+        className="w-fit p-2 rounded-md shadow-none hover:bg-zinc-50 cursor-pointer"
       >
         <div className="flex items-center gap-4">
           <h1>
             {user?.firstName} {user?.lastName}
           </h1>
           <div className="w-10 h-10 rounded-full overflow-hidden">
-            <img className="w-full h-full object-cover" src={guestImg} alt="" />
+            <img
+              className="w-full h-full object-cover"
+              src={guestImg}
+              alt="user profile picture"
+            />
           </div>
-          <span className={isOpen ? "rotate-180" : " "}>
+          <span className={isOpen ? "" : "rotate-180"}>
             <MdKeyboardArrowUp size={20} />
           </span>
         </div>
@@ -44,16 +53,32 @@ function User() {
             <>
               {" "}
               <a
-                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150"
-                href="/profile"
+                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150 flex items-center  text-gray-600"
+                href="/cart"
               >
-                <li>Profile</li>
+                {" "}
+                <li className="flex items-center gap-4">
+                  <ShoppingCart itemsCartNumber={cartItems.length} />
+                  Cart
+                </li>
               </a>
               <a
-                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150"
+                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150 text-gray-600"
+                href="/profile"
+              >
+                <li className="flex items-center gap-4">
+                  <CgProfile size={20} />
+                  Profile
+                </li>
+              </a>
+              <a
+                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150 text-gray-600"
                 href="/orders-history"
               >
-                <li>Order History</li>
+                <li className="flex items-center gap-4">
+                  <LuHistory size={20} />
+                  Order History
+                </li>
               </a>
             </>
           )}

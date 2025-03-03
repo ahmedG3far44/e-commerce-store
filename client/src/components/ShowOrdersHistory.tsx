@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import OrderItems from "./OrderItems";
@@ -6,16 +7,87 @@ import { OrderHistoryProps } from "../utils/types";
 import { LiaShippingFastSolid } from "react-icons/lia";
 import { MdOutlineWatchLater } from "react-icons/md";
 import { IoMdDoneAll } from "react-icons/io";
+import useAuth from "../context/auth/AuthContext";
+import toast from "react-hot-toast";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function ShowOrdersHistory({
+  id,
   totalAmount,
   address,
   items,
   status,
 }: OrderHistoryProps) {
   const [isOpen, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { user, token } = useAuth();
   // const [status] = useState("COMPLETED");
 
+  const handelUpdateOrderStatusToDelivered = async () => {
+    try {
+      if (!token || !user?.isAdmin)
+        throw new Error("Unauthorized user your not able to do this action!!");
+
+      setLoading(true);
+      const response = await fetch(`${BASE_URL}/admin/orders`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderId: id,
+          status: "DELIVERED",
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("can't update order status, please try again");
+      }
+      const data = await response.json();
+      if (!data) throw new Error("can't get response data!!");
+      toast.success("order status updated to DELIVERED success!!");
+      return;
+    } catch (err: any) {
+      console.log(err?.message);
+      toast.error(err?.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handelUpdateOrderStatusToShipped = async () => {
+    try {
+      if (!token || !user?.isAdmin)
+        throw new Error("Unauthorized user your not able to do this action!!");
+
+      setPending(true);
+      const response = await fetch(`${BASE_URL}/admin/orders`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderId: id,
+          status: "SHIPPED",
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("can't update order status, please try again");
+      }
+      const data = await response.json();
+      if (!data) throw new Error("can't get response data!!");
+      toast.success("order status updated to SHIPPED success!!");
+      return;
+    } catch (err: any) {
+      console.log(err?.message);
+      toast.error(err?.message);
+      return;
+    } finally {
+      setPending(false);
+    }
+  };
   return (
     <div className="w-full">
       <div
@@ -71,9 +143,33 @@ function ShowOrdersHistory({
       </div>
       <div className="p-2">
         {isOpen && (
-          <div>
-            <OrderItems items={items} />
-          </div>
+          <>
+            <div>
+              <OrderItems items={items} />
+            </div>
+            {user?.isAdmin && (
+              <div className="ml-8 pl-4 mt-4 flex items-center gap-4 p-2">
+                {status.toString() !== "SHIPPED" && (
+                  <button
+                    onClick={handelUpdateOrderStatusToShipped}
+                    disabled={pending}
+                    className="px-4 py-2 rounded-md text-white bg-orange-500 cursor-pointer hover:bg-orange-800 duration-150 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                  >
+                    {pending ? "updating..." : "SHIPPED"}
+                  </button>
+                )}
+                {status.toString() !== "DELIVERED" && (
+                  <button
+                    onClick={handelUpdateOrderStatusToDelivered}
+                    disabled={loading}
+                    className=" px-4 py-2 rounded-md text-white bg-green-500 cursor-pointer hover:bg-green-800 duration-150 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                  >
+                    {loading ? "updating..." : "DELIVERED"}
+                  </button>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

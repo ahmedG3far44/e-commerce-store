@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
+import UsersList from "../UsersList";
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function AdminUsers() {
@@ -8,8 +9,8 @@ function AdminUsers() {
     async function getAllUsersInfo() {
       try {
         const response = await fetch(`${BASE_URL}/admin/users`);
-        if(!response.ok){
-            throw new Error("connection error can't get users list!!")
+        if (!response.ok) {
+          throw new Error("connection error can't get users list!!");
         }
         const users = await response.json();
         return users;
@@ -23,7 +24,20 @@ function AdminUsers() {
   return (
     <div>
       <h1>Pending Orders</h1>
-      <div>{JSON.stringify(users)}</div>
+      <div className="mt-10 flex flex-col justify-start items-start gap-2 w-full">
+        {users.map((user) => {
+          return (
+            <UsersList
+              id={user._id}
+              firstName={user.firstName}
+              lastName={user.lastName}
+              email={user.email}
+              isAdmin={user.isAdmin}
+              joinUs={user.createdAt}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

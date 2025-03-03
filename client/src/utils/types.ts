@@ -91,6 +91,7 @@ export interface OrderList {
 }
 
 export interface OrderHistoryProps {
+  id: string;
   totalAmount: number;
   address: string;
   status: OrderStatus;
