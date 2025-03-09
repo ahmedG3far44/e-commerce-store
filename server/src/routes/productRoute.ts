@@ -34,7 +34,7 @@ router.put("/product/:id", verifyToken, async (req: ExtendedRequest, res) => {
   try {
     const product = req.body;
     const { id } = req.params;
-    const userId = req.user?.id;
+    // const userId = req.user?.id;
     const result = await updateNewProduct({ productId: id, product });
     res.status(result.statusCode).json(result.data);
   } catch (err: any) {

@@ -71,8 +71,9 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         body: JSON.stringify({ productId, quantity }),
       });
       if (!response.ok) {
-        console.log(response);
-        throw new Error("This product is already added before!!");
+        throw new Error(
+          `can't add this product, please check your connection!!`
+        );
       }
       const cart = await response.json();
 
@@ -224,7 +225,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     } catch (err: any) {
       console.error(err?.message);
       toast.error(err?.message);
-      return err?.message;
+      return err;
     }
   };
 

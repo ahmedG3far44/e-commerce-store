@@ -39,21 +39,19 @@ function ProductDetails() {
   if (!productInfo) return;
   const date = handelDates(productInfo?.createdAt);
   return (
-    <div>
+    <Container>
       <Header />
-      <Container>
-        <ProductInfo
-          productId={id!}
-          title={productInfo.title}
-          description={productInfo.description}
-          category={productInfo.category}
-          images={productInfo.images}
-          price={productInfo.price}
-          stock={productInfo.stock}
-          createdAt={date}
-        />
-      </Container>
-    </div>
+      <ProductInfo
+        productId={id!}
+        title={productInfo.title}
+        description={productInfo.description}
+        category={productInfo.category}
+        images={productInfo.images}
+        price={productInfo.price}
+        stock={productInfo.stock}
+        createdAt={date}
+      />
+    </Container>
   );
 }
 

@@ -1,31 +1,57 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import upload from "../configs/multer"; // Adjust the path to your Multer middleware
+import s3Client from "../configs/s3Client";
+import { Buffer } from "buffer";
 import { ExtendedRequest } from "../utils/types";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 
+const Bucket = process.env.AWS_S3_BUCKET as string;
 const router = express.Router();
 
-// Extend the Request interface to include the `files` property
-interface Req extends Request {
-  files?:
-    | Express.Multer.File[]
-    | {
-        [fieldname: string]: Express.Multer.File[];
-      }
-    | undefined;
+export interface File {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
 }
+router.post(
+  "/",
+  upload.array("image", 5),
+  async (req: ExtendedRequest, res) => {
+    try {
+      const files: File[] = req.files as File[];
 
-router.post("/", upload.any(), async (req: Req, res) => {
-  try {
-    // const files = req.files;
+      if (!files) {
+        throw new Error("there is no files to upload!!");
+      }
 
-    // for (const i of files) {
-    //   console.log(i);
-    // }
+      let imagesUrl: any[] = [];
+      files?.map(async (file) => {
+        const fileKey = `${Date.now()}`;
 
-    res.status(200).json({ message: "Files uploaded successfully!" });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+        imagesUrl.push(`${process.env.AWS_S3_BUCKET_DOMAIN}/${fileKey}`);
+
+        const command = new PutObjectCommand({
+          Bucket,
+          Key: fileKey,
+          Body: file.buffer,
+          ContentType: file.mimetype as string,
+        });
+
+        const result = await s3Client.send(command);
+
+        if (result.$metadata.httpStatusCode !== 200) {
+          throw new Error("can't upload files to S3!!");
+        }
+      });
+
+      res.status(201).json({ images: imagesUrl });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 export default router;

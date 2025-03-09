@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getUserOrders, login, register } from "../services/userService";
+import {
+  addUserAddress,
+  getUserOrders,
+  login,
+  register,
+} from "../services/userService";
 import verifyToken from "../middlewares/verifyToken";
 import { ExtendedRequest } from "../utils/types";
 
@@ -29,6 +34,17 @@ router.get("/orders", verifyToken, async (req: ExtendedRequest, res) => {
   try {
     const userId = req.user?.id!;
     const result = await getUserOrders({ userId });
+    res.status(result.statusCode).json(result.data);
+  } catch (err: any) {
+    res.status(500).json(err.message);
+  }
+});
+
+router.post("/address", verifyToken, async (req: ExtendedRequest, res) => {
+  try {
+    const userId = req.user?.id!;
+    const { address } = req.body;
+    const result = await addUserAddress({ userId, address });
     res.status(result.statusCode).json(result.data);
   } catch (err: any) {
     res.status(500).json(err.message);

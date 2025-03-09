@@ -2,6 +2,7 @@ import user from "../models/user";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import orderModel from "../models/order";
+import userModel from "../models/user";
 
 interface RegisterParams {
   firstName: string;
@@ -93,6 +94,28 @@ export const getUserOrders = async ({ userId }: getUserOrdersParams) => {
   }
 };
 
+interface addUserAddressParams {
+  userId: string;
+  address: string;
+}
+export const addUserAddress = async ({
+  userId,
+  address,
+}: addUserAddressParams) => {
+  try {
+    const user = await userModel.findById(userId);
+    user?.addresses.push(address);
+    await user?.save();
+    console.log();
+    if (!user?.addresses) {
+      return { data: "addresses list not found", statusCode: 400 };
+    }
+    // userAddressesList?.push(address);
+    return { data: user, statusCode: 200 };
+  } catch (err: any) {
+    return { data: err?.message, statusCode: 400 };
+  }
+};
 export interface GenerateTokenParams {
   id: string;
   firstName: string;

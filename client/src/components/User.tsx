@@ -7,6 +7,7 @@ import useCart from "../context/cart/CartContext";
 import ShoppingCart from "./ShoppingCart";
 import { CgProfile } from "react-icons/cg";
 import { LuHistory } from "react-icons/lu";
+import { RxDashboard } from "react-icons/rx";
 
 function User() {
   const { user, logOut } = useAuth();
@@ -47,7 +48,10 @@ function User() {
               className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150"
               href="/dashboard"
             >
-              <li>Dashboard</li>
+              <li className="flex items-center gap-4">
+                <RxDashboard size={20} />
+                Dashboard
+              </li>
             </a>
           ) : (
             <>

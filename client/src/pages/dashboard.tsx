@@ -1,6 +1,13 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import useAuth from "../context/auth/AuthContext";
 
 function Dashboard() {
+  const { logOut } = useAuth();
+  const navigate = useNavigate();
+  const handelLogout = () => {
+    logOut();
+    navigate("/");
+  };
   return (
     <div className="w-screen min-h-screen max-w-screen flex justify-start items-start ">
       <aside className="min-h-screen w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start ">
@@ -18,7 +25,10 @@ function Dashboard() {
             <a href="/dashboard/users">Users</a>
           </li>
         </ul>
-        <button className="hover:bg-gray-200 w-full p-4 rounded-md">
+        <button
+          onClick={handelLogout}
+          className="hover:bg-blue-700 duration-150 cursor-pointer w-full p-4 rounded-md bg-blue-500 text-white"
+        >
           Logout
         </button>
       </aside>
