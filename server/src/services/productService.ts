@@ -19,6 +19,7 @@ export const addNewProduct = async ({ productData }: AddProductParams) => {
     const validProductData = productSchema.safeParse(productData);
 
     if (!validProductData.success) {
+      console.log(validProductData.error.flatten().fieldErrors);
       return {
         data: `the product data are not valid => ${validProductData.error.message}`,
         statusCode: 400,

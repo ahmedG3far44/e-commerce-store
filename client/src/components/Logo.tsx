@@ -6,7 +6,7 @@ function Logo() {
     <div
       className="w-full cursor-pointer  p-4 rounded-xl"
       role="button"
-      onClick={() => navigate("")}
+      onClick={() => navigate("/")}
     >
       <div className="text-3xl font-bold flex justify-center items-center gap-4">
         <span className="text-blue-500">

@@ -20,6 +20,7 @@ import ProductDetails from "./pages/product-details";
 import AdminOrders from "./components/admin/AdminOrders";
 import AdminProducts from "./components/admin/AdminProducts";
 import AdminUsers from "./components/admin/AdminUsers";
+import AddAddress from "./pages/add-address";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/add-address" element={<AddAddress />} />
                 <Route path="/orders-history" element={<OrdersHistory />} />
                 <Route path="/success" element={<SuccessOrder />} />
               </Route>

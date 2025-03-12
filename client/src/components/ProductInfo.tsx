@@ -50,16 +50,21 @@ function ProductInfo({
     }
   };
   return (
-    <div className="w-full flex justify-between gap-8 items-start mt-10">
-      <div className="flex-1 h-[400px] grid grid-cols-2 gap-2  object-cover">
+    <div className="flex justify-between gap-10 items-start mt-10">
+      <div className="flex-1 overflow-hidden">
         <ProductImage images={images} />
       </div>
-      <div className="flex-1 h-[400px]  flex flex-col justify-between items-start gap-8">
-        <h2 className="text-3xl text-gray-700 font-bold">{title}</h2>
-        <h4>{category}</h4>
+
+      <div className="flex-1   flex flex-col justify-start items-start gap-2 p-4 ">
+        <h2 className="text-4xl text-blue-500 font-black">{title}</h2>
+        <h4 className="text-blue-500 py-1 px-4 rounded-4xl border bg-blue-50 border-blue-500">
+          {category}
+        </h4>
         <div className="flex flex-col justify-start items-start">
-          <span>{price} EGP</span>
-          <span>{stock}</span>
+          <span className="text-2xl text-blue-500 font-bold">{price} EGP</span>
+          <span className="text-sm my-4 text-zinc-500">
+            {stock} item in stock
+          </span>
         </div>
         <div className="my-8 text-gray-700">
           <p>{description}</p>
@@ -69,7 +74,7 @@ function ProductInfo({
             last updates: <span className="text-gray-500">{createdAt}</span>
           </span>
         </div>
-        <div className="w-full flex justify-center h-auto  items-end gap-4">
+        <div className="w-full flex justify-center  items-end gap-4 mt-auto">
           <button
             onClick={handelAddToCart}
             className="px-4 py-2 cursor-pointer rounded-md text-blue-500 border hover:bg-blue-500 hover:text-white duration-150 border-blue-500 w-full"

@@ -1,3 +1,4 @@
+import { addNewProduct } from "./productService";
 import user from "../models/user";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -116,6 +117,23 @@ export const addUserAddress = async ({
     return { data: err?.message, statusCode: 400 };
   }
 };
+
+interface GetUserAddressesListParams {
+  userId: string;
+}
+export const getUserAddressesList = async ({
+  userId,
+}: GetUserAddressesListParams) => {
+  try {
+    const user = await userModel.findById(userId);
+    const addresses = user?.addresses;
+
+    return { data: addresses, statusCode: 200 };
+  } catch (err: any) {
+    return { data: err?.message, statusCode: 400 };
+  }
+};
+
 export interface GenerateTokenParams {
   id: string;
   firstName: string;
