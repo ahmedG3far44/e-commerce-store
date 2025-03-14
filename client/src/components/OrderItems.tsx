@@ -2,9 +2,9 @@ import { OrderItemProps } from "../utils/types";
 
 function OrderItems({ items }: { items: OrderItemProps[] }) {
   return (
-    <div>
+    <>
       {items.length > 0 ? (
-        <div className="ml-8 pl-4 border-l-2 rounded-3xl border-l-zinc-300 flex flex-col justify-start items-start gap-2">
+        <div className="ml-8 pl-4 border-l-8  border-l-zinc-300 flex flex-col justify-start items-start gap-2">
           {items.map((item) => {
             return (
               <div
@@ -33,7 +33,7 @@ function OrderItems({ items }: { items: OrderItemProps[] }) {
       ) : (
         <p>there is no items info provided!!</p>
       )}
-    </div>
+    </>
   );
 }
 

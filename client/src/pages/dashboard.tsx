@@ -64,8 +64,8 @@ function Dashboard() {
     navigate("/");
   };
   return (
-    <div className="w-screen min-h-screen max-w-screen flex justify-start items-start ">
-      <aside className="min-h-screen w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start ">
+    <div className="w-screen min-h-screen max-w-screen flex justify-start items-start  relative">
+      <aside className="min-h-screen h-full w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start fixed left-0 top-0">
         <ul className="w-full flex justify-between flex-col items-start gap-1">
           {dashboardList.map((url) => {
             return (
@@ -87,12 +87,12 @@ function Dashboard() {
         </ul>
         <button
           onClick={handelLogout}
-          className="hover:bg-blue-700 duration-150 cursor-pointer w-full p-4 rounded-md bg-blue-500 text-white"
+          className="hover:bg-blue-700 duration-150 cursor-pointer w-full p-4 rounded-md bg-blue-500 text-white mt-auto"
         >
           Logout
         </button>
       </aside>
-      <main className="w-[80%] min-h-screen   p-4">
+      <main className="w-[80%] min-h-screen absolute right-0 top-0  p-4">
         <h1>Dashboard Admin</h1>
         {<Outlet />}
       </main>

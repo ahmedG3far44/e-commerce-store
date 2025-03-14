@@ -88,7 +88,6 @@ export interface OrderList {
   orderItems: OrderItemProps[];
   status: OrderStatus;
   totalOrderPrice: number;
-  orderDate: string;
 }
 
 export interface OrderHistoryProps {

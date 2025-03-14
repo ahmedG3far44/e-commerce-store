@@ -44,9 +44,9 @@ function ItemCart({
     }
   };
   return (
-    <div className="w-full flex flex-col justify-start items-start gap-4 border border-zinc-200 rounded-md   p-4  bg-zinc-100">
-      <div className="w-full flex justify-between items-center ">
-        <div className="w-32 h-32 rounded-2xl overflow-hidden mr-8">
+    <div className="w-full  flex flex-col justify-start items-start border border-zinc-200 rounded-md   p-4  bg-zinc-100">
+      <div className="w-full flex justify-between items-center">
+        <div className="w-20 h-20 rounded-2xl overflow-hidden mr-8 border border-zinc-200">
           <img
             className="w-full h-full object-cover"
             src={image ? image : noValidImage}
@@ -55,7 +55,7 @@ function ItemCart({
         </div>
 
         <div className="w-[30%] flex flex-col justify-start items-start gap-2">
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h2 className="text-xl font-bold">{title}</h2>
           {checkoutState && (
             <p className="text-sm line-clamp-3 text-gray-600">{description}</p>
           )}
@@ -108,7 +108,7 @@ function ItemCart({
           onClick={() => {
             deleteOneItemFromCart({ token, productId });
           }}
-          className="px-4 py-2 rounded-md bg-rose-500 text-white hover:bg-rose-800"
+          className="underline  cursor-pointer rounded-md text-rose-500 hover:text-rose-600"
         >
           Remove Item
         </button>

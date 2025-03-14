@@ -3,7 +3,7 @@ import Logo from "./Logo";
 
 function Footer() {
   return (
-    <div className="bg-blue-900 w-full flex flex-col  items-center gap-4">
+    <div className="bg-blue-900 w-full flex flex-col  items-center gap-4 mt-10">
       <Container>
         <div className="flex items-start justify-between">
           <Logo />

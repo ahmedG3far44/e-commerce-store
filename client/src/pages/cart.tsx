@@ -26,30 +26,33 @@ function CartPage() {
           <span className="text-blue-500">{totalAmount.toFixed(2)} EGP</span>
         </h1>
       </div>
-      {cartItems.length > 0 ? (
-        cartItems.map(({ product, productId, quantity, updatedAt }) => {
-          const { title, description, category, image, price, stock } = product;
-          return (
-            <ItemCart
-              key={productId}
-              productId={productId}
-              title={title}
-              category={category}
-              stock={stock}
-              description={description || ""}
-              image={image || ""}
-              price={price}
-              quantity={quantity}
-              updatedAt={updatedAt}
-              checkoutState={true}
-            />
-          );
-        })
-      ) : (
-        <p className="text-sm text-zinc-500 mt-8">
-          your cart is empty continue shopping and add new items!!
-        </p>
-      )}
+      <div className="flex flex-col items-start gap-1 justify-start">
+        {cartItems.length > 0 ? (
+          cartItems.map(({ product, productId, quantity, updatedAt }) => {
+            const { title, description, category, image, price, stock } =
+              product;
+            return (
+              <ItemCart
+                key={productId}
+                productId={productId}
+                title={title}
+                category={category}
+                stock={stock}
+                description={description || ""}
+                image={image || ""}
+                price={price}
+                quantity={quantity}
+                updatedAt={updatedAt}
+                checkoutState={true}
+              />
+            );
+          })
+        ) : (
+          <p className="text-sm text-zinc-500 mt-8">
+            your cart is empty continue shopping and add new items!!
+          </p>
+        )}
+      </div>
       {cartItems.length > 0 && (
         <div className="p-4 rounded-md bg-zinc-100 flex justify-between items-center w-full">
           <div>

@@ -51,6 +51,7 @@ function OrdersHistory() {
                 totalAmount={order.totalOrderPrice}
                 status={order.status}
                 items={order.orderItems}
+                orderDate={order?.createdAt}
               />
             );
           })}

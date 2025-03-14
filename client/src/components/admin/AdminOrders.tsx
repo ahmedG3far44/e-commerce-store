@@ -45,27 +45,31 @@ function AdminOrders({ OrderStatus }: { OrderStatus: string }) {
   }, []);
   return (
     <div>
-      <h1>Pending Orders</h1>
       {ordersList.length > 0 ? (
-        <div className="w-full min-w-full flex flex-col-reverse justify-start items-start gap-4 bg-zinc-50 border border-zinc-200 p-4 rounded-md my-4">
-          {ordersList.map((order) => {
-            return (
-              <ShowOrdersHistory
-                key={order._id}
-                id={order._id}
-                address={order.address}
-                totalAmount={order.totalOrderPrice}
-                status={order.status}
-                items={order.orderItems}
-                orderDate={order.createdAt}
-              />
-            );
-          })}
-        </div>
+        <>
+          <h1 className="text-2xl text-blue-500 font-bold my-8">
+            Orders: {ordersList.length}
+          </h1>
+          <div className="w-full min-w-full flex flex-col-reverse justify-start items-start gap-4 bg-zinc-50 border border-zinc-200 p-4 rounded-md my-4">
+            {ordersList.map((order) => {
+              return (
+                <ShowOrdersHistory
+                  key={order._id}
+                  id={order._id}
+                  address={order.address}
+                  totalAmount={order.totalOrderPrice}
+                  status={order.status}
+                  items={order.orderItems}
+                  orderDate={order.createdAt}
+                />
+              );
+            })}
+          </div>
+        </>
       ) : (
         <div className="w-full h-full flex justify-center items-center mt-40">
           <p className="text-3xl text-gray-500 font-semibold">
-            There is no orders yet!!
+            There is no orders available yet!!
           </p>
         </div>
       )}

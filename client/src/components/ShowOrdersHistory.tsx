@@ -103,7 +103,10 @@ function ShowOrdersHistory({
         onClick={() => setOpen(!isOpen)}
       >
         <div>
-          <h1>Ship Address: {address}</h1>
+          <h1>
+            <span className="font-bold mr-4">Customer Address:</span>{" "}
+            <span className="text-sm">{address}</span>
+          </h1>
         </div>
 
         <div className="flex items-center gap-4 ml-6 text-sm text-zinc-600">

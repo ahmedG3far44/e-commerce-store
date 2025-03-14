@@ -65,7 +65,7 @@ function CheckoutPage() {
       </div>
 
       <div className="w-full flex items-start justify-between gap-4 relative">
-        <div className="w-[80%]">
+        <div className="w-[80%] flex flex-col justify-start items-start gap-1">
           {cartItems.length > 0 ? (
             cartItems.map(
               ({ product, productId, quantity, updatedAt }: any) => {
@@ -97,7 +97,7 @@ function CheckoutPage() {
         {pending ? (
           <div>loading...</div>
         ) : (
-          <div className="w-[20%] sticky top-0">
+          <div className="w-[20%]">
             <TotalOrder total={totalAmount.toFixed(2)} addresses={addresses} />
           </div>
         )}

@@ -30,7 +30,7 @@ function HomePage() {
         <Banner />
         <Collections />
         <Features />
-        <div className="w-full flex max-sm:flex-col justify-center items-center m-auto flex-wrap gap-4 ">
+        <div className="w-full grid grid-cols-4 grid-flow-row gap-4">
           {error && (
             <div className="w-[200px] bg-rose-200 border-rose-800 text-rose-600 p-2 rounded-md">
               {error}
