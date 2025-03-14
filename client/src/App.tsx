@@ -50,8 +50,19 @@ function App() {
               <Route element={<AdminRoutes />}>
                 <Route path="/dashboard" element={<Dashboard />}>
                   <Route path="products" element={<AdminProducts />} />
-                  <Route path="orders" element={<AdminOrders />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route
+                    path="orders"
+                    element={<AdminOrders OrderStatus="orders" />}
+                  />
+                  <Route
+                    path="pending-orders"
+                    element={<AdminOrders OrderStatus="pending" />}
+                  />
+                  <Route
+                    path="shipped-orders"
+                    element={<AdminOrders OrderStatus="shipped" />}
+                  />
                 </Route>
               </Route>
 

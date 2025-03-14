@@ -29,7 +29,7 @@ router.post(
 
       let imagesUrl: any[] = [];
       files?.map(async (file) => {
-        const fileKey = `${Date.now()}`;
+        const fileKey = `${file.fieldname}-${Date.now()}`;
 
         imagesUrl.push(`${process.env.AWS_S3_BUCKET_DOMAIN}/${fileKey}`);
 

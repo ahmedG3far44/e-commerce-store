@@ -17,8 +17,8 @@ function ProductImage({ images }: { images: string[] | [] }) {
               className="w-20 h-20 rounded-md overflow-hidden hover:scale-1.1 cursor-pointer "
             >
               <img
-                className={` w-full h-full rounded-md ${
-                  img === activeImage && "p-2 border-2 border-zinc-400"
+                className={`object-cover w-full h-full border  border-zinc-200 rounded-md hover:scale-105 duration-150 ${
+                  img === activeImage && "p-2   border-zinc-400"
                 }`}
                 src={img}
                 alt=""

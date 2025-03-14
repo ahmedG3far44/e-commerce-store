@@ -95,6 +95,9 @@ function AdminProducts() {
 
       const response = await fetch(`${BASE_URL}/upload`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 

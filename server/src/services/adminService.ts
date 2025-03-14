@@ -41,32 +41,26 @@ export const getAllUsers = async () => {
 
 export const getPendingOrders = async () => {
   try {
-    const pendingOrders = await orderModel.find({
-      status: "PENDING",
-    });
+    const orders = await orderModel.find({ status: "PENDING" }).sort();
+    return { data: { orders }, statusCode: 200 };
+  } catch (err) {
+    return { data: err, statusCode: 400 };
+  }
+};
+export const getCompletedOrders = async () => {
+  try {
+    const orders = await orderModel.find({ status: "DELIVERED" }).sort();
+    return { data: { orders }, statusCode: 200 };
+  } catch (err) {
+    return { data: err, statusCode: 400 };
+  }
+};
 
-    // console.log(pendingOrders);
-    // const orders = { order: { ...pendingOrders }, userInfo: {} };
-
-    // for (const order of pendingOrders) {
-    //   const user = await userModel.findById(order.userId, {
-    //     firstName: 1,
-    //     lastName: 1,
-    //     email: 1,
-    //   });
-
-    //   orders.userInfo = {
-    //     id: user?._id,
-    //     firstName: user?.firstName,
-    //     lastName: user?.lastName,
-    //     email: user?.email,
-    //   };
-    // }
-
-    // console.log(orders);
-
-    return { data: pendingOrders, statusCode: 200 };
-  } catch (err: any) {
-    return { data: err.message, statusCode: 400 };
+export const getShippedOrders = async () => {
+  try {
+    const orders = await orderModel.find({ status: "SHIPPED" }).sort();
+    return { data: { orders }, statusCode: 200 };
+  } catch (err) {
+    return { data: err, statusCode: 400 };
   }
 };

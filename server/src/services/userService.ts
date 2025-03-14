@@ -83,10 +83,10 @@ export const login = async ({ email, password }: LoginParams) => {
   };
 };
 
-interface getUserOrdersParams {
+interface GetUserOrdersParams {
   userId: string;
 }
-export const getUserOrders = async ({ userId }: getUserOrdersParams) => {
+export const getUserOrders = async ({ userId }: GetUserOrdersParams) => {
   try {
     const orders = await orderModel.find({ userId }).sort();
     return { data: { orders }, statusCode: 200 };

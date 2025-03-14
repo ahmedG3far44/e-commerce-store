@@ -1,33 +1,54 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import ShowOrdersHistory from "../ShowOrdersHistory";
+import useAuth from "../../context/auth/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
-function AdminOrders() {
-  const [pendingOrders, setPendingOrders] = useState<any[]>([]);
+function AdminOrders({ OrderStatus }: { OrderStatus: string }) {
+  const [ordersList, setOrdersList] = useState<any[]>([]);
+  const { token } = useAuth();
   useEffect(() => {
-    async function getAllPendingOrders() {
+    async function getAllPendingOrders(OrderStatus: string) {
+      const url = `${BASE_URL}/admin/${
+        OrderStatus === "shipped"
+          ? "shipped-orders"
+          : OrderStatus === "pending"
+          ? "pending-orders"
+          : "orders"
+      }`;
       try {
-        const response = await fetch(`${BASE_URL}/admin/orders`);
+        console.log(url);
+        if (!token) return;
+
+        const response = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error("connection error can't get pending orders list!!");
         }
-        const pendingOrders = await response.json();
-        return pendingOrders;
+        const ordersList = await response.json();
+        console.log(ordersList);
+        const { orders } = ordersList;
+        return orders;
       } catch (err: any) {
         console.log(err?.message);
         alert(err?.message);
       }
     }
-    getAllPendingOrders().then((orders) => setPendingOrders([...orders]));
+    getAllPendingOrders(OrderStatus).then((orders) =>
+      setOrdersList([...orders])
+    );
   }, []);
   return (
     <div>
       <h1>Pending Orders</h1>
-      {pendingOrders.length > 0 ? (
+      {ordersList.length > 0 ? (
         <div className="w-full min-w-full flex flex-col-reverse justify-start items-start gap-4 bg-zinc-50 border border-zinc-200 p-4 rounded-md my-4">
-          {pendingOrders.map((order) => {
+          {ordersList.map((order) => {
             return (
               <ShowOrdersHistory
                 key={order._id}
@@ -36,6 +57,7 @@ function AdminOrders() {
                 totalAmount={order.totalOrderPrice}
                 status={order.status}
                 items={order.orderItems}
+                orderDate={order.createdAt}
               />
             );
           })}

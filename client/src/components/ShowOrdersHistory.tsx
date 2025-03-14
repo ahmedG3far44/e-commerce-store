@@ -18,12 +18,17 @@ function ShowOrdersHistory({
   address,
   items,
   status,
+  orderDate,
 }: OrderHistoryProps) {
   const [isOpen, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [loading, setLoading] = useState(false);
   const { user, token } = useAuth();
   // const [status] = useState("COMPLETED");
+
+  const date = new Date(orderDate);
+  const orderDates = date.toString().split("T")[0];
+  // const orderTime = date.toString().split("T")[1];
 
   const handelUpdateOrderStatusToDelivered = async () => {
     try {
@@ -101,12 +106,17 @@ function ShowOrdersHistory({
           <h1>Ship Address: {address}</h1>
         </div>
 
+        <div className="flex items-center gap-4 ml-6 text-sm text-zinc-600">
+          <span className=" font-semibold">Order Date:</span>
+          <span>{orderDates}</span>
+        </div>
+
         <div className="ml-auto self-end mr-10">
           <span
             className={` font-semibold 
             ${status.toString() === "PENDING" && "text-gray-500"}
             ${status.toString() === "SHIPPED" && "text-orange-600"}
-            ${status.toString() === "COMPLETED" && "text-green-500"}
+            ${status.toString() === "DELIVERED" && "text-green-500"}
             
             `}
           >
@@ -120,9 +130,9 @@ function ShowOrdersHistory({
                 {status} <LiaShippingFastSolid size={16} />{" "}
               </span>
             )}
-            {status.toString() === "COMPLETED" && (
+            {status.toString() === "DELIVERED" && (
               <span className="flex justify-center items-center gap-2">
-                {status} <IoMdDoneAll size={16} />{" "}
+                COMPLETED <IoMdDoneAll size={16} />{" "}
               </span>
             )}
           </span>
@@ -147,7 +157,7 @@ function ShowOrdersHistory({
             <div>
               <OrderItems items={items} />
             </div>
-            {user?.isAdmin && (
+            {user?.isAdmin && status.toString() !== "DELIVERED" && (
               <div className="ml-8 pl-4 mt-4 flex items-center gap-4 p-2">
                 {status.toString() !== "SHIPPED" && (
                   <button

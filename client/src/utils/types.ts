@@ -88,6 +88,7 @@ export interface OrderList {
   orderItems: OrderItemProps[];
   status: OrderStatus;
   totalOrderPrice: number;
+  orderDate: string;
 }
 
 export interface OrderHistoryProps {
@@ -96,6 +97,7 @@ export interface OrderHistoryProps {
   address: string;
   status: OrderStatus;
   items: OrderItemProps[];
+  orderDate: string;
 }
 
 export enum OrderStatus {

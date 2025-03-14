@@ -50,14 +50,17 @@ function ProductInfo({
     }
   };
   return (
-    <div className="flex justify-between gap-10 items-start mt-10">
+    <div className="flex justify-between gap-10 items-center mt-10">
       <div className="flex-1 overflow-hidden">
         <ProductImage images={images} />
       </div>
 
       <div className="flex-1   flex flex-col justify-start items-start gap-2 p-4 ">
         <h2 className="text-4xl text-blue-500 font-black">{title}</h2>
-        <h4 className="text-blue-500 py-1 px-4 rounded-4xl border bg-blue-50 border-blue-500">
+        <div className="my-8 text-gray-700">
+          <p>{description}</p>
+        </div>
+        <h4 className="text-blue-500 py-1 px-4 rounded-4xl my-4 border bg-blue-50 border-blue-500">
           {category}
         </h4>
         <div className="flex flex-col justify-start items-start">
@@ -65,9 +68,6 @@ function ProductInfo({
           <span className="text-sm my-4 text-zinc-500">
             {stock} item in stock
           </span>
-        </div>
-        <div className="my-8 text-gray-700">
-          <p>{description}</p>
         </div>
         <div>
           <span className="text-sm">

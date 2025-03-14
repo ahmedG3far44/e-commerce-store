@@ -1,14 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import UsersList from "../UsersList";
+import useAuth from "../../context/auth/AuthContext";
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function AdminUsers() {
+  const { token } = useAuth();
   const [users, setUsersList] = useState<any[]>([]);
   useEffect(() => {
     async function getAllUsersInfo() {
       try {
-        const response = await fetch(`${BASE_URL}/admin/users`);
+        if (!token) return;
+
+        const response = await fetch(`${BASE_URL}/admin/users`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error("connection error can't get users list!!");
         }
