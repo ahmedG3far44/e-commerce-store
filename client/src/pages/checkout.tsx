@@ -36,7 +36,7 @@ function CheckoutPage() {
 
       const addressesList = await response.json();
 
-      console.log(addressesList);
+      // console.log(addressesList);
 
       setAddressesList([...addressesList]);
 

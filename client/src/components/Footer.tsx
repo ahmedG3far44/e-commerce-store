@@ -3,20 +3,13 @@ import Logo from "./Logo";
 
 function Footer() {
   return (
-    <div className="bg-blue-900 w-full flex flex-col  items-center gap-4 mt-10">
+    <div className="bg-blue-700 text-gray-200 w-full flex flex-col  items-center gap-4 mt-10">
       <Container>
-        <div className="flex items-start justify-between">
-          <Logo />
-          <ul>
-            <li>privacy policy</li>
-            <li>terms & conditions</li>
-          </ul>
-          <div>
-            <button>Join us now</button>
-          </div>
+        <div className="w-full flex justify-center items-start">
+          <Logo status="footer" />
         </div>
       </Container>
-      <div className="p-4 text-gray-400">
+      <div className="p-4 text-gray-200">
         <p>all right's are reserved 2025</p>
       </div>
     </div>

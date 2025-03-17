@@ -57,23 +57,32 @@ function TotalOrder({ total, addresses }: TotalOrderProps) {
           </option>
         )}
       </select>
-      <div className="w-full flex items-center gap-2">
+      <div className="w-full flex flex-col justify-center items-center gap-2">
         <input
-          placeholder="coupon code"
+          placeholder="Discount Coupon"
           type="text"
-          name="coupon"
-          className="p-2 border rounded-md w-[60%] bg-zinc-200 border-zinc-300"
+          name="discount"
+          className="w-full p-2 border rounded-md  bg-zinc-200 border-zinc-200"
         />{" "}
-        <button className="w-[40%] p-2 rounded-md bg-blue-500 text-white hover:bg-blue-700">
+        <button className="w-full p-2 rounded-md bg-blue-500 cursor-pointer duration-150 text-white hover:bg-blue-700">
           Apply
         </button>
       </div>
-      <div className="w-full flex items-center justify-between  ">
-        <span className="w-full text-start font-semibold text-lg">
-          Total Order:
-        </span>
-        <span className="font-bold text-blue-500 text-2xl ">{total}EGP</span>
+      <div className="w-full flex flex-col justify-start items-start gap-1 font-bold">
+        <div className="w-full  flex items-center justify-between  ">
+          <span>Tax:</span>
+          <span className="text-gray-600">14%</span>
+        </div>
+        <div className="w-full flex items-center justify-between  ">
+          <span>Discount:</span>
+          <span className="text-red-500">-20.77 EGP</span>
+        </div>
+        <div className="w-full flex items-center justify-between  ">
+          <span>Total:</span>
+          <span className="text-blue-500">{total}EGP</span>
+        </div>
       </div>
+
       {addresses.length !== 0 && (
         <div className="w-full">
           <button

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-function Logo() {
+function Logo({ status }: { status: string }) {
   const navigate = useNavigate();
   return (
     <div
@@ -12,7 +12,13 @@ function Logo() {
         <span className="text-blue-500">
           <img src={"../../public/icon.png"} width={40} height={40} />
         </span>{" "}
-        <h1 className="w-full text-start text-blue-500 max-sm:hidden hover:text-blue-600">
+        <h1
+          className={`${
+            status === "footer"
+              ? "text-gray-200 hover:text-white"
+              : "text-blue-500 hover:text-blue-600"
+          } w-full text-start  max-sm:hidden duration-150`}
+        >
           Online Store
         </h1>
       </div>

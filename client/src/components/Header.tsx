@@ -19,10 +19,10 @@ function Header() {
     <header
       className={`${
         isScrolled && " border-b-zinc-200 border-b"
-      } bg-white m-auto w-full md:w-full flex justify-between items-center sticky left-0 top-0   `}
+      } bg-white m-auto w-full md:w-full flex justify-between items-center sticky left-0 top-0  z-[9999] `}
     >
       <div className="w-3/4 max-sm:w-full m-auto flex justify-between items-center gap-8 ">
-        <Logo />
+        <Logo status="header" />
 
         <div className="w-full">
           {isAuthenticated ? (

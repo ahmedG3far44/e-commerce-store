@@ -29,7 +29,7 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <QueryClientProvider client={queryClient}>
-          <Toaster position="top-center" reverseOrder={false} />
+          <Toaster position="bottom-center" reverseOrder={false} />
           <BrowserRouter>
             <Routes>
               <Route index path="/" element={<HomePage />} />
