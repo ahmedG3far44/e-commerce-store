@@ -2,10 +2,11 @@
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import useAuth from "../../context/auth/AuthContext";
+import UploadedImages from "./UploadedImages";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
-interface File {
+export interface File {
   lastModified: number;
   name: string;
   size: number;
@@ -24,6 +25,7 @@ interface Product {
 function AdminProducts() {
   const { token } = useAuth();
   const [uploadedImagesList, setImagesList] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[] | []>([]);
   const [pending, setPending] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const titleRef = useRef<any>(null);
@@ -41,6 +43,7 @@ function AdminProducts() {
       setPending(true);
       // upload files first to S3 bucket
       const files: File[] = imagesRef?.current?.files as File[];
+      setFiles([...files]);
 
       const imagesUpload = await uploadImages(files);
 
@@ -122,36 +125,22 @@ function AdminProducts() {
     }
   };
   return (
-    <div>
+    <div className="w-full h-full flex justify-center items-center ">
       <form
         ref={addProductFormRef}
         onSubmit={handelAddNewProduct}
-        className="w-[400px] p-4 bg-gray-100 rounded-md border border-gray-200 flex flex-col justify-start items-start gap-4"
+        className="w-1/2 mt-20 p-4 bg-gray-100 rounded-md border border-gray-200 flex flex-col justify-start items-start gap-4"
       >
         {error && (
           <div className="p-4 w-full rounded-md border-rose-500 text-rose-500 bg-rose-100 text-center font-semibold ">
             {error}
           </div>
         )}
-        {uploadedImagesList.length > 0 && (
-          <div className="flex justify-between items-center gap-4 flex-wrap">
-            {uploadedImagesList.map((img, index) => {
-              return (
-                <div
-                  key={index}
-                  className="bg-zinc-500 rounded-md overflow-hidden"
-                >
-                  <img
-                    width={60}
-                    height={60}
-                    src={img}
-                    alt={`product image number ${index}`}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
+
+        <div>
+          <UploadedImages uploaded={files} />
+        </div>
+
         <div className="w-full flex items-center gap-4">
           <input
             className="p-2 border bg-white border-gray-200 rounded-md w-full"
@@ -160,6 +149,7 @@ function AdminProducts() {
             multiple
             accept="image/*"
             ref={imagesRef}
+            onChange={(e) => setFiles([...e?.target?.files])}
           />
           {/* <button onClick={() => uploadImages}>upload</button> */}
         </div>

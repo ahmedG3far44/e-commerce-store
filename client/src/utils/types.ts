@@ -11,6 +11,7 @@ export interface IProductItem {
   productId: string;
   product: IProduct;
   quantity: number;
+  updatedAt: Date;
 }
 export interface ICart {
   items: IProductItem[];
@@ -88,6 +89,7 @@ export interface OrderList {
   orderItems: OrderItemProps[];
   status: OrderStatus;
   totalOrderPrice: number;
+  createdAt: Date;
 }
 
 export interface OrderHistoryProps {
@@ -96,7 +98,7 @@ export interface OrderHistoryProps {
   address: string;
   status: OrderStatus;
   items: OrderItemProps[];
-  orderDate: string;
+  orderDate: Date;
 }
 
 export enum OrderStatus {

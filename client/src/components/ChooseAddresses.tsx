@@ -5,7 +5,7 @@ interface ChooseAddressProps {
   setUserAddress: (address: string) => void;
 }
 function ChooseAddresses({ userAddress, setUserAddress }: ChooseAddressProps) {
-  const [address, setAddresses] = useState<string[]>(userAddress);
+  const [address] = useState<string[]>(userAddress);
   const [activeShippedAddress, setActiveAddress] = useState<string>("");
 
   return (
