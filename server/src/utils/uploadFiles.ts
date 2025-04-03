@@ -4,7 +4,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 // {
 //   [fieldname: string]: Express.Multer.File[];
 // } | Express.Multer.File[]
-const uploadFiles = async (buffer: Express.Multer.File[]) => {
+const uploadFiles = async (buffer: any) => {
   try {
     console.log(buffer);
     if (buffer.length <= 1) {

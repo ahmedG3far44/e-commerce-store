@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import rootRoute from "./routes/rootRoute";
 import mongoose from "mongoose";
+// import http from "http"
+// import https from "https"
 
 // config env variables
 dotenv.config();
@@ -14,12 +16,16 @@ const env = process.env.NODE_ENV as string;
 // cors configs
 app.use(
   cors({
-    origin: [process.env.ALLOWED_ORIGINS!, "*"],
+    origin: [
+      env === "development"
+        ? "http://localhost:5173/"
+        : process.env.ALLOWED_ORIGINS!,
+    ],
+    credentials: true,
   })
 );
 
 // db connection
-
 
 mongoose
   .connect(process.env.DATABASE_URL!)
@@ -29,7 +35,6 @@ mongoose
   .catch(() => {
     console.log("db connection failed!!");
   });
-
 
 // middlewares
 app.use(express.json());
@@ -44,3 +49,7 @@ app.use("/api", rootRoute);
 app.listen(port, () => {
   console.log(`server is running ${port}`);
 });
+
+
+// env === "development"? http.createServer(): https
+

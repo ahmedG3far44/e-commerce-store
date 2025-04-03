@@ -15,7 +15,7 @@ function OrdersHistory() {
       .then((ordersList) => {
         console.log(ordersList);
         setOrders(ordersList);
-      })
+      })  
       .catch((err) => {
         console.error(err);
         setError(err);

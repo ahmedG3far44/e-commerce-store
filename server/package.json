@@ -6,10 +6,15 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start:prod": "node ./dis/src/index.js"
+    "start:prod": "node ./dist/src/index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "E-commerce",
+    "Online Store",
+    "Shopping",
+    "Online E-commerce"
+  ],
+  "author": "Ahmed G3far",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
