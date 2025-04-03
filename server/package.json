@@ -1,12 +1,12 @@
 {
   "name": "e-commerce-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "it's and online e-commerce web application.",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon",
-    "start:prod": "node ./dist/src/index.js"
+    "dev": "nodemon src/index.ts",
+    "prod": "node dist/index.js"
   },
   "keywords": [
     "E-commerce",

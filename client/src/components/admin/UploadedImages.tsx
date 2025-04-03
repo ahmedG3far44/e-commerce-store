@@ -1,14 +1,6 @@
-
 // import { File } from "./AdminProducts";
 
-function UploadedImages({
-  uploaded,
-}: {
-  uploaded: File[] | undefined;
-  setUploaded: () => void;
-}) {
-
-
+function UploadedImages({ uploaded }: { uploaded: File[] | undefined }) {
   // for (const file of files) {
   //   const url = URL.createObjectURL(file);
   //   setUploadedList([...url]);

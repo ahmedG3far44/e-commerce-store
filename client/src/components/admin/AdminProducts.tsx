@@ -6,7 +6,7 @@ import UploadedImages from "./UploadedImages";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
-export interface File {
+export interface CustomFile {
   lastModified: number;
   name: string;
   size: number;
@@ -25,7 +25,7 @@ interface Product {
 function AdminProducts() {
   const { token } = useAuth();
   const [uploadedImagesList, setImagesList] = useState<string[]>([]);
-  const [files, setFiles] = useState<File[] | []>([]);
+  const [files, setFiles] = useState<CustomFile[] | []>([]);
   const [pending, setPending] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const titleRef = useRef<any>(null);
@@ -42,9 +42,9 @@ function AdminProducts() {
       if (!token) return;
       setPending(true);
       // upload files first to S3 bucket
-      const files: File[] = imagesRef?.current?.files as File[];
+      const files: CustomFile[] = imagesRef?.current?.files as CustomFile[];
       setFiles([...files]);
-
+      console.log(uploadedImagesList);
       const imagesUpload = await uploadImages(files);
 
       // make sure the response is returned correct
@@ -138,7 +138,7 @@ function AdminProducts() {
         )}
 
         <div>
-          <UploadedImages uploaded={files} />
+          <UploadedImages uploaded={files as File[]} />
         </div>
 
         <div className="w-full flex items-center gap-4">
@@ -149,7 +149,11 @@ function AdminProducts() {
             multiple
             accept="image/*"
             ref={imagesRef}
-            onChange={(e) => setFiles([...e?.target?.files])}
+            onChange={(e) => {
+              if (e.target.files) {
+                setFiles(Array.from(e.target.files));
+              }
+            }}
           />
           {/* <button onClick={() => uploadImages}>upload</button> */}
         </div>
