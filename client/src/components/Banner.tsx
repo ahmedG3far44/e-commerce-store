@@ -33,6 +33,7 @@ function Banner() {
             {bannerImagesList.map((banner, index) => {
               return (
                 <span
+                  key={index}
                   className={`${banner} w-2 h-2 rounded-full ${
                     index === counter ? "bg-blue-300" : "bg-blue-100"
                   }`}
