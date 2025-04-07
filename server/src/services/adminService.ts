@@ -1,5 +1,7 @@
+import { AnimationDuration } from "./../../../client/node_modules/recharts/types/util/types.d";
 import orderModel from "../models/order";
 import userModel from "../models/user";
+import { GetAdminInsightsParams } from "../utils/types";
 
 interface UpdateOrderStatusParams {
   orderId: string;
@@ -64,3 +66,121 @@ export const getShippedOrders = async () => {
     return { data: err, statusCode: 400 };
   }
 };
+
+export const getAdminInsights = async ({
+  duration,
+}: GetAdminInsightsParams) => {
+  try {
+    const currentDate = new Date();
+    const activeDate = {
+      start: currentDate,
+      end: currentDate,
+    };
+
+    switch (duration) {
+      case "today":
+          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
+          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
+      case "this-month":
+          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      case "last-month":
+          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
+          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth()-1, currentDate.getDay());
+      case "last-6-month":
+          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
+          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth()-6, currentDate.getDay());
+      case "last-12-month":
+          activeDate.start=new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
+          activeDate.end=new Date(currentDate.getFullYear(), currentDate.getMonth()-12, currentDate.getDay());
+      default:
+        break;
+    }
+
+    console.log(activeDate)
+    // let results = {};
+
+    // const stats = await orderModel.aggregate([
+    //   {
+    //     $match: {
+    //       status: "DELIVERED",
+    //       createdAt: {
+    //         $gte: duration,
+    //         $lte: duration,
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       count: { $sum: 1 },
+    //       totalRevenue: { $sum: "$totalOrderPrice" },
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 0,
+    //       count: 1,
+    //       totalRevenue: 1,
+    //     },
+    //   },
+    // ]);
+
+    const statsResult =  { count: 0, totalRevenue: 0 };
+
+    return { data: statsResult, statusCode: 200 };
+  } catch (error) {
+    console.error("Error fetching delivered order stats:", error);
+    return { data: error, statusCode: 400 };
+  }
+};
+
+export const getOrderStatusCounts = async () => {
+  try {
+    const result = await orderModel.aggregate([
+      {
+        $match: {
+          status: { $in: ["PENDING", "SHIPPED", "DELIVERED"] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          pending: {
+            $sum: { $cond: [{ $eq: ["$status", "PENDING"] }, 1, 0] },
+          },
+          shipped: {
+            $sum: { $cond: [{ $eq: ["$status", "SHIPPED"] }, 1, 0] },
+          },
+          delivered: {
+            $sum: { $cond: [{ $eq: ["$status", "DELIVERED"] }, 1, 0] },
+          },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          pending: 1,
+          shipped: 1,
+          delivered: 1,
+          totalOrders: 1,
+        },
+      },
+    ]);
+
+    // Handle case when no orders exist
+    const orderStatus =
+      result.length > 0
+        ? result[0]
+        : { pending: 0, shipped: 0, delivered: 0, totalOrders: 0 };
+
+    return { data: orderStatus, statusCode: 200 };
+  } catch (error) {
+    console.error("Error fetching order status counts:", error);
+
+    return { data: error, statusCode: 400 };
+  }
+};
+
+

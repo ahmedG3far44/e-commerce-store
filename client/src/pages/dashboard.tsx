@@ -7,12 +7,52 @@ import { AiOutlineProduct } from "react-icons/ai";
 import { BiHomeSmile } from "react-icons/bi";
 import { MdAccessTime } from "react-icons/md";
 import { PiShippingContainer } from "react-icons/pi";
+import { useEffect, useState } from "react";
+const BASE_URL = import.meta.env.VITE_BASE_URL as string;
+
+export interface OrdersCountType {
+  pending: number;
+  shipped: number;
+  delivered: number;
+  totalOrders: number;
+}
 
 function Dashboard() {
-  const { logOut } = useAuth();
+  const { logOut, token } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [pending, setPending] = useState(false);
+  const [orderStatus, setOrderStatus] = useState<OrdersCountType>({
+    pending: 0,
+    delivered: 0,
+    shipped: 0,
+    totalOrders: 0,
+  });
   const activeLink = location.pathname.split("/").pop();
+  useEffect(() => {
+    async function getOrdersCountStatus() {
+      try {
+        if (!token) throw new Error("your not authorized to do this action!!!");
+        setPending(true);
+        const response = await fetch(`${BASE_URL}/admin/orders-insights`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error("can't get orders counts insights!!");
+        const data = await response.json();
+        setOrderStatus({ ...data });
+        return;
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setPending(false);
+      }
+    }
+    getOrdersCountStatus();
+  }, [token]);
+
   const dashboardList = [
     {
       id: 1,
@@ -21,6 +61,13 @@ function Dashboard() {
       path: "/",
 
       icon: <BiHomeSmile size={20} />,
+    },
+    {
+      id: 2,
+      name: "Insight",
+      link: "insights",
+      path: "/dashboard/insights",
+      icon: <AiOutlineProduct size={20} />,
     },
     {
       id: 2,
@@ -64,7 +111,7 @@ function Dashboard() {
     navigate("/");
   };
   return (
-    <div className="w-screen min-h-screen max-w-screen flex justify-start items-start  relative">
+    <div className="w-screen min-h-screen max-w-screen flex justify-start items-start  relative bg-zinc-200">
       <aside className="min-h-screen h-full w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start fixed left-0 top-0">
         <ul className="w-full flex justify-between flex-col items-start gap-1">
           {dashboardList.map((url) => {
@@ -77,9 +124,58 @@ function Dashboard() {
                 } hover:bg-blue-200 w-full p-4 rounded-md duration-150 border border-zinc-200 bg-white`}
                 href={url.path}
               >
-                <li className="flex items-center gap-4">
-                  <span>{url.icon}</span>
-                  {url.name}
+                <li className="flex justify-between items-center gap-4">
+                  <div className="flex justify-start gap-4 items-center">
+                    <span>{url.icon}</span>
+                    {url.name}
+                  </div>
+                  {url.link === "pending-orders" ? (
+                    pending ? (
+                      <Skeleton />
+                    ) : (
+                      <>
+                        {orderStatus.pending > 0 && (
+                          <div className="w-6 h-6 bg-blue-50 text-blue-500 rounded-full text-sm border border-blue-500 flex items-center justify-center">
+                            <span>{orderStatus.pending}</span>
+                          </div>
+                        )}
+                      </>
+                    )
+                  ) : url.link === "delivered-orders" ? (
+                    pending ? (
+                      <Skeleton />
+                    ) : (
+                      <>
+                        {orderStatus.delivered > 0 && (
+                          <div className="w-6 h-6 bg-blue-50 text-blue-500 rounded-full text-sm border border-blue-500 flex items-center justify-center">
+                            <span>{orderStatus.delivered}</span>
+                          </div>
+                        )}
+                      </>
+                    )
+                  ) : url.link === "shipped-orders" ? (
+                    pending ? (
+                      <Skeleton />
+                    ) : (
+                      <>
+                        {orderStatus.shipped > 0 && (
+                          <div className="w-6 h-6 bg-blue-50 text-blue-500 rounded-full text-sm border border-blue-500 flex items-center justify-center">
+                            <span>{orderStatus.shipped}</span>
+                          </div>
+                        )}
+                      </>
+                    )
+                  ) : url.link === "orders" ? (
+                    pending ? (
+                      <Skeleton />
+                    ) : (
+                      <>
+                        {orderStatus.totalOrders > 0 && (
+                          <span> {orderStatus.totalOrders}</span>
+                        )}
+                      </>
+                    )
+                  ) : null}
                 </li>
               </a>
             );
@@ -101,3 +197,9 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+function Skeleton() {
+  return (
+    <span className={"w-6 h-6 bg-zinc-300 rounded-full animate-pulse"}></span>
+  );
+}

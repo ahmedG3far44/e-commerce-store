@@ -25,3 +25,13 @@ export interface ICart {
   totalAmount: number;
   userId: string;
 }
+
+export interface GetAdminInsightsParams {
+  duration:
+    | string
+    | "toady"
+    | "this-month"
+    | "last-month"
+    | "last-6-month"
+    | "last-12-month";
+}

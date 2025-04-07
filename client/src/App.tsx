@@ -21,6 +21,7 @@ import AdminOrders from "./components/admin/AdminOrders";
 import AdminProducts from "./components/admin/AdminProducts";
 import AdminUsers from "./components/admin/AdminUsers";
 import AddAddress from "./pages/add-address";
+import Insights from "./components/admin/Insights";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ function App() {
                     path="orders"
                     element={<AdminOrders OrderStatus="orders" />}
                   />
+                  <Route path="insights" element={<Insights />} />
                   <Route
                     path="pending-orders"
                     element={<AdminOrders OrderStatus="pending" />}

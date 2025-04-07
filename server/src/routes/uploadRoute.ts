@@ -4,6 +4,7 @@ import s3Client from "../configs/s3Client";
 import { Buffer } from "buffer";
 import { ExtendedRequest } from "../utils/types";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import crypto from "crypto";
 
 const Bucket = process.env.AWS_S3_BUCKET as string;
 const router = express.Router();
@@ -29,7 +30,7 @@ router.post(
 
       let imagesUrl: any[] = [];
       files?.map(async (file) => {
-        const fileKey = `${file.fieldname}-${Date.now()}`;
+        const fileKey = `${crypto.randomUUID()}}` ;
 
         imagesUrl.push(`${process.env.AWS_S3_BUCKET_DOMAIN}/${fileKey}`);
 
@@ -37,7 +38,7 @@ router.post(
           Bucket,
           Key: fileKey,
           Body: file.buffer,
-          ContentType: file.mimetype as string,
+          ContentType: file.mimetype,
         });
 
         const result = await s3Client.send(command);

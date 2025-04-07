@@ -12,12 +12,16 @@ dotenv.config();
 const app = express();
 
 const port = process.env.PORT as string;
-// const env = process.env.NODE_ENV as string;
+const env = process.env.NODE_ENV as string;
 const allowedOrigins = process.env.ALLOWED_ORIGINS as string;
 // cors configs
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: [
+      env === "development"
+        ? allowedOrigins || "http:localhost:5173"
+        : allowedOrigins,
+    ],
     credentials: true,
   })
 );
@@ -47,4 +51,4 @@ app.listen(port, () => {
   console.log(`server is running ${port}`);
 });
 
-// env === "development"? http.createServer(): https
+
