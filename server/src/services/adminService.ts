@@ -79,25 +79,65 @@ export const getAdminInsights = async ({
 
     switch (duration) {
       case "today":
-          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
-          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
+        activeDate.start = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDay()
+        );
+        activeDate.end = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDay()
+        );
       case "this-month":
-          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        activeDate.start = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          1
+        );
+        activeDate.end = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          1
+        );
       case "last-month":
-          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
-          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth()-1, currentDate.getDay());
+        activeDate.start = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDay()
+        );
+        activeDate.end = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() - 1,
+          currentDate.getDay()
+        );
       case "last-6-month":
-          activeDate.start= new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
-          activeDate.end= new Date(currentDate.getFullYear(), currentDate.getMonth()-6, currentDate.getDay());
+        activeDate.start = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDay()
+        );
+        activeDate.end = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() - 6,
+          currentDate.getDay()
+        );
       case "last-12-month":
-          activeDate.start=new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay());
-          activeDate.end=new Date(currentDate.getFullYear(), currentDate.getMonth()-12, currentDate.getDay());
+        activeDate.start = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDay()
+        );
+        activeDate.end = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() - 12,
+          currentDate.getDay()
+        );
       default:
         break;
     }
 
-    console.log(activeDate)
+    console.log(activeDate);
     // let results = {};
 
     // const stats = await orderModel.aggregate([
@@ -126,7 +166,7 @@ export const getAdminInsights = async ({
     //   },
     // ]);
 
-    const statsResult =  { count: 0, totalRevenue: 0 };
+    const statsResult = { count: 0, totalRevenue: 0 };
 
     return { data: statsResult, statusCode: 200 };
   } catch (error) {
@@ -183,4 +223,56 @@ export const getOrderStatusCounts = async () => {
   }
 };
 
+export const getSalesInsights = async () => {
+  try {
+    // calc total sales
+    const orders = await orderModel.aggregate([
+      {
+        $match: {
+          status: { $in: ["DELIVERED"] },
+        },
+      },
+    ]);
 
+    
+
+    const totalSales = orders.reduce((acc, currentOrder) => {
+      return acc + currentOrder.totalOrderPrice;
+    }, 0);
+
+  
+
+    // total orders
+    const totalOrders = orders.length;
+
+    // most spent
+    const mostSpent = await orderModel.aggregate([
+      {
+        $match: {
+          status: { $in: ["DELIVERED"] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          mostSpent: { $max: "$totalOrderPrice" },
+        },
+      },
+    ]);
+    // active customer
+    const customers = await userModel.aggregate([
+      { $count: "activeCustomers" },
+    ]);
+    // const activeCustomers = customers?.length;
+
+    const salesInsights = {
+      totalSales,
+      totalOrders,
+      mostSpent: mostSpent[0].mostSpent.toFixed(2),
+      activeCustomers: customers[0].activeCustomers,
+    };
+    return { data: salesInsights, statusCode: 200 };
+  } catch (err: any) {
+    return { data: err?.message, statusCode: 400 };
+  }
+};

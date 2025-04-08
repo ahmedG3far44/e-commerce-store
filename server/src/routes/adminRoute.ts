@@ -8,6 +8,7 @@ import {
   getPendingOrders,
   getShippedOrders,
   updateOrderStatus,
+  getSalesInsights,
 } from "../services/adminService";
 
 import {
@@ -15,7 +16,7 @@ import {
   getRevenueByTime,
   getTopCustomers,
   // getProfitMargins
-} from '../controllers/adminControllers';
+} from "../controllers/adminControllers";
 
 import verifyToken from "../middlewares/verifyToken";
 import verifyAdmin from "../middlewares/verifyAdmin";
@@ -55,6 +56,14 @@ router.get("/pending-orders", verifyToken, verifyAdmin, async (req, res) => {
 router.get("/orders-insights", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const result = await getOrderStatusCounts();
+    res.status(result.statusCode).json(result.data);
+  } catch (err: any) {
+    res.status(500).json(err.message);
+  }
+});
+router.get("/sales", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const result = await getSalesInsights();
     res.status(result.statusCode).json(result.data);
   } catch (err: any) {
     res.status(500).json(err.message);
@@ -102,9 +111,9 @@ router.put(
   }
 );
 
-router.get('/orders/status-counts', verifyToken, verifyAdmin, getOrderCount);
-router.get('/revenue/:period', verifyToken, verifyAdmin, getRevenueByTime);
-router.get('/customers/top', verifyToken, verifyAdmin, getTopCustomers);
+router.get("/orders/status-counts", verifyToken, verifyAdmin, getOrderCount);
+router.get("/revenue/:period", verifyToken, verifyAdmin, getRevenueByTime);
+router.get("/customers/top", verifyToken, verifyAdmin, getTopCustomers);
 // router.get('/profit-margins', verifyToken, verifyAdmin, getProfitMargins);
 
 export default router;

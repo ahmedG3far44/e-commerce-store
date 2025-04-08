@@ -115,3 +115,19 @@ export interface OrderItemProps {
   quantity: number;
   productPrice: number;
 }
+
+
+export interface OrdersCountType {
+  pending: number;
+  shipped: number;
+  delivered: number;
+  totalOrders: number;
+}
+
+export interface TopCustomer {
+  userId?: string;
+  profile?: string;
+  email: string;
+  orderCount: number;
+  totalSpent: number;
+}

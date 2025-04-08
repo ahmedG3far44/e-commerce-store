@@ -1,21 +1,14 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../context/auth/AuthContext";
-
-import { LiaShippingFastSolid } from "react-icons/lia";
-import { PiUsersBold } from "react-icons/pi";
-import { AiOutlineProduct } from "react-icons/ai";
-import { BiHomeSmile } from "react-icons/bi";
-import { MdAccessTime } from "react-icons/md";
-import { PiShippingContainer } from "react-icons/pi";
 import { useEffect, useState } from "react";
-const BASE_URL = import.meta.env.VITE_BASE_URL as string;
+import useAuth from "../context/auth/AuthContext";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-export interface OrdersCountType {
-  pending: number;
-  shipped: number;
-  delivered: number;
-  totalOrders: number;
-}
+import { BiHomeSmile } from "react-icons/bi";
+import { LuChartColumnBig, LuBox, LuBoxes } from "react-icons/lu";
+import { MdAccessTime } from "react-icons/md";
+import { LiaUserCircleSolid, LiaShippingFastSolid } from "react-icons/lia";
+import { OrdersCountType } from "../utils/types";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function Dashboard() {
   const { logOut, token } = useAuth();
@@ -67,28 +60,28 @@ function Dashboard() {
       name: "Insight",
       link: "insights",
       path: "/dashboard/insights",
-      icon: <AiOutlineProduct size={20} />,
+      icon: <LuChartColumnBig size={20} />,
     },
     {
       id: 2,
       name: "Products",
       link: "products",
       path: "/dashboard/products",
-      icon: <AiOutlineProduct size={20} />,
+      icon: <LuBox size={20} />,
     },
     {
       id: 3,
       name: "Users",
       link: "users",
       path: "/dashboard/users",
-      icon: <PiUsersBold size={20} />,
+      icon: <LiaUserCircleSolid size={20} />,
     },
     {
       id: 4,
       name: "All Orders",
       link: "orders",
       path: "/dashboard/orders",
-      icon: <PiShippingContainer size={20} />,
+      icon: <LuBoxes size={20} />,
     },
     {
       id: 5,
@@ -111,8 +104,8 @@ function Dashboard() {
     navigate("/");
   };
   return (
-    <div className="w-screen min-h-screen max-w-screen flex justify-start items-start  relative bg-zinc-200">
-      <aside className="min-h-screen h-full w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start fixed left-0 top-0">
+    <div className="w-full min-h-screen max-w-full flex justify-start items-start  relative bg-zinc-200">
+      <aside className="min-h-screen h-full w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start fixed left-0 top-0 max-md:hidden max-sm:hidden">
         <ul className="w-full flex justify-between flex-col items-start gap-1">
           {dashboardList.map((url) => {
             return (
@@ -135,9 +128,7 @@ function Dashboard() {
                     ) : (
                       <>
                         {orderStatus.pending > 0 && (
-                          <div className="w-6 h-6 bg-blue-50 text-blue-500 rounded-full text-sm border border-blue-500 flex items-center justify-center">
-                            <span>{orderStatus.pending}</span>
-                          </div>
+                          <Notification number={orderStatus.pending} />
                         )}
                       </>
                     )
@@ -147,9 +138,7 @@ function Dashboard() {
                     ) : (
                       <>
                         {orderStatus.delivered > 0 && (
-                          <div className="w-6 h-6 bg-blue-50 text-blue-500 rounded-full text-sm border border-blue-500 flex items-center justify-center">
-                            <span>{orderStatus.delivered}</span>
-                          </div>
+                          <Notification number={orderStatus.delivered} />
                         )}
                       </>
                     )
@@ -159,9 +148,7 @@ function Dashboard() {
                     ) : (
                       <>
                         {orderStatus.shipped > 0 && (
-                          <div className="w-6 h-6 bg-blue-50 text-blue-500 rounded-full text-sm border border-blue-500 flex items-center justify-center">
-                            <span>{orderStatus.shipped}</span>
-                          </div>
+                          <Notification number={orderStatus.shipped} />
                         )}
                       </>
                     )
@@ -171,7 +158,9 @@ function Dashboard() {
                     ) : (
                       <>
                         {orderStatus.totalOrders > 0 && (
-                          <span> {orderStatus.totalOrders}</span>
+                          <span className="text-[12px] font-semibold text-zinc-500">
+                            {orderStatus.totalOrders}{" "}
+                          </span>
                         )}
                       </>
                     )
@@ -188,8 +177,7 @@ function Dashboard() {
           Logout
         </button>
       </aside>
-      <main className="w-[80%] min-h-screen absolute right-0 top-0  p-4">
-        <h1>Dashboard Admin</h1>
+      <main className="w-[80%] min-h-screen absolute right-0 top-0  p-4 max-sm:w-full max-md:w-full max-sm:relative max-md:relative">
         {<Outlet />}
       </main>
     </div>
@@ -201,5 +189,12 @@ export default Dashboard;
 function Skeleton() {
   return (
     <span className={"w-6 h-6 bg-zinc-300 rounded-full animate-pulse"}></span>
+  );
+}
+function Notification({ number }: { number: number }) {
+  return (
+    <div className="p-2 w-5 h-5 font-semibold bg-blue-500 text-white rounded-full text-[10px] flex items-center justify-center">
+      <span>{number}</span>
+    </div>
   );
 }
