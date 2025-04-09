@@ -38,7 +38,10 @@ function AddAddress() {
       const data = await response.json();
       toast.success("A new address was added!");
       navigate("/checkout");
-      addressRef?.current.value.reset();
+      if(addressRef?.current){
+
+        addressRef?.current?.reset();
+      }
       return data;
     } catch (err: any) {
       setError(err?.message);

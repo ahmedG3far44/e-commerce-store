@@ -3,6 +3,8 @@ import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import useAuth from "../../context/auth/AuthContext";
 import UploadedImages from "./UploadedImages";
+import { categories } from "../../utils/handlers";
+
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -24,10 +26,19 @@ interface Product {
 
 function AdminProducts() {
   const { token } = useAuth();
-  const [uploadedImagesList, setImagesList] = useState<string[]>([]);
+  // const [uploadedImagesList, setImagesList] = useState<string[]>([]);
   const [files, setFiles] = useState<CustomFile[] | []>([]);
   const [pending, setPending] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [uploadResult, setUploadResult] = useState<{
+    success?: boolean;
+    url?: string[];
+    error?: string;
+  } | null>({
+    success: false,
+    url: [""],
+    error: "",
+  });
+  const [error, setError] = useState<string | null>(null);
   const titleRef = useRef<any>(null);
   const addProductFormRef = useRef<any>(null);
   const descriptionRef = useRef<any>(null);
@@ -44,11 +55,19 @@ function AdminProducts() {
       // upload files first to S3 bucket
       const files: CustomFile[] = imagesRef?.current?.files as CustomFile[];
       setFiles([...files]);
-      console.log(uploadedImagesList);
-      const imagesUpload = await uploadImages(files);
+      console.log(uploadResult?.url);
+      const imagesUpload = await uploadImages(files as File[]);
 
       // make sure the response is returned correct
-      if (!imagesUpload) throw new Error("can't upload files to S3!!");
+      if (!imagesUpload || imagesUpload.length <= 0)
+        throw new Error("can't upload files to S3!!");
+      console.log("image url :");
+      console.log(imagesUpload);
+      setUploadResult({
+        success: true,
+        url: imagesUpload,
+      });
+
       // make add new product  request
       const product: Product = {
         title: titleRef?.current?.value as string,
@@ -74,13 +93,19 @@ function AdminProducts() {
 
       if (!data) throw new Error("can't get a new product!!");
 
+      if (addProductFormRef.current) {
+        setError(null);
+        addProductFormRef?.current?.reset();
+      }
       toast.success("a new product was added successful!!");
-
-      addProductFormRef?.current?.reset();
       return data;
     } catch (err: any) {
       console.log(err?.message);
       setError(err?.message);
+      setUploadResult({
+        success: false,
+        error: err?.message,
+      });
       toast.error(err?.message);
       return err;
     } finally {
@@ -88,7 +113,7 @@ function AdminProducts() {
     }
   };
 
-  const uploadImages = async (files: any[]) => {
+  const uploadImages = async (files: File[]) => {
     try {
       const formData = new FormData();
 
@@ -114,9 +139,7 @@ function AdminProducts() {
 
       const { images } = data;
 
-      setImagesList([...images]);
-
-      toast.success("uploaded images success!!");
+      // setImagesList([...images]);
       return images;
     } catch (err: any) {
       console.log(err?.message);
@@ -142,9 +165,17 @@ function AdminProducts() {
         </div>
 
         <div className="w-full flex items-center gap-4">
+          <label
+            htmlFor="image"
+            className="p-4 border border-dashed rounded-md bg-white border-zinc-500 hover:bg-zinc-100 duration-150 cursor-pointer text-sm text-zinc-600 w-full h-[100px] flex flex-col items-center justify-center"
+          >
+            <h1>Upload your product images</h1>
+            <span>here</span>
+          </label>
           <input
-            className="p-2 border bg-white border-gray-200 rounded-md w-full"
+            className="hidden p-2 border bg-white border-gray-200 rounded-md w-full"
             name="image"
+            id="image"
             type="file"
             multiple
             accept="image/*"
@@ -155,6 +186,7 @@ function AdminProducts() {
               }
             }}
           />
+
           {/* <button onClick={() => uploadImages}>upload</button> */}
         </div>
         <input
@@ -170,16 +202,19 @@ function AdminProducts() {
           id="category"
           ref={categoryRef}
         >
-          <option value="electronics">Electronics</option>
-          <option value="clothes">Clothes</option>
-          <option value="laptops">Laptops</option>
-          <option value="tools">Tools</option>
+          {categories.map((category) => {
+            const categorySlug = category.path
+              .split("/")[2]
+              .split("-")
+              .join(" ");
+            return <option value={categorySlug}>{categorySlug}</option>;
+          })}
         </select>
         <textarea
           className="p-2 border bg-white border-gray-200 rounded-md w-full"
           name="description"
           id="description"
-          placeholder="product title"
+          placeholder="product description"
           ref={descriptionRef}
         />
         <div className="flex w-full items-center gap-4 ">

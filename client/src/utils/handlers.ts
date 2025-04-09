@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  IProduct,
   loginUserParams,
   OnlyTokenParams,
   RegisterUserParams,
@@ -73,7 +74,7 @@ export const getAllProducts = async () => {
     if (!response.ok) {
       throw new Error("can't get a product please check your connection!!");
     }
-    const products = await response.json();
+    const products: IProduct[] = await response.json();
 
     return products;
   } catch (err) {
@@ -156,3 +157,34 @@ export const createOrder = async ({
     return err?.message;
   }
 };
+
+export const categories = [
+  {
+    id: 1,
+    categoryName: "Gaming Mouse Pads",
+    path: "/category/gaming-mouse-pads",
+    image: "../../public/images/mouse-2.jpg",
+    description: "Precision-engineered for gamers",
+  },
+  {
+    id: 2,
+    categoryName: "Extended Desk Mats",
+    path: "/category/extended-desk-mats",
+    image: "../../public/images/keyboard.jpg",
+    description: "Full desk coverage for your setup",
+  },
+  {
+    id: 3,
+    categoryName: "Designer Collections",
+    path: "/category/designer-collections",
+    image: "../../public/images/headset.jpg",
+    description: "Unique patterns for creative professionals",
+  },
+  {
+    id: 4,
+    categoryName: "PC Accessories",
+    path: "/category/pc-accessories",
+    image: "../../public/images/monitor.jpg",
+    description: "Complete your workstation",
+  },
+];

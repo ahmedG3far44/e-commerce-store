@@ -1,11 +1,13 @@
 export interface IProduct {
+  _id: string;
   title: string;
   description: string | null;
   category: string | null;
-  image: string | null;
+  images: string[] | [];
   price: number;
   stock: number;
 }
+
 
 export interface IProductItem {
   productId: string;
@@ -115,7 +117,6 @@ export interface OrderItemProps {
   quantity: number;
   productPrice: number;
 }
-
 
 export interface OrdersCountType {
   pending: number;

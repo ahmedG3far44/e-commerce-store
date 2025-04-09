@@ -1,5 +1,5 @@
 import { useState } from "react";
-import noValidImage from "../../public/no-image.jpg";
+import noValidImage from "../../public/images/placeholder.png";
 import useAuth from "../context/auth/AuthContext";
 import useCart from "../context/cart/CartContext";
 import handelDates from "../utils/handelDates";

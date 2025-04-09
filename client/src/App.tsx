@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 //
-import HomePage from "./pages/home";
+import LandingPage from "./pages/landing-page";
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
 import ProfilePage from "./pages/profile";
@@ -22,6 +22,7 @@ import AdminProducts from "./components/admin/AdminProducts";
 import AdminUsers from "./components/admin/AdminUsers";
 import AddAddress from "./pages/add-address";
 import Insights from "./components/admin/Insights";
+import ShopByCategory from "./pages/categories";
 
 const queryClient = new QueryClient();
 
@@ -33,8 +34,12 @@ function App() {
           <Toaster position="bottom-center" reverseOrder={false} />
           <BrowserRouter>
             <Routes>
-              <Route index path="/" element={<HomePage />} />
-              <Route path="/:id" element={<ProductDetails />} />
+              <Route index path="/" element={<LandingPage />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route
+                path="/category/:category-name"
+                element={<ShopByCategory />}
+              />
 
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />

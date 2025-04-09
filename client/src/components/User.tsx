@@ -8,6 +8,7 @@ import ShoppingCart from "./ShoppingCart";
 import { CgProfile } from "react-icons/cg";
 import { LuHistory } from "react-icons/lu";
 import { RxDashboard } from "react-icons/rx";
+import "../index.css";
 
 function User() {
   const { user, logOut } = useAuth();
@@ -19,7 +20,7 @@ function User() {
     navigate("/");
   };
   return (
-    <div className="absolute top-0 right-0  z-50 ">
+    <div className="relative  ">
       <div
         onClick={() => setOpen(!isOpen)}
         role="button"
@@ -42,11 +43,11 @@ function User() {
         </div>
       </div>
       {isOpen && (
-        <ul className=" min-w-40 p-2  flex flex-col justify-start items-start  rounded-md bg-zinc-100 border-zinc-400 shadow-md transition-all">
+        <ul className="absolute z-50 top-15 right-0 min-w-40 p-2 animate-fade flex flex-col justify-start items-start  rounded-md bg-zinc-100 border-zinc-400 shadow-md transition-all">
           {user?.isAdmin ? (
             <a
               className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150"
-              href="/dashboard"
+              href="/dashboard/insights"
             >
               <li className="flex items-center gap-4">
                 <RxDashboard size={20} />
