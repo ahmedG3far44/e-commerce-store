@@ -2,20 +2,25 @@
 import { useEffect, useState } from "react";
 import ShowOrdersHistory from "../ShowOrdersHistory";
 import useAuth from "../../context/auth/AuthContext";
+import { Order } from "../../utils/types";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function AdminOrders({ OrderStatus }: { OrderStatus: string }) {
-  const [ordersList, setOrdersList] = useState<any[]>([]);
+  const [ordersList, setOrdersList] = useState<Order[]>([]);
   const { token } = useAuth();
   useEffect(() => {
     async function getAllPendingOrders(OrderStatus: string) {
-      const url = `${BASE_URL}/admin/${
+      const url = `${BASE_URL}/admin/orders/${
         OrderStatus === "shipped"
-          ? "shipped-orders"
+          ? "shipped"
           : OrderStatus === "pending"
-          ? "pending-orders"
-          : "orders"
+          ? "pending"
+          : OrderStatus === "delivered"
+          ? "delivered"
+          : OrderStatus === "canceled"
+          ? "canceled"
+          : "all"
       }`;
       try {
         console.log(url);
@@ -42,7 +47,7 @@ function AdminOrders({ OrderStatus }: { OrderStatus: string }) {
     getAllPendingOrders(OrderStatus).then((orders) =>
       setOrdersList([...orders])
     );
-  }, []);
+  }, [token]);
   return (
     <div>
       {ordersList.length > 0 ? (
@@ -55,12 +60,14 @@ function AdminOrders({ OrderStatus }: { OrderStatus: string }) {
               return (
                 <ShowOrdersHistory
                   key={order._id}
-                  id={order._id}
-                  address={order.address}
-                  totalAmount={order.totalOrderPrice}
+                  _id={order._id}
+                  totalOrderPrice={order.totalOrderPrice}
                   status={order.status}
-                  items={order.orderItems}
-                  orderDate={order.createdAt}
+                  updatedAt={order.updatedAt}
+                  userId={order.userId}
+                  orderItems={order.orderItems}
+                  createdAt={order.createdAt}
+                  customer={order?.customer}
                 />
               );
             })}

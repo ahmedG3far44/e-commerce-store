@@ -1,6 +1,6 @@
 import { Outlet, Navigate } from "react-router-dom";
 import useAuth from "../context/auth/AuthContext";
-import Header from "./Header";
+import Header from "./landing/Header";
 import Container from "./Container";
 
 function ProtectedRoutes() {

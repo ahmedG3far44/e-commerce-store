@@ -1,7 +1,7 @@
 import { AnimationDuration } from "./../../../client/node_modules/recharts/types/util/types.d";
 import orderModel from "../models/order";
 import userModel from "../models/user";
-import { GetAdminInsightsParams } from "../utils/types";
+import { GetAdminInsightsParams, GetOrderByStatus } from "../utils/types";
 
 interface UpdateOrderStatusParams {
   orderId: string;
@@ -41,27 +41,17 @@ export const getAllUsers = async () => {
   }
 };
 
-export const getPendingOrders = async () => {
+export const getOrdersByStatus = async ({ state }: GetOrderByStatus) => {
   try {
-    const orders = await orderModel.find({ status: "PENDING" }).sort();
-    return { data: { orders }, statusCode: 200 };
-  } catch (err) {
-    return { data: err, statusCode: 400 };
-  }
-};
-export const getCompletedOrders = async () => {
-  try {
-    const orders = await orderModel.find({ status: "DELIVERED" }).sort();
-    return { data: { orders }, statusCode: 200 };
-  } catch (err) {
-    return { data: err, statusCode: 400 };
-  }
-};
-
-export const getShippedOrders = async () => {
-  try {
-    const orders = await orderModel.find({ status: "SHIPPED" }).sort();
-    return { data: { orders }, statusCode: 200 };
+    if (state === "ALL") {
+      const orders = await orderModel.find().sort();
+      return { data: { orders }, statusCode: 200 };
+    } else {
+      const orders = await orderModel
+        .find({ status: state.toUpperCase() })
+        .sort();
+      return { data: { orders }, statusCode: 200 };
+    }
   } catch (err) {
     return { data: err, statusCode: 400 };
   }
@@ -138,33 +128,6 @@ export const getAdminInsights = async ({
     }
 
     console.log(activeDate);
-    // let results = {};
-
-    // const stats = await orderModel.aggregate([
-    //   {
-    //     $match: {
-    //       status: "DELIVERED",
-    //       createdAt: {
-    //         $gte: duration,
-    //         $lte: duration,
-    //       },
-    //     },
-    //   },
-    //   {
-    //     $group: {
-    //       _id: null,
-    //       count: { $sum: 1 },
-    //       totalRevenue: { $sum: "$totalOrderPrice" },
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //       count: 1,
-    //       totalRevenue: 1,
-    //     },
-    //   },
-    // ]);
 
     const statsResult = { count: 0, totalRevenue: 0 };
 
@@ -234,13 +197,9 @@ export const getSalesInsights = async () => {
       },
     ]);
 
-    
-
     const totalSales = orders.reduce((acc, currentOrder) => {
       return acc + currentOrder.totalOrderPrice;
     }, 0);
-
-  
 
     // total orders
     const totalOrders = orders.length;

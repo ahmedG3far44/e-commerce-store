@@ -35,3 +35,26 @@ export interface GetAdminInsightsParams {
     | "last-6-month"
     | "last-12-month";
 }
+
+export interface CheckoutCartParams {
+  userId: string;
+  shipInfo: ShipInfo;
+}
+export interface ShipInfo {
+  address: string;
+  country?: string;
+  state?: string;
+  phone?: string;
+}
+export interface Customer {
+  name: string;
+  email?: string;
+  address:string;
+  area?: string;
+  phone?: string;
+}
+
+
+export interface GetOrderByStatus {
+  state: string | "pending" | "shipped" | "delivered" | "canceled";
+}

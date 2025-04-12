@@ -15,7 +15,7 @@ function ImageSlider({ images }: { images: string[] }) {
   }, [images.length]);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center h-56 overflow-hidden relative rounded-2xl ">
+    <div className="w-full h-full flex flex-col justify-center items-center  overflow-hidden relative rounded-2xl ">
       <img
         loading="lazy"
         src={images[activeIndex]}

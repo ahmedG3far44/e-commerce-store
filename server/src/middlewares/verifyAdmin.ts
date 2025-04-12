@@ -25,7 +25,7 @@ const verifyAdmin = async (
         .status(403)
         .json("Your not able to do this action, only admins can!!");
     }
-    
+
     req.user = validUser;
     next();
   } catch (err) {

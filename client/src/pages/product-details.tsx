@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import Header from "../components/Header";
+import Header from "../components/landing/Header";
 import Container from "../components/Container";
 import handelDates from "../utils/handelDates";
 import ProductInfo, { ProductInfoProps } from "../components/ProductInfo";

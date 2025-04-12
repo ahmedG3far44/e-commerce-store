@@ -55,21 +55,6 @@ function Footer() {
                     </a>
                   </li>
                 );
-                // <li>
-                //   <a href="/accessories" className="hover:text-white transition">
-                //     PC Accessories
-                //   </a>
-                // </li>
-                // <li>
-                //   <a href="/new-arrivals" className="hover:text-white transition">
-                //     New Arrivals
-                //   </a>
-                // </li>
-                // <li>
-                //   <a href="/best-sellers" className="hover:text-white transition">
-                //     Best Sellers
-                //   </a>
-                // </li>
               })}
             </ul>
           </div>
@@ -85,16 +70,6 @@ function Footer() {
               <li>
                 <a href="/shipping" className="hover:text-white transition">
                   Shipping & Returns
-                </a>
-              </li>
-              <li>
-                <a href="/warranty" className="hover:text-white transition">
-                  Warranty
-                </a>
-              </li>
-              <li>
-                <a href="/contact" className="hover:text-white transition">
-                  Contact Us
                 </a>
               </li>
             </ul>

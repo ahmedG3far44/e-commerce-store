@@ -4,7 +4,7 @@ import product from "../models/product";
 import userModel from "../models/user";
 import productModel from "../models/product";
 import orderModel from "../models/order";
-import { IProduct, IProductItem } from "../utils/types";
+import { CheckoutCartParams, IProduct, IProductItem } from "../utils/types";
 
 interface CreateCartParams {
   userId: string;
@@ -216,11 +216,7 @@ export const clearCart = async ({ userId }: ClearCartParams) => {
   }
 };
 
-interface CheckoutCartParams {
-  userId: string;
-  address: string;
-}
-export const checkout = async ({ userId, address }: CheckoutCartParams) => {
+export const checkout = async ({ userId, shipInfo }: CheckoutCartParams) => {
   try {
     const cart = await getActiveCart({ userId });
 
@@ -260,9 +256,19 @@ export const checkout = async ({ userId, address }: CheckoutCartParams) => {
       });
     }
 
+    const customer = await userModel.findById(userId);
+
+    if (!customer) throw new Error("not foud user !!");
+
     const order = await orderModel.create({
       orderItems,
-      address,
+      customer: {
+        name: `${customer?.firstName} ${customer?.lastName}`,
+        email: customer.email,
+        address: shipInfo?.address,
+        area: `${shipInfo?.state} | ${shipInfo?.country}`,
+        phone: shipInfo?.phone,
+      },
       userId,
       totalOrderPrice: cart.totalAmount,
     });
@@ -281,3 +287,4 @@ export const checkout = async ({ userId, address }: CheckoutCartParams) => {
     return { data: err, statusCode: 400 };
   }
 };
+

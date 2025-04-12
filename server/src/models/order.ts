@@ -1,4 +1,6 @@
+import { Customer } from "./../utils/types";
 import mongoose, { Schema, ObjectId, Document } from "mongoose";
+
 
 interface IOrderItemsList {
   productTitle: string;
@@ -17,17 +19,17 @@ const orderItemsSchema = new Schema<IOrderItemsList>({
 
 interface IOrder extends Document {
   orderItems: IOrderItemsList[];
-  address: string;
+  customer: Customer;
   totalOrderPrice: number;
   userId: ObjectId | string;
 }
 
- const OrderStatusEnum = ["PENDING", "SHIPPED", "DELIVERED"];
+const OrderStatusEnum = ["PENDING", "SHIPPED", "DELIVERED", "CANCELED"];
 
 const orderSchema = new Schema(
   {
     orderItems: { type: [orderItemsSchema] },
-    address: { type: String, required: true },
+    customer: { type: Schema.Types.Mixed, required: true },
     totalOrderPrice: { type: Number, required: true },
     status: { type: String, enum: OrderStatusEnum, default: "PENDING" },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },

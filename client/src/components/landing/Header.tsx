@@ -16,8 +16,8 @@ function Header() {
   return (
     <header
       className={`${
-        isScrolled && "border-b-zinc-200 border-b"
-      } bg-white shadow-sm sticky top-0 z-[999] `}
+        isScrolled && "border-b-zinc-200 border-b shadow-md"
+      } bg-white border-b border-zinc-100  sticky top-0 z-[999] `}
     >
       <div className="container mx-auto px-4 py-4">
         <div className="m-auto flex items-center justify-around">

@@ -63,35 +63,42 @@ function Dashboard() {
       icon: <LuChartColumnBig size={20} />,
     },
     {
-      id: 2,
+      id: 3,
       name: "Products",
       link: "products",
       path: "/dashboard/products",
       icon: <LuBox size={20} />,
     },
     {
-      id: 3,
+      id: 4,
       name: "Users",
       link: "users",
       path: "/dashboard/users",
       icon: <LiaUserCircleSolid size={20} />,
     },
     {
-      id: 4,
+      id: 5,
       name: "All Orders",
-      link: "orders",
-      path: "/dashboard/orders",
+      link: "all-orders",
+      path: "/dashboard/all-orders",
       icon: <LuBoxes size={20} />,
     },
     {
-      id: 5,
+      id: 6,
+      name: "Delivered Orders",
+      link: "delivered-orders",
+      path: "/dashboard/delivered-orders",
+      icon: <LuBoxes size={20} />,
+    },
+    {
+      id: 7,
       name: "Pending Orders",
       link: "pending-orders",
       path: "/dashboard/pending-orders",
       icon: <MdAccessTime size={20} />,
     },
     {
-      id: 6,
+      id: 8,
       name: "Shipped Orders",
       link: "shipped-orders",
       path: "/dashboard/shipped-orders",
@@ -152,14 +159,14 @@ function Dashboard() {
                         )}
                       </>
                     )
-                  ) : url.link === "orders" ? (
+                  ) : url.link === "all-orders" ? (
                     pending ? (
                       <Skeleton />
                     ) : (
                       <>
                         {orderStatus.totalOrders > 0 && (
                           <span className="text-[12px] font-semibold text-zinc-500">
-                            {orderStatus.totalOrders}{" "}
+                            {orderStatus.totalOrders}
                           </span>
                         )}
                       </>

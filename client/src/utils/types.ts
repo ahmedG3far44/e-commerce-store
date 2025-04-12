@@ -8,7 +8,6 @@ export interface IProduct {
   stock: number;
 }
 
-
 export interface IProductItem {
   productId: string;
   product: IProduct;
@@ -131,4 +130,32 @@ export interface TopCustomer {
   email: string;
   orderCount: number;
   totalSpent: number;
+}
+
+export interface ProductInITemsList {
+  _id: string;
+  productTitle: string;
+  productImages: string;
+  productDescription: string;
+  productPrice: number;
+  quantity: number;
+}
+
+export interface Customer {
+  name: string;
+  email?: string;
+  address: string;
+  area?: string;
+  phone?: string;
+}
+
+export interface Order {
+  _id: string;
+  orderItems: ProductInITemsList[];
+  status: string | "PENDING" | "SHIPPED" | "DELIVERED" | "CANCELED";
+  customer?: Customer;
+  totalOrderPrice: number;
+  createdAt: Date;
+  updatedAt?: Date;
+  userId: string;
 }

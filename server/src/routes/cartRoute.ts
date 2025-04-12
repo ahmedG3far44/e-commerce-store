@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ExtendedRequest } from "../utils/types";
+import { ExtendedRequest, ShipInfo } from "../utils/types";
 import {
   addProductToCart,
   checkout,
@@ -78,9 +78,9 @@ router.delete("/cart/items", verifyToken, async (req: ExtendedRequest, res) => {
     const result = await clearCart({
       userId,
     });
-    res.status(result.statusCode).send(result.data);
+    res.status(result.statusCode).json(result.data);
   } catch (err: any) {
-    res.status(500).send(err.message);
+    res.status(500).json(err.message);
   }
 });
 
@@ -90,14 +90,16 @@ router.post(
   async (req: ExtendedRequest, res) => {
     try {
       const userId = req.user?.id!;
-      const { address } = req.body;
+      const payload: ShipInfo = req.body;
       const result = await checkout({
         userId,
-        address,
+        shipInfo: {
+          ...payload,
+        },
       });
-      res.status(result.statusCode).send(result.data);
+      res.status(result.statusCode).json(result.data);
     } catch (err: any) {
-      res.status(500).send(err.message);
+      res.status(500).json(err.message);
     }
   }
 );

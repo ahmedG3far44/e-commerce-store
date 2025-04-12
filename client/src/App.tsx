@@ -58,8 +58,12 @@ function App() {
                   <Route path="products" element={<AdminProducts />} />
                   <Route path="users" element={<AdminUsers />} />
                   <Route
-                    path="orders"
-                    element={<AdminOrders OrderStatus="orders" />}
+                    path="all-orders"
+                    element={<AdminOrders OrderStatus="all" />}
+                  />
+                  <Route
+                    path="delivered-orders"
+                    element={<AdminOrders OrderStatus="delivered" />}
                   />
                   <Route path="insights" element={<Insights />} />
                   <Route

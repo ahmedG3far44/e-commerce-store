@@ -1,14 +1,12 @@
 import { Router } from "express";
-import { ExtendedRequest } from "../utils/types";
+import { ExtendedRequest, GetOrderByStatus } from "../utils/types";
 import {
   getAdminInsights,
   getAllUsers,
   getOrderStatusCounts,
-  getCompletedOrders,
-  getPendingOrders,
-  getShippedOrders,
   updateOrderStatus,
   getSalesInsights,
+  getOrdersByStatus,
 } from "../services/adminService";
 
 import {
@@ -23,36 +21,36 @@ import verifyAdmin from "../middlewares/verifyAdmin";
 
 const router = Router();
 
+// router.get(
+//   "/orders",
+//   verifyToken,
+//   verifyAdmin,
+//   async (req: ExtendedRequest, res) => {
+//     try {
+//       const result = await getCompletedOrders();
+//       res.status(result.statusCode).json(result.data);
+//     } catch (err: any) {
+//       res.status(500).json(err?.message);
+//     }
+//   }
+// );
+
 router.get(
-  "/orders",
+  "/orders/:state",
   verifyToken,
   verifyAdmin,
   async (req: ExtendedRequest, res) => {
     try {
-      const result = await getCompletedOrders();
+      const state = req.params.state;
+      if (!state) throw Error("status not found!!");
+      const result = await getOrdersByStatus({ state: state.toUpperCase() });
       res.status(result.statusCode).json(result.data);
     } catch (err: any) {
-      res.status(500).json(err?.message);
+      res.status(500).json(err.message);
     }
   }
 );
 
-router.get("/shipped-orders", verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const result = await getShippedOrders();
-    res.status(result.statusCode).json(result.data);
-  } catch (err: any) {
-    res.status(500).json(err.message);
-  }
-});
-router.get("/pending-orders", verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const result = await getPendingOrders();
-    res.status(result.statusCode).json(result.data);
-  } catch (err: any) {
-    res.status(500).json(err.message);
-  }
-});
 router.get("/orders-insights", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const result = await getOrderStatusCounts();
