@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ExtendedRequest, GetOrderByStatus } from "../utils/types";
+import { ExtendedRequest } from "../utils/types";
 import {
   getAdminInsights,
   getAllUsers,
@@ -21,19 +21,7 @@ import verifyAdmin from "../middlewares/verifyAdmin";
 
 const router = Router();
 
-// router.get(
-//   "/orders",
-//   verifyToken,
-//   verifyAdmin,
-//   async (req: ExtendedRequest, res) => {
-//     try {
-//       const result = await getCompletedOrders();
-//       res.status(result.statusCode).json(result.data);
-//     } catch (err: any) {
-//       res.status(500).json(err?.message);
-//     }
-//   }
-// );
+
 
 router.get(
   "/orders/:state",
@@ -111,7 +99,6 @@ router.put(
 
 router.get("/orders/status-counts", verifyToken, verifyAdmin, getOrderCount);
 router.get("/revenue/:period", verifyToken, verifyAdmin, getRevenueByTime);
-router.get("/customers/top", verifyToken, verifyAdmin, getTopCustomers);
-// router.get('/profit-margins', verifyToken, verifyAdmin, getProfitMargins);
+router.get("/customers/top", verifyToken, verifyAdmin, getTopCustomers);;
 
 export default router;

@@ -1,32 +1,28 @@
-import express from "express";
-import dotenv from "dotenv";
+import fs from "fs";
 import cors from "cors";
-import rootRoute from "./routes/rootRoute";
+import https from "https";
+import dotenv from "dotenv";
+import express from "express";
 import mongoose from "mongoose";
-// import http from "http"
-// import https from "https"
+import rootRoute from "./routes/rootRoute";
 
-// config env variables
 dotenv.config();
 
 const app = express();
 
 const port = process.env.PORT as string;
 const env = process.env.NODE_ENV as string;
-const allowedOrigins = process.env.ALLOWED_ORIGINS as string;
-// cors configs
-app.use(
-  cors({
-    origin: [
-      env === "development"
-        ? allowedOrigins || "http:localhost:5173"
-        : allowedOrigins,
-    ],
-    credentials: true,
-  })
-);
+// const allowedOrigins = process.env.ALLOWED_ORIGINS as string;
 
-// db connection
+
+const corsOptions = {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  };
+
+app.use(cors(corsOptions));
 
 mongoose
   .connect(process.env.DATABASE_URL!)
@@ -40,15 +36,33 @@ mongoose
 // middlewares
 app.use(express.json());
 
+
+
+
 // routes
 app.get("/", (req, res) => {
   res.send("app is running success");
 });
+app.get("/health", (req, res) => {
+  res.json({"status": "ok", "message": "server is running good!"});
+});
 app.use("/api", rootRoute);
 
-// Listening Port
-app.listen(port, () => {
-  console.log(`server is running ${port}`);
-});
 
+
+// server
+if (env === "production") {
+  const options = {
+    key: fs.readFileSync("path/to/your/private.key", "utf-8"),
+    cert: fs.readFileSync("path/to/your/certificate.crt", "utf-8"),
+  };
+
+  https.createServer(options, app).listen(443, () => {
+    console.log(`Https server is running on port 443 in ${env} environment`);
+  });
+} else {
+  app.listen(port, () => {
+    console.log(`Http server is running on port ${port} in ${env} environment`);
+  });
+}
 

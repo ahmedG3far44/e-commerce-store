@@ -1,0 +1,23 @@
+/client/.env
+/client/node_modules
+/client/dist
+/client/logs    
+/client/tmp
+/client/coverage
+/client/.DS_Store
+/client/.vscode
+/client/.idea
+/client/.cache
+/client/build
+/server/.env
+/server/node_modules
+/server/dist    
+/server/logs
+/server/tmp
+/server/coverage
+/server/.DS_Store   
+/server/.vscode
+/server/.idea
+
+# Logs
+*.log         

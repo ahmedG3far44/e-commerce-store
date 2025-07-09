@@ -1,11 +1,6 @@
-import mongoose, { Schema, Document } from "mongoose";
 import { IProductItem } from "./../utils/types";
+import mongoose, { Schema, Document } from "mongoose";
 
-// interface ICartProduct {
-//   quantity: number;
-//   product: IProduct;
-//   productId: string;
-// }
 
 const cartItemListSchema = new Schema(
   {
@@ -47,7 +42,6 @@ const cartSchema = new Schema(
   }
 );
 
-// const itemsModel = mongoose.model<ICartItemList>("items", cartItemListSchema);
 
 const cartModel = mongoose.model<ICart>("cart", cartSchema);
 

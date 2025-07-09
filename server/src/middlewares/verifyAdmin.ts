@@ -1,6 +1,6 @@
-import { ExtendedRequest } from "./../utils/types";
-import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { Response, NextFunction } from "express";
+import { ExtendedRequest } from "./../utils/types";
 import { GenerateTokenParams } from "../services/userService";
 
 const verifyAdmin = async (
