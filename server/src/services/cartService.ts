@@ -1,10 +1,9 @@
-import { string } from "zod";
+
 import cartModel from "./../models/cart";
-import product from "../models/product";
 import userModel from "../models/user";
 import productModel from "../models/product";
 import orderModel from "../models/order";
-import { CheckoutCartParams, IProduct, IProductItem } from "../utils/types";
+import { CheckoutCartParams, IProductItem } from "../utils/types";
 
 interface CreateCartParams {
   userId: string;

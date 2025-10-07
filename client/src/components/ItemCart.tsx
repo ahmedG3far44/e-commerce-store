@@ -72,7 +72,7 @@ function ItemCart({
             <button
               className="p-2 w-10 h-10 bg-blue-500 hover:bg-blue-800 cursor-pointer rounded-md text-white text-2xl flex justify-center items-center"
               onClick={() => {
-                setNewQuantity((quantity += 1));
+                setNewQuantity((prev) => (prev += 1));
                 handelUpdateQuantity(newQuantity);
               }}
             >
@@ -89,7 +89,7 @@ function ItemCart({
               <button
                 className="p-2 w-10 h-10 bg-blue-500 hover:bg-blue-800 cursor-pointer rounded-md text-white text-2xl flex justify-center items-center"
                 onClick={() => {
-                  setNewQuantity((quantity -= 1));
+                  setNewQuantity((prev) => (prev -= 1));
                   handelUpdateQuantity(newQuantity);
                 }}
               >

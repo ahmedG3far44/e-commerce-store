@@ -3,6 +3,7 @@ import verifyToken from "../middlewares/verifyToken";
 import { ExtendedRequest } from "../utils/types";
 import {
   addNewProduct,
+  deleteProductById,
   getAllProducts,
   getProductById,
   updateNewProduct,
@@ -20,7 +21,7 @@ router.get("/product", async (req, res) => {
 });
 
 // create a middleware to check the user is admin or not only admins can access this endpoint.
-router.post("/product", async (req: ExtendedRequest, res) => {
+router.post("/product", verifyToken, async (req: ExtendedRequest, res) => {
   try {
     const product = req.body;
     const result = await addNewProduct({ productData: product });
@@ -45,6 +46,16 @@ router.get("/product/:id", async (req: ExtendedRequest, res) => {
   try {
     const { id } = req.params;
     const result = await getProductById({ productId: id });
+    res.status(result.statusCode).json(result.data);
+  } catch (err: any) {
+    res.status(500).json(err.message);
+  }
+});
+
+router.delete("/product/:id", verifyToken, async (req: ExtendedRequest, res) => {
+  try {
+    const { id } = req.params;
+    const result = await deleteProductById({ productId: id });
     res.status(result.statusCode).json(result.data);
   } catch (err: any) {
     res.status(500).json(err.message);

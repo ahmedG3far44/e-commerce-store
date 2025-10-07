@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useState } from "react";
 import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
@@ -14,8 +13,7 @@ function CheckoutPage() {
 
   const [pending, setPending] = useState(false);
   const [addresses, setAddressesList] = useState<string[]>([]);
-  // const addressRef = useRef(null);
-  // const addressFormRef = useRef(null);
+
 
   const getAddressesList = async ({ token }: { token: string }) => {
     try {

@@ -6,51 +6,87 @@ import Header from "../components/landing/Header";
 import Container from "../components/Container";
 import handelDates from "../utils/handelDates";
 import ProductInfo, { ProductInfoProps } from "../components/ProductInfo";
+import RelatedProducts from "../components/landing/RelatedProducts";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function ProductDetails() {
   const { id } = useParams();
   const [productInfo, setProductInfo] = useState<ProductInfoProps | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
+
     async function getProductById(productId: string) {
       try {
+        setLoading(true);
         const response = await fetch(`${BASE_URL}/product/${productId}`);
-
         if (!response.ok) {
-          throw new Error("can't get Product details, check your connection!!");
+          throw new Error("Can't get product details, check your connection!");
         }
-
         const productInfo = await response.json();
-
         setProductInfo({ ...productInfo });
-
         return productInfo;
       } catch (err: any) {
         toast.error(err?.message);
         console.error(err?.message);
         return;
+      } finally {
+        setLoading(false);
       }
     }
+
     getProductById(id);
   }, [id]);
-  if (!productInfo) return;
+
+  if (loading) {
+    return (
+      <Container>
+        <Header />
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </Container>
+    );
+  }
+
+  if (!productInfo) {
+    return (
+      <Container>
+        <Header />
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <p className="text-gray-500 text-lg">Product not found</p>
+        </div>
+      </Container>
+    );
+  }
+
   const date = handelDates(productInfo?.createdAt);
+
   return (
     <Container>
       <Header />
-      <ProductInfo
-        productId={id!}
-        title={productInfo.title}
-        description={productInfo.description}
-        category={productInfo.category}
-        images={productInfo.images}
-        price={productInfo.price}
-        stock={productInfo.stock}
-        createdAt={date}
-      />
+      <div className="py-8">
+        <ProductInfo
+          productId={id!}
+          title={productInfo.title}
+          description={productInfo.description}
+          category={productInfo.category}
+          images={productInfo.images}
+          price={productInfo.price}
+          stock={productInfo.stock}
+          createdAt={date}
+        />
+
+        {/* Related Products Section */}
+        <div className="mt-16">
+          <RelatedProducts
+            category={productInfo.category}
+            currentProductId={id!}
+          />
+        </div>
+      </div>
     </Container>
   );
 }

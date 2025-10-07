@@ -85,3 +85,16 @@ export const getProductById = async ({ productId }: GetProductByIdParams) => {
     return { data: "can't get product by Id", statusCode: 400 };
   }
 };
+
+export const deleteProductById = async ({ productId }: GetProductByIdParams) => {
+  try {
+    const product = await productModel.findByIdAndDelete({ _id: productId });
+
+    if (!product) {
+      return { data: "faild to delete this product doesn't exist!!", statusCode: 400 };
+    }
+    return { data: product, statusCode: 200 };
+  } catch (err) {
+    return { data: "can't delete product by Id", statusCode: 400 };
+  }
+};

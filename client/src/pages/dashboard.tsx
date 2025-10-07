@@ -111,7 +111,7 @@ function Dashboard() {
     navigate("/");
   };
   return (
-    <div className="w-full min-h-screen max-w-full flex justify-start items-start  relative bg-zinc-200">
+    <div className="w-full min-h-screen max-w-full flex justify-start bg-zinc-300 items-start  relative ">
       <aside className="min-h-screen h-full w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start fixed left-0 top-0 max-md:hidden max-sm:hidden">
         <ul className="w-full flex justify-between flex-col items-start gap-1">
           {dashboardList.map((url) => {
@@ -184,7 +184,7 @@ function Dashboard() {
           Logout
         </button>
       </aside>
-      <main className="w-[80%] min-h-screen absolute right-0 top-0  p-4 max-sm:w-full max-md:w-full max-sm:relative max-md:relative">
+      <main className="w-[80%] min-h-screen h-screen overflow-y-auto absolute right-0 top-0  p-4 max-sm:w-full max-md:w-full max-sm:relative max-md:relative">
         {<Outlet />}
       </main>
     </div>

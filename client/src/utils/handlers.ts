@@ -68,19 +68,17 @@ export const logout = async () => {
   return;
 };
 
-export const getAllProducts = async () => {
+export const getAllProducts = async (): Promise<IProduct[]> => {
   try {
     const response = await fetch(`${BASE_URL}/product`);
     if (!response.ok) {
       throw new Error("can't get a product please check your connection!!");
     }
     const products: IProduct[] = await response.json();
-
     return products;
   } catch (err) {
     console.error(err);
-
-    return err;
+    return [] as IProduct[];
   }
 };
 

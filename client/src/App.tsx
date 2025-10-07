@@ -15,7 +15,6 @@ import AdminRoutes from "./components/AdminRoutes";
 import Dashboard from "./pages/dashboard";
 import OrdersHistory from "./pages/orders";
 import SuccessOrder from "./pages/success-order";
-import { Toaster } from "react-hot-toast";
 import ProductDetails from "./pages/product-details";
 import AdminOrders from "./components/admin/AdminOrders";
 import AdminProducts from "./components/admin/AdminProducts";
@@ -23,6 +22,8 @@ import AdminUsers from "./components/admin/AdminUsers";
 import AddAddress from "./pages/add-address";
 import Insights from "./components/admin/Insights";
 import ShopByCategory from "./pages/categories";
+import { Toaster } from "react-hot-toast";
+import CategoryPage from "./pages/categories";
 
 const queryClient = new QueryClient();
 
@@ -37,8 +38,8 @@ function App() {
               <Route index path="/" element={<LandingPage />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route
-                path="/category/:category-name"
-                element={<ShopByCategory />}
+                path="/category/:categoryName"
+                element={<CategoryPage />}
               />
 
               <Route path="/login" element={<LoginPage />} />

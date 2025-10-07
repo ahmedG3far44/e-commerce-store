@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../context/auth/AuthContext";
 import { createOrder } from "../utils/handlers";
@@ -13,9 +13,11 @@ interface TotalOrderProps {
 function TotalOrder({ total, addresses }: TotalOrderProps) {
   const navigate = useNavigate();
   const addressRef = useRef<any>(null);
+  const [loading, setLoading] = useState(false);
   const { token } = useAuth();
   const handelCheckout = async () => {
     try {
+      setLoading(true);
       const address = addressRef?.current?.value;
       if (!token) {
         throw new Error("address is required please fill it correct!!");
@@ -30,6 +32,8 @@ function TotalOrder({ total, addresses }: TotalOrderProps) {
     } catch (err: any) {
       toast.error(err?.message);
       return;
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -86,10 +90,11 @@ function TotalOrder({ total, addresses }: TotalOrderProps) {
       {addresses.length !== 0 && (
         <div className="w-full">
           <button
-            className="p-2 rounded-md w-full bg-blue-500 cursor-pointer text-white hover:bg-blue-700 duration-150"
+            disabled={loading}
+            className="p-2 rounded-md w-full bg-blue-500 cursor-pointer text-white hover:bg-blue-700 duration-150 disabled:cursor-not-allowed disabled:bg-zinc-500"
             onClick={handelCheckout}
           >
-            Confirm Order
+            {loading ? "Confirming Order..." : " Confirm Order"}
           </button>
         </div>
       )}

@@ -55,8 +55,7 @@ function ShowOrdersHistory({
       const data = await response.json();
       if (!data) throw new Error("can't get response data!!");
       toast.success("order status updated to DELIVERED success!!");
-      console.log("on change state of order return ");
-      console.log(data);
+
       return;
     } catch (err: any) {
       console.log(err?.message);
@@ -88,9 +87,6 @@ function ShowOrdersHistory({
       const data = await response.json();
       if (!data) throw new Error("can't get response data!!");
       toast.success("order status updated to SHIPPED success!!");
-
-      console.log("on change state of order return ");
-      console.log(data);
       return;
     } catch (err: any) {
       console.log(err?.message);
@@ -123,11 +119,8 @@ function ShowOrdersHistory({
       const data = await response.json();
       if (!data) throw new Error("can't get response data!!");
       toast.success("The order is cancled!!");
-      console.log("on change state of order return ");
-      console.log(data);
       return;
     } catch (err: any) {
-      console.log(err?.message);
       toast.error(err?.message);
       return;
     } finally {
@@ -135,10 +128,10 @@ function ShowOrdersHistory({
     }
   };
   return (
-    <div className="w-full flex flex-col justify-start items-start  gap-2">
+    <div className="w-full flex flex-col justify-start items-start  gap-4">
       <div
         role={"button"}
-        className="w-full flex justify-between items-center p-2 border border-zinc-200 cursor-pointer hover:shadow-md transition-all  max-sm:flex-col max-md:flex-col max-sm:justify-start max-md:justify-start  max-sm:items-start max-md:items-start"
+        className="w-full flex justify-between items-center p-2  border-zinc-200 border-t border-b  cursor-pointer hover:shadow-md transition-all  max-sm:flex-col max-md:flex-col max-sm:justify-start max-md:justify-start  max-sm:items-start max-md:items-start"
         onClick={() => setOpen(!isOpen)}
       >
         <div className="w-full flex items-center justify-center gap-2">
@@ -176,7 +169,7 @@ function ShowOrdersHistory({
         </div>
       </div>
       {isOpen && (
-        <div className="bg-zinc-100 p-4 w-full border border-zinc-200">
+        <div className="bg-zinc-200 p-4 w-full border border-zinc-300 rounded-2xl ">
           {customer && (
             <OrderCustomerInfo className="p-2" customer={customer} />
           )}

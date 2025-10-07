@@ -1,6 +1,7 @@
+import { IProduct } from "../../utils/types";
 import { useEffect, useState } from "react";
 import { getAllProducts } from "../../utils/handlers";
-import { IProduct } from "../../utils/types";
+
 import ProductCard from "../ProductCard";
 
 function FeaturedProducts() {
@@ -38,18 +39,9 @@ function FeaturedProducts() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-8">
                 {displayProducts.map((product) => (
-                  <ProductCard
-                    key={product._id}
-                    _id={product._id}
-                    title={product.title}
-                    description={product.description}
-                    images={product.images}
-                    category={product.category}
-                    stock={product.stock}
-                    price={product.price}
-                  />
+                  <ProductCard key={product._id} {...product} />
                 ))}
               </div>
             )}

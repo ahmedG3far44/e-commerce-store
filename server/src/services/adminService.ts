@@ -1,4 +1,3 @@
-import { AnimationDuration } from "./../../../client/node_modules/recharts/types/util/types.d";
 import orderModel from "../models/order";
 import userModel from "../models/user";
 import { GetAdminInsightsParams, GetOrderByStatus } from "../utils/types";
@@ -188,7 +187,7 @@ export const getOrderStatusCounts = async () => {
 
 export const getSalesInsights = async () => {
   try {
-    // calc total sales
+
     const orders = await orderModel.aggregate([
       {
         $match: {
@@ -201,10 +200,9 @@ export const getSalesInsights = async () => {
       return acc + currentOrder.totalOrderPrice;
     }, 0);
 
-    // total orders
     const totalOrders = orders.length;
 
-    // most spent
+
     const mostSpent = await orderModel.aggregate([
       {
         $match: {
@@ -218,12 +216,10 @@ export const getSalesInsights = async () => {
         },
       },
     ]);
-    // active customer
+
     const customers = await userModel.aggregate([
       { $count: "activeCustomers" },
     ]);
-    // const activeCustomers = customers?.length;
-
     const salesInsights = {
       totalSales,
       totalOrders,
