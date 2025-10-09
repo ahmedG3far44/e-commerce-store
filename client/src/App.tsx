@@ -1,6 +1,6 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-//
+
 import LandingPage from "./pages/landing-page";
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
@@ -21,17 +21,15 @@ import AdminProducts from "./components/admin/AdminProducts";
 import AdminUsers from "./components/admin/AdminUsers";
 import AddAddress from "./pages/add-address";
 import Insights from "./components/admin/Insights";
-import ShopByCategory from "./pages/categories";
 import { Toaster } from "react-hot-toast";
 import CategoryPage from "./pages/categories";
 
-const queryClient = new QueryClient();
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <QueryClientProvider client={queryClient}>
+
           <Toaster position="bottom-center" reverseOrder={false} />
           <BrowserRouter>
             <Routes>
@@ -81,7 +79,6 @@ function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </BrowserRouter>
-        </QueryClientProvider>
       </CartProvider>
     </AuthProvider>
   );

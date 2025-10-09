@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
 import ItemCart from "../components/ItemCart";
@@ -29,7 +28,7 @@ function CartPage() {
       <div className="flex flex-col items-start gap-1 justify-start">
         {cartItems.length > 0 ? (
           cartItems.map(({ product, productId, quantity, updatedAt }) => {
-            const { title, description, category, image, price, stock } =
+            const { title, description, category, images, price, stock } =
               product;
             return (
               <ItemCart
@@ -38,8 +37,8 @@ function CartPage() {
                 title={title}
                 category={category}
                 stock={stock}
-                description={description || ""}
-                image={image || ""}
+                description={description as string}
+                image={images[0]}
                 price={price}
                 quantity={quantity}
                 updatedAt={updatedAt}
