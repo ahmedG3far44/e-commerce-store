@@ -1,1 +1,1 @@
-
+Description of this e-commerce project

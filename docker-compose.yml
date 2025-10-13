@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  client:
+    build:
+      context: ./client
+    container_name: client_app
+    restart: always
+    env_file:
+      - ./client/.env  
+    environment:
+      - NODE_ENV=production
+
+  server:
+    build:
+      context: ./server
+    container_name: server_app
+    restart: always
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - client
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx_proxy
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - client
+      - server
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew; done'"

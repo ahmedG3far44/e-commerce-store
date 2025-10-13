@@ -39,7 +39,6 @@ app.use(express.json());
 
 
 
-// routes
 app.get("/", (req, res) => {
   res.send("app is running success");
 });
@@ -50,11 +49,10 @@ app.use("/api", rootRoute);
 
 
 
-// server
 if (env === "production") {
   const options = {
-    key: fs.readFileSync("path/to/your/private.key", "utf-8"),
-    cert: fs.readFileSync("path/to/your/certificate.crt", "utf-8"),
+    key: fs.readFileSync(process.env.SSL_KEY as string),
+    cert: fs.readFileSync(process.env.SSL_CERT as string),
   };
 
   https.createServer(options, app).listen(443, () => {

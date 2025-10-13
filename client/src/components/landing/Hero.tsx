@@ -44,7 +44,7 @@ function Hero() {
           <div className="relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-300">
               <img
-                src="../../../public/images/headset.jpg"
+                src="headset.jpg"
                 alt="Premium Gaming Setup"
                 className="w-full h-auto object-cover"
               />
