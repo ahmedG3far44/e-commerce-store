@@ -33,7 +33,8 @@ mongoose
     console.log("db connection failed!!");
   });
 
-// middlewares
+
+  
 app.use(express.json());
 
 

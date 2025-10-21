@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 interface IProduct extends Document {
+  categoryId: Types.ObjectId;
   title: string;
   description: string;
   category?: string;
@@ -11,6 +12,11 @@ interface IProduct extends Document {
 
 const productSchema = new Schema(
   {
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: [true, 'Category is required']
+    },
     title: {
       type: String,
       require: true,

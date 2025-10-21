@@ -14,7 +14,7 @@ import {
   getRevenueByTime,
   getTopCustomers,
   // getProfitMargins
-} from "../controllers/adminControllers";
+} from "../controllers/admin.controller";
 
 import verifyToken from "../middlewares/verifyToken";
 import verifyAdmin from "../middlewares/verifyAdmin";
