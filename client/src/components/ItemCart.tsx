@@ -8,7 +8,7 @@ interface ItemCart {
   productId: string;
   title: string;
   description: string;
-  category: string | null;
+  categoryName: string | null;
   image: string;
   quantity: number;
   stock: number;
@@ -19,7 +19,7 @@ interface ItemCart {
 function ItemCart({
   productId,
   title,
-  category,
+  categoryName,
   description,
   image,
   quantity,
@@ -62,7 +62,9 @@ function ItemCart({
           <span className="text-sm text-zinc-500 ">{handelDates(date)}</span>
         </div>
 
-        <span className="text-md font-semibold text-blue-500">{category}</span>
+        <span className="text-md font-semibold text-blue-500">
+          {categoryName}
+        </span>
 
         <div className="flex items-center gap-4">
           <span>${price}</span>X<span>{newQuantity}</span>

@@ -3,7 +3,8 @@ import cartModel from "./../models/cart";
 import userModel from "../models/user";
 import productModel from "../models/product";
 import orderModel from "../models/order";
-import { CheckoutCartParams, IProductItem } from "../utils/types";
+
+import { CheckoutCartParams, CartProduct, IProductItem, ICart } from "../utils/types";
 
 interface CreateCartParams {
   userId: string;
@@ -40,7 +41,6 @@ interface AddProductToCartParams {
   productId: string;
   quantity: number;
 }
-
 export const addProductToCart = async ({
   userId,
   productId,
@@ -48,46 +48,46 @@ export const addProductToCart = async ({
 }: AddProductToCartParams) => {
   try {
     const product = await productModel.findById(productId);
+
     if (!product) {
       return { data: "this product not found", statusCode: 400 };
     }
+
     if (product.stock < quantity) {
       return { data: "this product is out of stock!!", statusCode: 400 };
     }
 
     let cart = await getActiveCart({ userId });
 
+    // Handle error case from getActiveCart
     if ("statusCode" in cart) {
       return cart;
     }
 
+    // Check if product already exists in cart
     const isAddedToCart = cart.items.find(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId.toString() === productId.toString()
     );
 
     if (isAddedToCart) {
       return { data: "this product is already on cart!!", statusCode: 400 };
     }
-    const { _id, title, description, images, price, stock, category } = product;
-
-    let image = "";
-    !!images?.length ? (image = images[0]) : "";
 
     const newProduct: IProductItem = {
       productId,
       product: {
-        title,
-        description,
-        category: category || null,
-        image,
-        price,
-        stock,
+        title: product.title,
+          thumbnail: product.images?.[0] || "",
+        description: product.description,
+        categoryId: product.categoryId.toString(),
+        categoryName: product.categoryName,
+        price: product.price,
+        stock: product.stock,
       },
       quantity,
     };
 
     cart.items.push(newProduct);
-
     cart.totalAmount += product.price * quantity;
 
     const updatedCart = await cart.save();
@@ -128,13 +128,8 @@ export const updateItemsInCart = async ({
 
     updatedItem.quantity = quantity;
 
-    const totalItems = cart.items.filter(
-      (item) => item.productId !== productId
-    );
-
-    const totalItemsPrice = calculateItemsInCartTotalPrice(totalItems);
-
-    cart.totalAmount = totalItemsPrice;
+    // Recalculate total for ALL items (including the updated one)
+    cart.totalAmount = calculateItemsInCartTotalPrice(cart.items);
 
     const updatedCart = await cart.save();
 
@@ -143,7 +138,6 @@ export const updateItemsInCart = async ({
     return { data: err.message, statusCode: 400 };
   }
 };
-
 const calculateItemsInCartTotalPrice = (totalItems: IProductItem[]): number => {
   return totalItems.reduce((acc, current) => {
     return acc + current.product.price * current.quantity;
@@ -165,17 +159,19 @@ export const deleteItemFromCart = async ({
       return cart;
     }
 
-    const deletedItems = cart.items.find(
-      (item) => item.productId.toString() !== productId
+    // Find the item to delete (should use === not !==)
+    const itemToDelete = cart.items.find(
+      (item) => item.productId.toString() === productId
     );
 
-    if (!deletedItems) {
+    if (!itemToDelete) {
       return {
         data: "failed to delete this item!!",
         statusCode: 400,
       };
     }
 
+    // Filter out the deleted item
     const totalItems = cart.items.filter(
       (item) => item.productId.toString() !== productId
     );

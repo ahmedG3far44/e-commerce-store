@@ -1,13 +1,16 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 interface IProduct extends Document {
-  categoryId: Types.ObjectId;
   title: string;
   description: string;
-  category?: string;
+  categoryId: Types.ObjectId;
+  categoryName: string;
   images?: string[];
   price: number;
   stock: number;
+  totalSales: number;
+  ordersCount: number;
+
 }
 
 const productSchema = new Schema(
@@ -15,6 +18,10 @@ const productSchema = new Schema(
     categoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
+      required: [true, 'Category is required']
+    },
+    categoryName: {
+      type:String,
       required: [true, 'Category is required']
     },
     title: {
@@ -26,6 +33,10 @@ const productSchema = new Schema(
     },
     category: {
       type: String,
+    },
+    thumbnail:{
+      type: String,
+      require: true,
     },
     images: {
       type: [String],
@@ -39,6 +50,14 @@ const productSchema = new Schema(
       type: Number,
       default: true,
     },
+    totalSales: {
+      type: Number,
+      default: 0,
+    },
+    ordersCount: {
+      type: Number,
+      default: 0,
+    }
   },
   {
     timestamps: true,

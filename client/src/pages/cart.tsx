@@ -4,6 +4,18 @@ import ItemCart from "../components/ItemCart";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
+interface IProduct {
+  _id: string;
+  title: string;
+  description: string | null;
+  categoryName: string | null;
+  image: string;
+  price: number;
+  stock: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 function CartPage() {
   const { token } = useAuth();
   const { cartItems, totalAmount, getUserCart, clearAllItemsFromCart } =
@@ -28,18 +40,17 @@ function CartPage() {
       <div className="flex flex-col items-start gap-1 justify-start">
         {cartItems.length > 0 ? (
           cartItems.map(({ product, productId, quantity, updatedAt }) => {
-            const { title, description, category, images, price, stock } =
-              product;
+            console.log(product);
             return (
               <ItemCart
                 key={productId}
+                categoryName={product.category}
+                image={product.thumbnail as string}
+                description={product.description as string}
+                price={product.price}
+                stock={product.stock}
+                title={product.title}
                 productId={productId}
-                title={title}
-                category={category}
-                stock={stock}
-                description={description as string}
-                image={images[0]}
-                price={price}
                 quantity={quantity}
                 updatedAt={updatedAt}
                 checkoutState={true}

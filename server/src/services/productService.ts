@@ -1,7 +1,9 @@
-import { IProduct } from "../utils/types";
 import { productSchema } from "../utils/validationSchema";
 import product from "../models/product";
 import productModel from "../models/product";
+import categoryModel from "../models/category"; 
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import s3Client from "../configs/s3Client";
 
 export const getAllProducts = async () => {
   try {
@@ -11,13 +13,16 @@ export const getAllProducts = async () => {
     return { data: err.message, statusCode: 400 };
   }
 };
+
 interface AddProductParams {
   productData: string;
 }
+
 export const addNewProduct = async ({ productData }: AddProductParams) => {
   try {
-    const validProductData = productSchema.safeParse(productData);
 
+    console.log(productData)
+    const validProductData = productSchema.safeParse(productData);
     if (!validProductData.success) {
       console.log(validProductData.error.flatten().fieldErrors);
       return {
@@ -26,9 +31,20 @@ export const addNewProduct = async ({ productData }: AddProductParams) => {
       };
     }
 
-    const newProduct = await product.insertOne({ ...validProductData.data });
-    await newProduct.save();
+    const category = await categoryModel.findById(validProductData.data.categoryId);
+    if (!category) {
+      return {
+        data: "Category not found",
+        statusCode: 400,
+      };
+    }
 
+    const newProduct = await product.insertOne({
+      ...validProductData.data,
+      totalSales: 0, 
+      ordersCount: 0, 
+    });
+    await newProduct.save();
     return { data: newProduct, statusCode: 201 };
   } catch (err) {
     return { data: "can't create a product", statusCode: 400 };
@@ -36,35 +52,55 @@ export const addNewProduct = async ({ productData }: AddProductParams) => {
 };
 
 interface IUpdateProduct {
-  product: IProduct;
+  product: any;
   productId: string;
 }
+
 export const updateNewProduct = async ({
   productId,
   product,
 }: IUpdateProduct) => {
   try {
     const existProduct = await productModel.findById(productId);
-
     if (!existProduct) {
       return { data: "this product not found!!", statusCode: 400 };
     }
 
     const validProductData = productSchema.safeParse(product);
-
     if (!validProductData.success) {
       return { data: "the product data are not valid", statusCode: 400 };
     }
 
-    const updatedProduct = await productModel.findByIdAndUpdate(productId, {
-      ...validProductData.data,
-    });
+    let categoryName = existProduct.categoryName;
+    if (String(existProduct.categoryId) !== validProductData.data.categoryId) {
+      const category = await categoryModel.findById(validProductData.data.categoryId);
+      if (!category) {
+        return {
+          data: "Category not found",
+          statusCode: 400,
+        };
+      }
+      categoryName = category.name;
+    }
+
+   
+    const updatedProduct = await productModel.findByIdAndUpdate(
+      productId,
+      {
+        ...validProductData.data,
+        categoryName,
+        totalSales: existProduct.totalSales, 
+        ordersCount: existProduct.ordersCount, 
+      },
+      { new: true } 
+    );
+
     if (!updatedProduct) {
       return { data: "can't update product info", statusCode: 400 };
     }
-    await updatedProduct.save();
 
-    return { data: updatedProduct, statusCode: 203 };
+    // Note: findByIdAndUpdate returns the updated doc, no need to save again
+    return { data: updatedProduct, statusCode: 200 }; // Changed from 203 to 200
   } catch (err) {
     return { data: "can't update product info", statusCode: 400 };
   }
@@ -73,12 +109,12 @@ export const updateNewProduct = async ({
 interface GetProductByIdParams {
   productId: string;
 }
+
 export const getProductById = async ({ productId }: GetProductByIdParams) => {
   try {
-    const productDetails = await productModel.findById({ _id: productId });
-
+    const productDetails = await productModel.findById(productId); // Simplified
     if (!productDetails) {
-      return { data: "The product doesn't found!!", statusCode: 400 };
+      return { data: "The product doesn't found!!", statusCode: 404 }; // Changed to 404
     }
     return { data: productDetails, statusCode: 200 };
   } catch (err) {
@@ -88,13 +124,45 @@ export const getProductById = async ({ productId }: GetProductByIdParams) => {
 
 export const deleteProductById = async ({ productId }: GetProductByIdParams) => {
   try {
-    const product = await productModel.findByIdAndDelete({ _id: productId });
-
+    const product = await productModel.findById(productId); 
     if (!product) {
-      return { data: "faild to delete this product doesn't exist!!", statusCode: 400 };
+      return { 
+        data: "failed to delete, this product doesn't exist!!", 
+        statusCode: 404 
+      };
     }
-    return { data: product, statusCode: 200 };
+    // Delete images from S3
+    for (const img of product?.images as string[]){
+      const deletedKey = img.split(".com/")[1].trim();
+      console.log(deletedKey)
+      const command = new DeleteObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: deletedKey
+      });
+      // Note: You'll need to execute the command with S3 client
+
+      await s3Client.send(command).then(()=>{
+        console.log("all images deleted success", img.split(".com/")[1].trim())
+      }).catch((error)=> {
+        return { data: "can't delete product by Id", statusCode: 400 };
+      })
+    }
+    
+    // Delete the product from database
+    await productModel.findByIdAndDelete(productId);
+    return { data: product, statusCode: 200, message:"product deleted success!!" };
   } catch (err) {
     return { data: "can't delete product by Id", statusCode: 400 };
   }
+};
+
+
+export const updateProductSales = async (productId: string, quantity: number) => {
+  return await productModel.findByIdAndUpdate(
+    productId,
+    {
+      $inc: { totalSales: quantity, ordersCount: 1 }
+    },
+    { new: true }
+  );
 };

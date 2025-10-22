@@ -3,7 +3,13 @@ import useAuth from "../context/auth/AuthContext";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { BiHomeSmile } from "react-icons/bi";
-import { LuChartColumnBig, LuBox, LuBoxes } from "react-icons/lu";
+import {
+  LuChartColumnBig,
+  LuBox,
+  LuBoxes,
+  LuGitCompare,
+  LuLayoutPanelTop,
+} from "react-icons/lu";
 import { MdAccessTime } from "react-icons/md";
 import { LiaUserCircleSolid, LiaShippingFastSolid } from "react-icons/lia";
 import { OrdersCountType } from "../utils/types";
@@ -64,41 +70,48 @@ function Dashboard() {
     },
     {
       id: 3,
+      name: "Categories",
+      link: "categories",
+      path: "/dashboard/categories",
+      icon: <LuLayoutPanelTop size={20} />,
+    },
+    {
+      id: 4,
       name: "Products",
       link: "products",
       path: "/dashboard/products",
       icon: <LuBox size={20} />,
     },
     {
-      id: 4,
+      id: 5,
       name: "Users",
       link: "users",
       path: "/dashboard/users",
       icon: <LiaUserCircleSolid size={20} />,
     },
     {
-      id: 5,
+      id: 6,
       name: "All Orders",
       link: "all-orders",
       path: "/dashboard/all-orders",
       icon: <LuBoxes size={20} />,
     },
     {
-      id: 6,
+      id: 7,
       name: "Delivered Orders",
       link: "delivered-orders",
       path: "/dashboard/delivered-orders",
       icon: <LuBoxes size={20} />,
     },
     {
-      id: 7,
+      id: 8,
       name: "Pending Orders",
       link: "pending-orders",
       path: "/dashboard/pending-orders",
       icon: <MdAccessTime size={20} />,
     },
     {
-      id: 8,
+      id: 9,
       name: "Shipped Orders",
       link: "shipped-orders",
       path: "/dashboard/shipped-orders",

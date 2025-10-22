@@ -20,7 +20,6 @@ router.get("/product", async (req, res) => {
   }
 });
 
-// create a middleware to check the user is admin or not only admins can access this endpoint.
 router.post("/product", verifyToken, async (req: ExtendedRequest, res) => {
   try {
     const product = req.body;

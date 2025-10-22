@@ -19,7 +19,6 @@ router.get("/cart", verifyToken, async (req: ExtendedRequest, res) => {
     const cart = await getActiveCart({ userId });
     res.status(200).json(cart);
   } catch (err: any) {
-    // console.log(err);
     res.status(500).json(err.message);
   }
 });

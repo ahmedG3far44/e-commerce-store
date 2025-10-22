@@ -4,12 +4,11 @@ export interface IProduct {
   description: string | null;
   category: string | null;
   images: string[] | [];
-  brand?:string;
-  currency: "USD" | "GBP" | "EUR" | "AED" | "RSA" | "EGP" 
+  thumbnail?: string;
   price: number;
   stock: number;
-  rating?: number;
-  createdAt?: string;
+  createdAt?: Date;
+  updatedAt?:Date;
 }
 
 export interface IProductItem {

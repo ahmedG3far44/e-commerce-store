@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Order } from "../../utils/types";
 import { useEffect, useState } from "react";
 import ShowOrdersHistory from "../ShowOrdersHistory";
 import useAuth from "../../context/auth/AuthContext";
-import { Order } from "../../utils/types";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 

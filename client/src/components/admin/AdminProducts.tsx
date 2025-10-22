@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef, useState, useEffect } from "react";
+import { useCategory } from "../../context/category/CategoryContext";
 import toast from "react-hot-toast";
-import useAuth from "../../context/auth/AuthContext";
 import UploadedImages from "./UploadedImages";
-import { categories } from "../../utils/handlers";
-
+import useAuth from "../../context/auth/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -20,21 +18,27 @@ interface Product {
   _id?: string;
   title: string;
   description: string;
-  category: string;
+  thumbnail: string;
   images: string[];
   price: number;
   stock: number;
+  categoryId: string;
+  categoryName: string;
+  totalSales: number;
+  ordersCount: number;
   createdAt?: string;
 }
 
 function AdminProducts() {
   const { token } = useAuth();
+  const { categories } = useCategory();
   const [files, setFiles] = useState<CustomFile[] | []>([]);
   const [pending, setPending] = useState<boolean>(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploadedResults, setUploadResult] = useState<{
     success?: boolean;
     url?: string[];
@@ -49,26 +53,50 @@ function AdminProducts() {
   const titleRef = useRef<any>(null);
   const addProductFormRef = useRef<any>(null);
   const descriptionRef = useRef<any>(null);
-  const categoryRef = useRef<any>(null);
+  const categoryRef = useRef<HTMLSelectElement | null>(null);
   const imagesRef = useRef<any>(null);
-  const priceRef = useRef<any>(null);
-  const stockRef = useRef<any>(null);
+  const priceRef = useRef<any>("0");
+  const stockRef = useRef<any>("0");
 
-  // Fetch all products
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (editingProduct) {
+      // Populate form with editing product data
+      if (titleRef.current) titleRef.current.value = editingProduct.title;
+      if (descriptionRef.current)
+        descriptionRef.current.value = editingProduct.description;
+      if (categoryRef.current)
+        categoryRef.current.value = editingProduct.categoryId;
+      if (priceRef.current)
+        priceRef.current.value = editingProduct.price.toString();
+      if (stockRef.current)
+        stockRef.current.value = editingProduct.stock.toString();
+
+      // Scroll to form
+      addProductFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [editingProduct]);
 
   const handleRemoveSelectedFile = (removedFile: File) => {
     const filterFiles = files.filter((file) => file !== removedFile);
     setFiles(filterFiles);
   };
+
   const fetchProducts = async () => {
     try {
       setLoadingProducts(true);
       const response = await fetch(`${BASE_URL}/product`);
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
+
+      console.log(products);
+
       setProducts(data);
     } catch (err: any) {
       toast.error(err?.message || "Failed to load products");
@@ -80,34 +108,64 @@ function AdminProducts() {
   const handelAddNewProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      if (!token) return;
+      if (!token) {
+        toast.error("Authentication required");
+        return;
+      }
 
       setPending(true);
+      setError(null);
 
-      const files: CustomFile[] = imagesRef?.current?.files as CustomFile[];
-      setFiles([...files]);
+      // Check if we're updating or creating
+      let imagesUpload: string[] = [];
 
-      const imagesUpload = await uploadImages(files as File[]);
+      if (files.length > 0) {
+        // Upload new images
+        const filesArray: CustomFile[] = imagesRef?.current
+          ?.files as CustomFile[];
+        imagesUpload = await uploadImages(filesArray as File[]);
 
-      if (!imagesUpload || imagesUpload.length <= 0)
-        throw new Error("Can't upload files to S3!");
+        if (!imagesUpload || imagesUpload.length <= 0) {
+          throw new Error("Can't upload files to S3!");
+        }
 
-      setUploadResult({
-        success: true,
-        url: imagesUpload,
-      });
+        setUploadResult({
+          success: true,
+          url: imagesUpload,
+        });
+      } else if (editingProduct) {
+        // Keep existing images if updating and no new images
+        imagesUpload = editingProduct.images;
+      } else {
+        throw new Error("Please upload at least one image");
+      }
+
+      const selectedCategoryId = categoryRef.current?.value as string;
+      const categoryName = categories.find(
+        (category) => category._id === selectedCategoryId
+      )?.name as string;
 
       const product: Product = {
+        categoryId: selectedCategoryId,
+        categoryName: categoryName,
         title: titleRef?.current?.value as string,
         description: descriptionRef?.current?.value as string,
-        category: categoryRef?.current?.value as string,
+        thumbnail: imagesUpload[0],
         images: imagesUpload,
         price: parseFloat(priceRef?.current?.value),
         stock: parseInt(stockRef?.current?.value),
+        ordersCount: editingProduct?.ordersCount || 0,
+        totalSales: editingProduct?.totalSales || 0,
       };
 
-      const response = await fetch(`${BASE_URL}/product`, {
-        method: "POST",
+      const url = editingProduct
+        ? `${BASE_URL}/product/${editingProduct._id}`
+        : `${BASE_URL}/product`;
+
+      const method = editingProduct ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -115,30 +173,41 @@ function AdminProducts() {
         body: JSON.stringify(product),
       });
 
-      if (!response.ok) throw new Error("Can't add a new product!");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message ||
+            `Can't ${editingProduct ? "update" : "add"} product!`
+        );
+      }
 
       const data = await response.json();
 
-      if (!data) throw new Error("Can't get a new product!");
+      if (!data)
+        throw new Error(
+          `Can't get ${editingProduct ? "updated" : "new"} product!`
+        );
 
+      // Reset form
       if (addProductFormRef.current) {
         setError(null);
         addProductFormRef?.current?.reset();
         setFiles([]);
+        setEditingProduct(null);
       }
 
-      toast.success("Product added successfully!");
-      fetchProducts();
-      return data;
+      toast.success(
+        `Product ${editingProduct ? "updated" : "added"} successfully!`
+      );
+      await fetchProducts();
     } catch (err: any) {
-      console.log(err?.message);
+      console.error(err?.message);
       setError(err?.message);
       setUploadResult({
         success: false,
         error: err?.message,
       });
       toast.error(err?.message);
-      return err;
     } finally {
       setPending(false);
     }
@@ -175,13 +244,13 @@ function AdminProducts() {
       const { images } = data;
       return images;
     } catch (err: any) {
-      console.log(err?.message);
+      console.error(err?.message);
       toast.error(err?.message);
       setUploadResult({
         error: (err as Error).message,
         success: false,
       });
-      return;
+      throw err;
     } finally {
       setUploadResult((prev) => ({
         ...prev,
@@ -191,56 +260,80 @@ function AdminProducts() {
   };
 
   const deleteProduct = async (productId: string) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
-
     try {
-      setPending(true);
-      setError(null);
+      if (!token) {
+        toast.error("Authentication required");
+        return;
+      }
+
       const response = await fetch(`${BASE_URL}/product/${productId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
 
-      if (!response.ok) throw new Error("Failed to delete product");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete product");
+      }
 
       toast.success("Product deleted successfully!");
-      fetchProducts();
+      await fetchProducts();
     } catch (err: any) {
+      console.error(err);
       toast.error(err?.message || "Failed to delete product");
-      setError((err as Error).message);
-    } finally {
-      setPending(false);
     }
   };
 
-  // Filter products
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setError(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setError(null);
+    setFiles([]);
+    if (addProductFormRef.current) {
+      addProductFormRef.current.reset();
+    }
+  };
+
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory =
-      filterCategory === "all" || product.category === filterCategory;
+      filterCategory === "all" || product.categoryId === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <div className="w-full min-h-screen  py-8 px-4">
+    <div className="w-full min-h-screen py-8 px-4">
       <div className="max-w-7xl h-screen mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-600 mt-1">Manage your product inventory</p>
         </div>
 
-        {/* Add Product Form - Shopify Style */}
+        {/* Add/Edit Product Form */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
           <div className="border-b border-gray-200 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Add New Product
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {editingProduct ? "Edit Product" : "Add New Product"}
+              </h2>
+              {editingProduct && (
+                <button
+                  onClick={handleCancelEdit}
+                  className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
           </div>
 
           <form
@@ -280,6 +373,7 @@ function AdminProducts() {
                   name="title"
                   placeholder="Short sleeve t-shirt"
                   required
+                  disabled={pending}
                 />
               </div>
 
@@ -295,13 +389,19 @@ function AdminProducts() {
                   rows={4}
                   placeholder="Describe your product..."
                   required
+                  disabled={pending}
                 />
               </div>
 
               {/* Images Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Media
+                  Media{" "}
+                  {editingProduct && (
+                    <span className="text-gray-500 text-xs">
+                      (Leave empty to keep existing images)
+                    </span>
+                  )}
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
                   <input
@@ -312,6 +412,7 @@ function AdminProducts() {
                     multiple
                     accept="image/*"
                     ref={imagesRef}
+                    disabled={pending}
                     onChange={(e) => {
                       if (e.target.files) {
                         setFiles(Array.from(e.target.files));
@@ -320,7 +421,9 @@ function AdminProducts() {
                   />
                   <label
                     htmlFor="image"
-                    className="flex flex-col items-center justify-center cursor-pointer"
+                    className={`flex flex-col items-center justify-center ${
+                      pending ? "cursor-not-allowed" : "cursor-pointer"
+                    }`}
                   >
                     <svg
                       className="w-12 h-12 text-gray-400 mb-3"
@@ -363,9 +466,25 @@ function AdminProducts() {
                     )}
                   </div>
                 )}
+                {editingProduct && files.length === 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-600 mb-2">
+                      Current images:
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      {editingProduct.images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={img}
+                          alt={`Product ${idx + 1}`}
+                          className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Category, Price, Stock */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -376,18 +495,13 @@ function AdminProducts() {
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     name="category"
                     required
+                    disabled={pending}
                   >
-                    {categories.map((category, index) => {
-                      const categorySlug = category.path
-                        .split("/")[2]
-                        .split("-")
-                        .join(" ");
-                      return (
-                        <option key={index} value={categorySlug}>
-                          {categorySlug}
-                        </option>
-                      );
-                    })}
+                    {categories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -404,6 +518,7 @@ function AdminProducts() {
                     min="0"
                     step="0.01"
                     required
+                    disabled={pending}
                   />
                 </div>
 
@@ -419,13 +534,24 @@ function AdminProducts() {
                     placeholder="0"
                     min="0"
                     required
+                    disabled={pending}
                   />
                 </div>
               </div>
             </div>
 
             {/* Submit Button */}
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex justify-end gap-3">
+              {editingProduct && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  disabled={pending}
+                >
+                  Cancel
+                </button>
+              )}
               <button
                 className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-sm"
                 type="submit"
@@ -452,8 +578,10 @@ function AdminProducts() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       />
                     </svg>
-                    Creating product...
+                    {editingProduct ? "Updating..." : "Creating..."}
                   </span>
+                ) : editingProduct ? (
+                  "Update Product"
                 ) : (
                   "Add Product"
                 )}
@@ -462,7 +590,8 @@ function AdminProducts() {
           </form>
         </div>
 
-        <div className="bg-zinc-200 rounded-lg shadow-sm ">
+        {/* Products List */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="border-b border-gray-200 px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center justify-start gap-2">
@@ -470,16 +599,9 @@ function AdminProducts() {
                   All Products
                 </h2>
                 {filteredProducts.length > 0 && (
-                  <div className="bg-zinc-200 text-sm px-6 py-4 border-t border-gray-200">
-                    <p className="text-sm text-zinc-400">
-                      Showing{" "}
-                      <span className="font-medium">
-                        {filteredProducts.length}
-                      </span>{" "}
-                      of <span className="font-medium">{products.length}</span>{" "}
-                      products
-                    </p>
-                  </div>
+                  <span className="text-sm text-gray-500">
+                    ({filteredProducts.length} of {products.length})
+                  </span>
                 )}
               </div>
 
@@ -498,17 +620,11 @@ function AdminProducts() {
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value="all">All Categories</option>
-                  {categories.map((category, index) => {
-                    const categorySlug = category.path
-                      .split("/")[2]
-                      .split("-")
-                      .join(" ");
-                    return (
-                      <option key={index} value={categorySlug}>
-                        {categorySlug}
-                      </option>
-                    );
-                  })}
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -563,6 +679,12 @@ function AdminProducts() {
                       Status
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sales
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Orders
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -571,7 +693,8 @@ function AdminProducts() {
                   {filteredProducts.map((product) => (
                     <ProductItem
                       key={product._id}
-                      deleteProduct={deleteProduct}
+                      deleteProduct={() => deleteProduct(product._id as string)}
+                      editProduct={handleEditProduct}
                       product={product}
                     />
                   ))}
@@ -590,29 +713,33 @@ export default AdminProducts;
 function ProductItem({
   product,
   deleteProduct,
+  editProduct,
 }: {
   product: Product;
   deleteProduct: (id: string) => void;
+  editProduct: (product: Product) => void;
 }) {
   const [loading, setLoading] = useState(false);
+
   async function handleDeleteProduct() {
     try {
       setLoading(true);
-      await deleteProduct(product._id!);
+      await deleteProduct(product._id as string);
     } catch (error) {
-      console.log((error as Error).message);
+      console.error((error as Error).message);
     } finally {
       setLoading(false);
     }
   }
+
   return (
-    <tr className="hover:bg-zinc-300 duration-300 transition-colors bg-zinc-100">
+    <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
             <img
               className="h-16 w-16 object-cover"
-              src={product.images[0] || "/placeholder.svg"}
+              src={product.thumbnail}
               alt={product.title}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = "/placeholder.svg";
@@ -623,7 +750,7 @@ function ProductItem({
             <div className="text-sm font-medium text-gray-900 line-clamp-1">
               {product.title}
             </div>
-            <div className=" text-gray-500 line-clamp-1 text-sm max-w-[250px] overflow-x-hidden">
+            <div className="text-gray-500 line-clamp-1 text-sm max-w-[250px] overflow-x-hidden">
               {product.description}
             </div>
           </div>
@@ -631,14 +758,14 @@ function ProductItem({
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800">
-          {product.category}
+          {product.categoryName}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-        {product.price} EGP
+        {product.price} USD
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {product.stock} units
+        {product.stock} items
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {product.stock > 0 ? (
@@ -651,14 +778,45 @@ function ProductItem({
           </span>
         )}
       </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {product.totalSales > 0 ? (
+          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
+            {product.totalSales.toPrecision()}
+          </span>
+        ) : (
+          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800">
+            N/A
+          </span>
+        )}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {product.ordersCount > 0 ? (
+          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
+            {product.ordersCount.toPrecision()}
+          </span>
+        ) : (
+          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800">
+            N/A
+          </span>
+        )}
+      </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <button
-          disabled={loading}
-          onClick={handleDeleteProduct}
-          className="text-red-600 disabled:text-red-900 duration-300 hover:text-red-900 transition-colors"
-        >
-          {loading ? "Deleting..." : "Delete"}
-        </button>
+        <div className="flex items-center justify-end gap-3">
+          <button
+            onClick={() => editProduct(product)}
+            disabled={loading}
+            className="text-blue-600 hover:text-blue-900 disabled:text-blue-300 transition-colors"
+          >
+            Edit
+          </button>
+          <button
+            disabled={loading}
+            onClick={handleDeleteProduct}
+            className="text-red-600 hover:text-red-900 cursor-pointer duration-300 disabled:text-red-300 transition-colors"
+          >
+            {loading ? "Deleting..." : "Delete"}
+          </button>
+        </div>
       </td>
     </tr>
   );

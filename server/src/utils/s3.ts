@@ -2,6 +2,7 @@ import s3Client from "../configs/s3Client";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 
 
+
 const BUCKET_NAME = process.env.AWS_S3_BUCKET as string;
 
 export const uploadFiles = async (buffer: any) => {
@@ -72,3 +73,5 @@ export const deleteFromS3 = async (imageUrl: string): Promise<void> => {
     // Don't throw error, just log it
   }
 };
+
+

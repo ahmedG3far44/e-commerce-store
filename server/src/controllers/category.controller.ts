@@ -96,24 +96,30 @@ export const getCategoryById = async (req: ExtendedRequest, res: Response) => {
 export const updateCategory = async (req: ExtendedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
-
+    const { name, description, removeImage } = req.body;
+    
     const category = await Category.findById(id);
     if (!category) {
       res.status(404).json({ error: 'Category not found' });
       return;
     }
 
-    // Update fields
+
     if (name) category.name = name;
     if (description) category.description = description;
 
-    // If new image is uploaded
-    if (req.file) {
-      // Delete old image from S3
-      await deleteFromS3(category.image);
 
-      // Upload new image
+    if (removeImage === 'true' && !req.file) {
+   
+      await deleteFromS3(category.image);
+     
+      category.image = ''; 
+    }
+    
+    
+    if (req.file) {
+    
+      await deleteFromS3(category.image);
       const imageUrl = await uploadToS3(req.file);
       category.image = imageUrl;
     }

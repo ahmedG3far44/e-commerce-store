@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../context/auth/AuthContext";
 import useCart from "../../context/cart/CartContext";
-import { categories } from "../../utils/handlers";
 import User from "../User";
 import Button from "../Button";
 import Logo from "../Logo";
+import { useCategory } from "../../context/category/CategoryContext";
+import Navigation from "../Navigation";
 
 function Header() {
   const navigate = useNavigate();
+  const { categories } = useCategory();
   const { isAuthenticated } = useAuth();
   const { cartItems } = useCart();
   const [isScrolled, setScroll] = useState(false);
@@ -62,17 +64,7 @@ function Header() {
               <Logo />
 
               {/* Desktop Navigation */}
-              <nav className="hidden lg:flex items-center space-x-1">
-                {categories.map((category) => (
-                  <a
-                    key={category.id}
-                    href={category.path}
-                    className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                  >
-                    {category.categoryName}
-                  </a>
-                ))}
-              </nav>
+              <Navigation categories={categories} />
             </div>
 
             {/* Right Side Actions */}
@@ -312,14 +304,18 @@ function Header() {
           <nav className="flex-1 overflow-y-auto p-4">
             <div className="space-y-1">
               {categories.map((category) => (
-                <a
-                  key={category.id}
-                  href={category.path}
+                <Link
+                  key={category._id}
+                  to={`/category/${category.name
+                    .toLocaleLowerCase()
+                    .split(" ")
+                    .join("-")
+                    .trim()}`}
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all font-medium"
                 >
-                  {category.categoryName}
-                </a>
+                  {category.name}
+                </Link>
               ))}
             </div>
 

@@ -5,23 +5,26 @@ export interface ExtendedRequest extends Request {
   user?: GenerateTokenParams | undefined;
 }
 
-export interface IProduct {
+export interface CartProduct {
+  _id?:string;
   title: string;
-  description: string | null;
-  category: string | null;
-  image: string | null;
+  description: string;
+  categoryName: string ;
+  categoryId:string;
+  thumbnail: string;
   price: number;
   stock: number;
 }
 
 export interface IProductItem {
   productId: string;
-  product: IProduct;
+  product: CartProduct;
   quantity: number;
 }
+
 export interface ICart {
-  items: IProductItem[];
   status: string;
+  items: IProductItem[];
   totalAmount: number;
   userId: string;
 }
