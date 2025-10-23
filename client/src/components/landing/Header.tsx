@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../../context/auth/AuthContext";
-import useCart from "../../context/cart/CartContext";
-import User from "../User";
-import Button from "../Button";
-import Logo from "../Logo";
 import { useCategory } from "../../context/category/CategoryContext";
+
+import Button from "../Button";
+import User from "../User";
+import Logo from "../Logo";
 import Navigation from "../Navigation";
+
+import useCart from "../../context/cart/CartContext";
+import useAuth from "../../context/auth/AuthContext";
+import ShoppingCart from "../ShoppingCart";
 
 function Header() {
   const navigate = useNavigate();
   const { categories } = useCategory();
   const { isAuthenticated } = useAuth();
-  const { cartItems } = useCart();
+  const { cartItems, totalCartItems } = useCart();
   const [isScrolled, setScroll] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setSearchOpen] = useState(false);
+
+  const totalItems = cartItems.reduce((curr, acc) => {
+    return curr + acc.quantity;
+  }, 0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,17 +50,11 @@ function Header() {
       setSearchQuery("");
     }
   };
-
-  const cartItemCount = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
-
   return (
     <>
       <header
         className={`${
-          isScrolled ? "shadow-lg bg-white/95 backdrop-blur-md" : "bg-white"
+          isScrolled ? "bg-white" : "bg-white blur-1"
         } sticky top-0 z-50 border-b border-gray-200 transition-all duration-300`}
       >
         <div className="container mx-auto px-4">
@@ -92,30 +93,7 @@ function Header() {
 
               {/* Cart Icon */}
               {isAuthenticated && (
-                <button
-                  onClick={() => navigate("/cart")}
-                  className="relative flex items-center justify-center w-10 h-10 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-all"
-                  aria-label="Shopping cart"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                  {cartItemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-600 rounded-full">
-                      {cartItemCount > 9 ? "9+" : cartItemCount}
-                    </span>
-                  )}
-                </button>
+                <ShoppingCart itemsCartNumber={totalItems as number} />
               )}
 
               {/* User Auth Section - Desktop */}
@@ -344,9 +322,9 @@ function Header() {
                     </svg>
                     Shopping Cart
                   </span>
-                  {cartItemCount > 0 && (
+                  {totalCartItems > 0 && (
                     <span className="flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-blue-600 rounded-full">
-                      {cartItemCount}
+                      {totalCartItems}
                     </span>
                   )}
                 </button>

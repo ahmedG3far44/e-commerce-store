@@ -1,5 +1,5 @@
 import { IProductItem } from "./../utils/types";
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 
 const cartItemListSchema = new Schema(
@@ -10,8 +10,10 @@ const cartItemListSchema = new Schema(
       type: {
         title: { type: String, required: true },
         description: { type: String },
-        category: { type: String },
-        image: { type: String },
+        categoryName: { type: String },
+        categoryId: { type: Types.ObjectId, ref:"Category", required:true
+         },
+        thumbnail: { type: String, require:true },
         price: { type: Number, required: true },
         stock: { type: Number, required: true },
       },

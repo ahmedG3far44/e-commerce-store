@@ -38,7 +38,7 @@ function ProductCard({
   _id,
   title,
   description,
-  category,
+  categoryName,
   images,
   price,
   stock,
@@ -64,8 +64,8 @@ function ProductCard({
         <ImageSlider images={images as string[]} />
 
         {/* Category Badge */}
-        {category && (
-          <Badge text={category} className="absolute right-3 top-3" />
+        {categoryName && (
+          <Badge text={categoryName} className="absolute right-3 top-3" />
         )}
 
         {/* Out of Stock Overlay */}

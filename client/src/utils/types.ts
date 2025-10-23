@@ -2,7 +2,8 @@ export interface IProduct {
   _id: string;
   title: string;
   description: string | null;
-  category: string | null;
+  categoryName: string;
+  catergoryId:string;
   images: string[] | [];
   thumbnail?: string;
   price: number;
@@ -47,6 +48,7 @@ export interface ClearCartParamsType {
 export interface CartContextType {
   cartItems: IProductItem[];
   totalAmount: number;
+  totalCartItems:number;
   addItemToCart: ({
     productId,
     quantity,
@@ -64,6 +66,9 @@ export interface CartContextType {
   clearAllItemsFromCart: ({ token }: ClearCartParamsType) => void;
   getUserCart: ({ token }: ClearCartParamsType) => void;
   createOrder: ({ token, address }: { token: string; address: string }) => void;
+  pending:boolean;
+  error: string | null
+
 }
 
 export interface RegisterUserParams {

@@ -49,6 +49,8 @@ export const addProductToCart = async ({
   try {
     const product = await productModel.findById(productId);
 
+    console.log(product)
+
     if (!product) {
       return { data: "this product not found", statusCode: 400 };
     }
@@ -59,12 +61,11 @@ export const addProductToCart = async ({
 
     let cart = await getActiveCart({ userId });
 
-    // Handle error case from getActiveCart
     if ("statusCode" in cart) {
       return cart;
     }
 
-    // Check if product already exists in cart
+
     const isAddedToCart = cart.items.find(
       (item) => item.productId.toString() === productId.toString()
     );
@@ -77,7 +78,7 @@ export const addProductToCart = async ({
       productId,
       product: {
         title: product.title,
-          thumbnail: product.images?.[0] || "",
+        thumbnail: product.images?.[0] || "",
         description: product.description,
         categoryId: product.categoryId.toString(),
         categoryName: product.categoryName,
@@ -86,6 +87,8 @@ export const addProductToCart = async ({
       },
       quantity,
     };
+
+    console.log(newProduct)
 
     cart.items.push(newProduct);
     cart.totalAmount += product.price * quantity;

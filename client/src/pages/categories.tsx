@@ -5,77 +5,21 @@ import { getAllProducts } from "../utils/handlers";
 import { IProduct } from "../utils/types";
 import ProductCard from "../components/ProductCard";
 
-// Types come from shared utils/types
-
 interface FilterState {
   priceRange: [number, number];
   inStock: boolean | null;
-  brands: string[];
-  minRating: number;
-  sortBy:
-    | "price-asc"
-    | "price-desc"
-    | "name-asc"
-    | "name-desc"
-    | "newest"
-    | "rating";
+  sortBy: "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
 }
 
-// function ProductCard({ product }: { product: IProduct }) {
-//   return (
-//     <article className="group bg-white rounded-xl flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-zinc-200 h-full">
-//       <div className="relative w-full aspect-square overflow-hidden bg-zinc-100">
-//         <img
-//           src={product.images[0]}
-//           alt={product.title}
-//           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-//         />
-//         {product.stock === 0 && (
-//           <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
-//             <span className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold text-sm">
-//               Out of Stock
-//             </span>
-//           </div>
-//         )}
-//       </div>
-
-//       <div className="flex flex-col flex-1 p-4">
-//         <h3 className="font-bold text-base text-zinc-900 mb-2 line-clamp-1">
-//           {product.title}
-//         </h3>
-//         <p className="text-zinc-600 text-sm leading-relaxed mb-4 line-clamp-2 flex-grow">
-//           {product.description}
-//         </p>
-
-//         <div className="mt-auto pt-3 border-t border-zinc-100">
-//           <div className="flex items-center justify-between">
-//             <span className="text-2xl font-bold text-zinc-900">
-//               ${product.price.toFixed(2)}
-//             </span>
-//             {product.stock > 0 && (
-//               <button className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition text-sm font-medium">
-//                 Add to Cart
-//               </button>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     </article>
-//   );
-// }
-
-// Filter Component
 function FilterSidebar({
   filters,
   onFilterChange,
-  availableBrands,
   priceRange,
   totalProducts,
   filteredCount,
 }: {
   filters: FilterState;
   onFilterChange: (filters: Partial<FilterState>) => void;
-  availableBrands: string[];
   priceRange: [number, number];
   totalProducts: number;
   filteredCount: number;
@@ -88,27 +32,16 @@ function FilterSidebar({
     onFilterChange({ priceRange: newRange });
   };
 
-  const toggleBrand = (brand: string) => {
-    const newBrands = filters.brands.includes(brand)
-      ? filters.brands.filter((b) => b !== brand)
-      : [...filters.brands, brand];
-    onFilterChange({ brands: newBrands });
-  };
-
   const resetFilters = () => {
     onFilterChange({
       priceRange: priceRange,
       inStock: null,
-      brands: [],
-      minRating: 0,
       sortBy: "newest",
     });
   };
 
   const activeFilterCount = [
     filters.inStock !== null ? 1 : 0,
-    filters.brands.length,
-    filters.minRating > 0 ? 1 : 0,
     filters.priceRange[0] !== priceRange[0] ||
     filters.priceRange[1] !== priceRange[1]
       ? 1
@@ -211,7 +144,6 @@ function FilterSidebar({
             <option value="price-desc">Price: High to Low</option>
             <option value="name-asc">Name: A to Z</option>
             <option value="name-desc">Name: Z to A</option>
-            <option value="rating">Highest Rated</option>
           </select>
         </div>
 
@@ -285,76 +217,6 @@ function FilterSidebar({
           </div>
         </div>
 
-        {/* Brands */}
-        {availableBrands.length > 0 && (
-          <div className="space-y-3">
-            <label className="block text-sm font-semibold text-zinc-900">
-              Brand {filters.brands.length > 0 && `(${filters.brands.length})`}
-            </label>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {availableBrands.map((brand) => (
-                <label
-                  key={brand}
-                  className="flex items-center gap-2 cursor-pointer group"
-                >
-                  <input
-                    type="checkbox"
-                    checked={filters.brands.includes(brand)}
-                    onChange={() => toggleBrand(brand)}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-zinc-700 group-hover:text-zinc-900">
-                    {brand}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Rating */}
-        <div className="space-y-3">
-          <label className="block text-sm font-semibold text-zinc-900">
-            Minimum Rating
-          </label>
-          <div className="space-y-2">
-            {[4, 3, 2, 1, 0].map((rating) => (
-              <label
-                key={rating}
-                className="flex items-center gap-2 cursor-pointer group"
-              >
-                <input
-                  type="radio"
-                  checked={filters.minRating === rating}
-                  onChange={() => onFilterChange({ minRating: rating })}
-                  className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <div className="flex items-center gap-1">
-                  {rating === 0 ? (
-                    <span className="text-sm text-zinc-700">All Ratings</span>
-                  ) : (
-                    <>
-                      {[...Array(5)].map((_, i) => (
-                        <svg
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < rating ? "text-yellow-400" : "text-zinc-300"
-                          }`}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                      <span className="text-sm text-zinc-700 ml-1">& up</span>
-                    </>
-                  )}
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-
         {/* Apply Button (Mobile) */}
         {isOpen && (
           <button
@@ -369,22 +231,19 @@ function FilterSidebar({
   );
 }
 
-// Main Category Page Component
 function CategoryPage() {
   const { categoryName } = useParams();
 
-  console.log(categoryName);
   const [category] = useState(categoryName);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 1000],
     inStock: null,
-    brands: [],
-    minRating: 0,
     sortBy: "newest",
   });
 
   const [allProducts, setDisplayProducts] = useState<IProduct[] | []>([]);
   const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     async function handleGetProducts() {
       try {
@@ -394,7 +253,7 @@ function CategoryPage() {
           console.log(products);
           const filterCategoryProducts = products.filter(
             (product) =>
-              (product.category ?? "").toLocaleLowerCase() ===
+              (product.catergoryId ?? "").toLocaleLowerCase() ===
               (categoryName ?? "").toLocaleLowerCase()
           );
           setDisplayProducts(filterCategoryProducts as IProduct[]);
@@ -406,10 +265,11 @@ function CategoryPage() {
       }
     }
     handleGetProducts();
-  }, []);
+  }, [categoryName]);
 
   // Calculate price range from all products
   const absolutePriceRange = useMemo<[number, number]>(() => {
+    if (allProducts.length === 0) return [0, 1000];
     const prices = allProducts.map((p) => p.price);
     return [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))];
   }, [allProducts]);
@@ -418,14 +278,6 @@ function CategoryPage() {
   useEffect(() => {
     setFilters((prev) => ({ ...prev, priceRange: absolutePriceRange }));
   }, [absolutePriceRange]);
-
-  // Get available brands
-  const availableBrands = useMemo(() => {
-    const brands = new Set(
-      allProducts.map((p) => p.brand).filter(Boolean) as string[]
-    );
-    return Array.from(brands).sort();
-  }, [allProducts]);
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -444,18 +296,6 @@ function CategoryPage() {
       filtered = filtered.filter((p) => p.stock === 0);
     }
 
-    // Filter by brands
-    if (filters.brands.length > 0) {
-      filtered = filtered.filter(
-        (p) => p.brand && filters.brands.includes(p.brand)
-      );
-    }
-
-    // Filter by rating
-    if (filters.minRating > 0) {
-      filtered = filtered.filter((p) => (p.rating || 0) >= filters.minRating);
-    }
-
     // Sort
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
@@ -467,8 +307,6 @@ function CategoryPage() {
           return a.title.localeCompare(b.title);
         case "name-desc":
           return b.title.localeCompare(a.title);
-        case "rating":
-          return (b.rating || 0) - (a.rating || 0);
         case "newest":
           return (
             new Date(b.createdAt || 0).getTime() -
@@ -488,7 +326,6 @@ function CategoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Header */}
       <Header />
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -524,7 +361,6 @@ function CategoryPage() {
             <FilterSidebar
               filters={filters}
               onFilterChange={handleFilterChange}
-              availableBrands={availableBrands}
               priceRange={absolutePriceRange}
               totalProducts={allProducts.length}
               filteredCount={filteredProducts.length}
@@ -564,8 +400,6 @@ function CategoryPage() {
                         handleFilterChange({
                           priceRange: absolutePriceRange,
                           inStock: null,
-                          brands: [],
-                          minRating: 0,
                         })
                       }
                       className="text-blue-600 hover:text-blue-700 font-medium"

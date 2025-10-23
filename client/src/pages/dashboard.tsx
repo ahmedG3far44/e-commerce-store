@@ -7,9 +7,9 @@ import {
   LuChartColumnBig,
   LuBox,
   LuBoxes,
-  LuGitCompare,
   LuLayoutPanelTop,
 } from "react-icons/lu";
+import { FiLogOut } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
 import { LiaUserCircleSolid, LiaShippingFastSolid } from "react-icons/lia";
 import { OrdersCountType } from "../utils/types";
@@ -125,78 +125,13 @@ function Dashboard() {
   };
   return (
     <div className="w-full min-h-screen max-w-full flex justify-start bg-zinc-300 items-start  relative ">
-      <aside className="min-h-screen h-full w-[20%] bg-gray-100 p-4 flex flex-col justify-between items-start fixed left-0 top-0 max-md:hidden max-sm:hidden">
-        <ul className="w-full flex justify-between flex-col items-start gap-1">
-          {dashboardList.map((url) => {
-            return (
-              <a
-                key={url.id}
-                className={`${
-                  url.link === activeLink &&
-                  "text-blue-500 bg-blue-200 font-bold"
-                } hover:bg-blue-200 w-full p-4 rounded-md duration-150 border border-zinc-200 bg-white`}
-                href={url.path}
-              >
-                <li className="flex justify-between items-center gap-4">
-                  <div className="flex justify-start gap-4 items-center">
-                    <span>{url.icon}</span>
-                    {url.name}
-                  </div>
-                  {url.link === "pending-orders" ? (
-                    pending ? (
-                      <Skeleton />
-                    ) : (
-                      <>
-                        {orderStatus.pending > 0 && (
-                          <Notification number={orderStatus.pending} />
-                        )}
-                      </>
-                    )
-                  ) : url.link === "delivered-orders" ? (
-                    pending ? (
-                      <Skeleton />
-                    ) : (
-                      <>
-                        {orderStatus.delivered > 0 && (
-                          <Notification number={orderStatus.delivered} />
-                        )}
-                      </>
-                    )
-                  ) : url.link === "shipped-orders" ? (
-                    pending ? (
-                      <Skeleton />
-                    ) : (
-                      <>
-                        {orderStatus.shipped > 0 && (
-                          <Notification number={orderStatus.shipped} />
-                        )}
-                      </>
-                    )
-                  ) : url.link === "all-orders" ? (
-                    pending ? (
-                      <Skeleton />
-                    ) : (
-                      <>
-                        {orderStatus.totalOrders > 0 && (
-                          <span className="text-[12px] font-semibold text-zinc-500">
-                            {orderStatus.totalOrders}
-                          </span>
-                        )}
-                      </>
-                    )
-                  ) : null}
-                </li>
-              </a>
-            );
-          })}
-        </ul>
-        <button
-          onClick={handelLogout}
-          className="hover:bg-blue-700 duration-150 cursor-pointer w-full p-4 rounded-md bg-blue-500 text-white mt-auto"
-        >
-          Logout
-        </button>
-      </aside>
+      <DashboardSidebar
+        dashboardList={dashboardList}
+        pending={pending}
+        orderStatus={orderStatus}
+        activeLink={activeLink as string}
+        handelLogout={handelLogout}
+      />
       <main className="w-[80%] min-h-screen h-screen overflow-y-auto absolute right-0 top-0  p-4 max-sm:w-full max-md:w-full max-sm:relative max-md:relative">
         {<Outlet />}
       </main>
@@ -216,5 +151,193 @@ function Notification({ number }: { number: number }) {
     <div className="p-2 w-5 h-5 font-semibold bg-blue-500 text-white rounded-full text-[10px] flex items-center justify-center">
       <span>{number}</span>
     </div>
+  );
+}
+
+interface DashboardSidebarProps {
+  dashboardList: any[];
+  activeLink: string;
+  orderStatus: {
+    pending: number;
+    delivered: number;
+    shipped: number;
+    totalOrders: number;
+  };
+  pending: boolean;
+  handelLogout: () => void;
+}
+
+export function DashboardSidebar({
+  dashboardList,
+  activeLink,
+  orderStatus,
+  pending,
+  handelLogout,
+}: DashboardSidebarProps) {
+  return (
+    <aside className="min-h-screen h-full w-[280px] bg-gradient-to-b from-gray-50 to-gray-100 border-r border-gray-200 p-6 flex flex-col justify-between items-start fixed left-0 top-0 max-md:hidden max-sm:hidden shadow-sm">
+      {/* Logo/Brand Section */}
+      <div className="w-full mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+            <span className="text-white font-bold text-xl">D</span>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
+            <p className="text-xs text-gray-500">Admin Panel</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Menu */}
+      <nav className="w-full flex-1 overflow-y-auto">
+        <ul className="w-full flex flex-col items-start gap-2">
+          {dashboardList.map((url) => {
+            const isActive = url.link === activeLink;
+            const isOrderLink = url.link.includes("orders");
+
+            // Determine notification count
+            let notificationCount = 0;
+            if (url.link === "pending-orders") {
+              notificationCount = orderStatus.pending;
+            } else if (url.link === "delivered-orders") {
+              notificationCount = orderStatus.delivered;
+            } else if (url.link === "shipped-orders") {
+              notificationCount = orderStatus.shipped;
+            } else if (url.link === "all-orders") {
+              notificationCount = orderStatus.totalOrders;
+            }
+
+            return (
+              <li key={url.id} className="w-full">
+                <a
+                  href={url.path}
+                  className={`
+                    group relative w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl
+                    transition-all duration-200 ease-in-out
+                    ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-200"
+                        : "text-gray-700 hover:bg-white hover:shadow-sm"
+                    }
+                  `}
+                >
+                  {/* Active Indicator Bar */}
+                  {isActive && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full" />
+                  )}
+
+                  <div className="flex items-center gap-3 flex-1">
+                    {/* Icon */}
+                    <span
+                      className={`
+                        text-xl transition-transform duration-200
+                        ${isActive ? "scale-110" : "group-hover:scale-110"}
+                      `}
+                    >
+                      {url.icon}
+                    </span>
+
+                    {/* Label */}
+                    <span
+                      className={`
+                        font-medium text-sm
+                        ${isActive ? "font-semibold" : ""}
+                      `}
+                    >
+                      {url.name}
+                    </span>
+                  </div>
+
+                  {/* Notification Badge / Count */}
+                  {pending ? (
+                    <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse" />
+                  ) : (
+                    <>
+                      {notificationCount > 0 && (
+                        <>
+                          {url.link === "all-orders" ? (
+                            // Simple count for all orders
+                            <span
+                              className={`
+                                text-xs font-semibold px-2 py-1 rounded-md
+                                ${
+                                  isActive
+                                    ? "bg-white/20 text-white"
+                                    : "bg-gray-200 text-gray-600"
+                                }
+                              `}
+                            >
+                              {notificationCount}
+                            </span>
+                          ) : (
+                            // Notification badge for specific order types
+                            <span className="relative flex items-center justify-center">
+                              <span
+                                className={`
+                                  inline-flex items-center justify-center min-w-[24px] h-6 px-2
+                                  text-xs font-bold rounded-full
+                                  ${
+                                    isActive
+                                      ? "bg-white text-blue-600"
+                                      : "bg-blue-600 text-white"
+                                  }
+                                  shadow-sm
+                                `}
+                              >
+                                {notificationCount > 99
+                                  ? "99+"
+                                  : notificationCount}
+                              </span>
+                              {/* Pulse animation for active notifications */}
+                              {!isActive && notificationCount > 0 && (
+                                <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping" />
+                              )}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* User Info Section (Optional) */}
+      <div className="w-full pt-6 border-t border-gray-200 mb-4">
+        <div className="flex items-center gap-3 px-2 py-2">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">AD</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-gray-900 truncate">
+              Admin User
+            </p>
+            <p className="text-xs text-gray-500 truncate">admin@example.com</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Logout Button */}
+      <button
+        onClick={handelLogout}
+        className="
+          w-full flex items-center justify-center gap-2
+          px-4 py-3.5 rounded-xl
+          bg-white text-gray-700 font-semibold
+          border-2 border-gray-200
+          hover:bg-red-50 hover:text-red-600 hover:border-red-200
+          transition-all duration-200
+          shadow-sm hover:shadow-md
+          group
+        "
+      >
+        <FiLogOut className="text-lg transition-transform duration-200 group-hover:translate-x-1" />
+        <span>Logout</span>
+      </button>
+    </aside>
   );
 }

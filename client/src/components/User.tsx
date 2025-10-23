@@ -12,13 +12,20 @@ import "../index.css";
 
 function User() {
   const { user, logOut } = useAuth();
-  const { cartItems } = useCart();
+  const { cartItems, totalCartItems } = useCart();
   const [isOpen, setOpen] = useState(false);
   const navigate = useNavigate();
   const handelLogout = () => {
     logOut();
     navigate("/");
   };
+
+  console.log(cartItems, totalCartItems);
+
+  const totalItems = cartItems.reduce((curr, acc) => {
+    return curr + acc.quantity;
+  }, 0);
+
   return (
     <div className="relative  ">
       <div
@@ -56,17 +63,6 @@ function User() {
             </a>
           ) : (
             <>
-              {" "}
-              <a
-                className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150 flex items-center  text-gray-600"
-                href="/cart"
-              >
-                {" "}
-                <li className="flex items-center gap-4">
-                  <ShoppingCart itemsCartNumber={cartItems.length} />
-                  Cart
-                </li>
-              </a>
               <a
                 className="p-2 rounded-md  cursor-pointer w-full hover:bg-zinc-200 duration-150 text-gray-600"
                 href="/profile"

@@ -1,24 +1,29 @@
-
 import { useEffect, useState } from "react";
 import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
 import ItemCart from "../components/ItemCart";
-import TotalOrder from "../components/TotalOrder";
+import {
+  FiShoppingCart,
+  FiMapPin,
+  FiLock,
+  FiPlus,
+  FiCheck,
+} from "react-icons/fi";
+import { BiPackage } from "react-icons/bi";
+import { MdOutlineLocalShipping } from "react-icons/md";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function CheckoutPage() {
   const { token } = useAuth();
-  const { cartItems, totalAmount, getUserCart } = useCart();
-
+  const { cartItems, totalAmount, getUserCart, createOrder } = useCart();
   const [pending, setPending] = useState(false);
   const [addresses, setAddressesList] = useState<string[]>([]);
-
+  const [selectedAddress, setSelectedAddress] = useState<string>("");
 
   const getAddressesList = async ({ token }: { token: string }) => {
     try {
       if (!token) return;
-
       setPending(true);
       const response = await fetch(`${BASE_URL}/user/address`, {
         method: "GET",
@@ -27,19 +32,17 @@ function CheckoutPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (!response.ok) {
-        throw new Error("connection error can't get a addresses!!");
+        throw new Error("connection error can't get addresses!!");
       }
-
       const addressesList = await response.json();
-
-      // console.log(addressesList);
-
       setAddressesList([...addressesList]);
-
+      if (addressesList.length > 0) {
+        setSelectedAddress(addressesList[0]);
+      }
       return addressesList;
     } catch (err: any) {
+      console.error(err.message);
       return err.message;
     } finally {
       setPending(false);
@@ -52,53 +55,212 @@ function CheckoutPage() {
     getAddressesList({ token });
   }, [token]);
 
-  return (
-    <div className="min-h-[calc(100vh-120px)] flex flex-col justify-start items-center gap-4 p-4">
-      <div className="p-4 rounded-md bg-zinc-100 flex justify-between text-2xl font-bold items-center w-full">
-        <h1 className="text-blue-500">All Cart Items</h1>
-        <h1 className="text-2xl font-bold">
-          Total:{" "}
-          <span className="text-blue-500">{totalAmount.toFixed(2)} EGP</span>
-        </h1>
-      </div>
+  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const shippingCost = 0; // Free shipping
+  const finalTotal = totalAmount + shippingCost;
 
-      <div className="w-full flex items-start justify-between gap-4 relative">
-        <div className="w-[80%] flex flex-col justify-start items-start gap-1">
-          {cartItems.length > 0 ? (
-            cartItems.map(
-              ({ product, productId, quantity, updatedAt }: any) => {
-                const { title, description, category, image, price, stock } =
-                  product;
-                return (
-                  <ItemCart
-                    key={productId}
-                    productId={productId}
-                    title={title}
-                    category={category}
-                    stock={stock}
-                    description={description || ""}
-                    image={image || ""}
-                    price={price}
-                    quantity={quantity}
-                    updatedAt={updatedAt}
-                    checkoutState={false}
-                  />
-                );
-              }
-            )
-          ) : (
-            <p className="text-sm text-zinc-500 mt-8">
-              your cart is empty continue shopping and add new items!!
-            </p>
-          )}
-        </div>
-        {pending ? (
-          <div>loading...</div>
-        ) : (
-          <div className="w-[20%]">
-            <TotalOrder total={totalAmount.toFixed(2)} addresses={addresses} />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <FiShoppingCart className="w-8 h-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
           </div>
-        )}
+          <p className="text-gray-600">
+            Complete your order • {itemCount} item{itemCount !== 1 ? "s" : ""}{" "}
+            in cart
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Cart Items Section */}
+            <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <BiPackage className="w-6 h-6 text-blue-600" />
+                <h2 className="text-xl font-bold text-gray-900">
+                  Order Items ({itemCount})
+                </h2>
+              </div>
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {cartItems.length > 0 ? (
+                  cartItems.map(
+                    ({ product, productId, quantity, updatedAt }: any) => {
+                      const {
+                        title,
+                        description,
+                        categoryName,
+                        thumbnail,
+                        price,
+                        stock,
+                      } = product;
+                      return (
+                        <ItemCart
+                          key={productId}
+                          categoryName={categoryName}
+                          image={thumbnail as string}
+                          description={description as string}
+                          price={price}
+                          stock={stock}
+                          title={title}
+                          productId={productId}
+                          quantity={quantity}
+                          updatedAt={updatedAt}
+                          checkoutState={false}
+                        />
+                      );
+                    }
+                  )
+                ) : (
+                  <p className="text-center text-gray-500 py-8">
+                    Your cart is empty. Continue shopping to add items!
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Shipping Address Section */}
+            <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <FiMapPin className="w-6 h-6 text-blue-600" />
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Shipping Address
+                  </h2>
+                </div>
+                <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                  <FiPlus className="w-4 h-4" />
+                  Add New
+                </button>
+              </div>
+
+              {pending ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+              ) : addresses.length > 0 ? (
+                <div className="space-y-3">
+                  {addresses.map((address, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedAddress(address)}
+                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                        selectedAddress === address
+                          ? "border-blue-600 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300 bg-white"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                            selectedAddress === address
+                              ? "border-blue-600 bg-blue-600"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          {selectedAddress === address && (
+                            <FiCheck className="w-3 h-3 text-white" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-900 font-medium">{address}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
+                  <FiMapPin className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600 mb-4">No addresses found</p>
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                    Add Address
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Order Summary Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                Order Summary
+              </h2>
+
+              {/* Price Breakdown */}
+              <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal ({itemCount} items)</span>
+                  <span className="font-medium">
+                    {totalAmount.toFixed(2)} EGP
+                  </span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+                  <span className="font-medium text-green-600">Free</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Tax</span>
+                  <span className="font-medium">Included</span>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-lg font-bold text-gray-900">Total</span>
+                <span className="text-2xl font-bold text-blue-600">
+                  {finalTotal.toFixed(2)} EGP
+                </span>
+              </div>
+
+              {/* Place Order Button */}
+              <button
+                onClick={() => {
+                  if (token) {
+                    createOrder({ token, address: addresses[0] });
+                  }
+                }}
+                disabled={!selectedAddress || cartItems.length === 0}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none mb-4"
+              >
+                <FiLock className="w-5 h-5" />
+                Place Order
+              </button>
+
+              {/* Security Badge */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <FiLock className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-gray-600">
+                    <p className="font-medium text-gray-900 mb-1">
+                      Secure Checkout
+                    </p>
+                    <p>
+                      Your payment information is encrypted and secure. We never
+                      store your card details.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Info */}
+              <div className="mt-6 pt-6 border-t border-gray-200 space-y-3 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <MdOutlineLocalShipping className="w-5 h-5 text-blue-600" />
+                  <span>Free shipping on all orders</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BiPackage className="w-5 h-5 text-blue-600" />
+                  <span>Easy returns within 30 days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
