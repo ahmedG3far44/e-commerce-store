@@ -1,36 +1,186 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ReactNode, useState } from "react";
-// import OrderItems from "./OrderItems";
+import { ReactNode, useState, useMemo } from "react";
 import { Customer, Order, ProductInITemsList } from "../utils/types";
 
-import { LiaShippingFastSolid } from "react-icons/lia";
-import { MdOutlineWatchLater, MdKeyboardArrowUp } from "react-icons/md";
-import { IoMdDoneAll } from "react-icons/io";
+import { MdKeyboardArrowUp } from "react-icons/md";
+import { IoSearchOutline } from "react-icons/io5";
 
 import useAuth from "../context/auth/AuthContext";
 import toast from "react-hot-toast";
-import { LuX } from "react-icons/lu";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
-function ShowOrdersHistory({
-  _id,
-  totalOrderPrice,
-  orderItems,
-  status,
-  createdAt,
+interface ShowOrdersHistoryProps extends Order {
+  onStatusUpdate?: (orderId: string, newStatus: string) => void;
+}
+
+// Status component
+function Status({
+  statusText,
+  className,
+  children,
+}: {
+  statusText: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  const getStatusColor = (status: string) => {
+    switch (status.toUpperCase()) {
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800";
+      case "SHIPPED":
+        return "bg-blue-100 text-blue-800";
+      case "DELIVERED":
+        return "bg-green-100 text-green-800";
+      case "CANCELED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+        statusText
+      )} ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
+
+function OrderCustomerInfo({
   customer,
-}: Order) {
+  className,
+}: {
+  customer: Customer;
+  className?: string;
+}) {
+  return (
+    <div className={`bg-white border border-zinc-200 rounded-md ${className}`}>
+      <h3 className="font-bold mb-2">Customer Information</h3>
+      <div className="space-y-1 text-sm">
+        <p>
+          <span className="font-semibold">Name:</span> {customer.name}
+        </p>
+        {customer.email && (
+          <p>
+            <span className="font-semibold">Email:</span> {customer.email}
+          </p>
+        )}
+        <p>
+          <span className="font-semibold">Address:</span> {customer.address}
+        </p>
+        {customer?.phone ? (
+          <p>
+            <span className="font-semibold">Phone:</span> {customer.phone}
+          </p>
+        ) : (
+          <p>
+            <span className="font-semibold">Phone:</span> +201505508939
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// OrderTracker component
+function OrderTracker({
+  orderStatus,
+  className,
+}: {
+  orderStatus: string;
+  className?: string;
+}) {
+  const statuses = ["PENDING", "SHIPPED", "DELIVERED"];
+  const currentStatusIndex = statuses.indexOf(orderStatus.toUpperCase());
+
+  return (
+    <div className={`bg-white border border-zinc-200 rounded-md ${className}`}>
+      <h3 className="font-bold mb-3">Order Progress</h3>
+      <div className="flex items-center space-x-4">
+        {statuses.map((status, index) => (
+          <div key={status} className="flex items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                index <= currentStatusIndex
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-500"
+              }`}
+            >
+              {index + 1}
+            </div>
+            <span
+              className={`ml-2 text-sm font-medium ${
+                index <= currentStatusIndex ? "text-blue-600" : "text-gray-500"
+              }`}
+            >
+              {status}
+            </span>
+            {index < statuses.length - 1 && (
+              <div
+                className={`w-8 h-0.5 mx-2 ${
+                  index < currentStatusIndex ? "bg-blue-600" : "bg-gray-200"
+                }`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Items component
+function Items({
+  itemsList,
+  className,
+}: {
+  itemsList: ProductInITemsList[];
+  className?: string;
+}) {
+  return (
+    <div className={`space-y-2 ${className}`}>
+      {itemsList.map((item, index) => (
+        <div
+          key={index}
+          className="flex items-center space-x-4 p-2 border border-zinc-200 rounded-md"
+        >
+          <img
+            src={item.productImages}
+            alt={item.productTitle}
+            className="w-12 h-12 object-cover rounded"
+          />
+          <div className="flex-1">
+            <h4 className="font-semibold text-sm">{item.productTitle}</h4>
+            <p className="text-xs text-gray-600">{item.productDescription}</p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold">${item.productPrice.toFixed(2)}</p>
+            <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function OrderItem({
+  order,
+  onStatusUpdate,
+}: {
+  order: Order;
+  onStatusUpdate?: (orderId: string, newStatus: string) => void;
+}) {
   const [isOpen, setOpen] = useState(false);
   const [shippPending, setShippPending] = useState(false);
   const [cancelPending, setCancelPending] = useState(false);
   const [completePending, setCompletePending] = useState(false);
 
   const { user, token } = useAuth();
-  // const [status] = useState("COMPLETED");
 
-  const date = new Date(createdAt);
-  // const orderTime = date.toString().split("T")[1];
+  const date = new Date(order.createdAt);
 
   const handelUpdateOrderStatusToDelivered = async () => {
     try {
@@ -45,7 +195,7 @@ function ShowOrdersHistory({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          orderId: _id,
+          orderId: order._id,
           status: "DELIVERED",
         }),
       });
@@ -54,9 +204,12 @@ function ShowOrdersHistory({
       }
       const data = await response.json();
       if (!data) throw new Error("can't get response data!!");
-      toast.success("order status updated to DELIVERED success!!");
 
-      return;
+      if (onStatusUpdate) {
+        onStatusUpdate(order._id, "DELIVERED");
+      }
+
+      toast.success("order status updated to DELIVERED success!!");
     } catch (err: any) {
       console.log(err?.message);
       toast.error(err?.message);
@@ -64,6 +217,7 @@ function ShowOrdersHistory({
       setCompletePending(false);
     }
   };
+
   const handelUpdateOrderStatusToShipped = async () => {
     try {
       if (!token || !user?.isAdmin)
@@ -77,7 +231,7 @@ function ShowOrdersHistory({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          orderId: _id,
+          orderId: order._id,
           status: "SHIPPED",
         }),
       });
@@ -86,16 +240,20 @@ function ShowOrdersHistory({
       }
       const data = await response.json();
       if (!data) throw new Error("can't get response data!!");
+
+      if (onStatusUpdate) {
+        onStatusUpdate(order._id, "SHIPPED");
+      }
+
       toast.success("order status updated to SHIPPED success!!");
-      return;
     } catch (err: any) {
       console.log(err?.message);
       toast.error(err?.message);
-      return;
     } finally {
       setShippPending(false);
     }
   };
+
   const handelUpdateOrderStatusToCanceled = async () => {
     try {
       if (!token || !user?.isAdmin)
@@ -109,7 +267,7 @@ function ShowOrdersHistory({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          orderId: _id,
+          orderId: order._id,
           status: "CANCELED",
         }),
       });
@@ -118,42 +276,46 @@ function ShowOrdersHistory({
       }
       const data = await response.json();
       if (!data) throw new Error("can't get response data!!");
+
+      if (onStatusUpdate) {
+        onStatusUpdate(order._id, "CANCELED");
+      }
+
       toast.success("The order is cancled!!");
-      return;
     } catch (err: any) {
       toast.error(err?.message);
-      return;
     } finally {
       setCancelPending(false);
     }
   };
+
   return (
-    <div className="w-full flex flex-col justify-start items-start  gap-4">
+    <div className="w-full flex flex-col justify-start items-start gap-4">
       <div
-        role={"button"}
-        className="w-full flex justify-between items-center p-2  border-zinc-200 border-t border-b  cursor-pointer hover:shadow-md transition-all  max-sm:flex-col max-md:flex-col max-sm:justify-start max-md:justify-start  max-sm:items-start max-md:items-start"
+        role="button"
+        className="w-full flex justify-between items-center p-2 border-zinc-200 border-t border-b cursor-pointer hover:shadow-md transition-all max-sm:flex-col max-md:flex-col max-sm:justify-start max-md:justify-start max-sm:items-start max-md:items-start"
         onClick={() => setOpen(!isOpen)}
       >
         <div className="w-full flex items-center justify-center gap-2">
           <span>Reference:</span>
           <span className="text-sm underline text-blue-500 font-semibold">
-            #{_id}
+            #{order._id}
           </span>
         </div>
         <div className="w-full flex items-center justify-center gap-2 mx-4">
-          <span className="w-full  text-sm text-nowrap text-zinc-600 font-semibold">
+          <span className="w-full text-sm text-nowrap text-zinc-600 font-semibold">
             {date.toLocaleDateString()} | {date.toLocaleTimeString()}
           </span>
         </div>
         <div className="w-full flex items-center justify-center gap-2">
-          <Status statusText={status.toString()} className="text-sm">
-            {status}
+          <Status statusText={order.status.toString()} className="text-sm">
+            {order.status}
           </Status>
         </div>
         <div className="w-full flex items-center justify-center gap-2">
           <span>Total:</span>
           <span className="text-zinc-800 font-black text-xl">
-            {totalOrderPrice.toFixed(2).toLocaleString()}{" "}
+            {order.totalOrderPrice.toFixed(2).toLocaleString()}{" "}
             <span className="text-sm text-zinc-800">EGP</span>
           </span>
         </div>
@@ -169,27 +331,29 @@ function ShowOrdersHistory({
         </div>
       </div>
       {isOpen && (
-        <div className="bg-zinc-200 p-4 w-full border border-zinc-300 rounded-2xl ">
-          {customer && (
-            <OrderCustomerInfo className="p-2" customer={customer} />
+        <div className="bg-zinc-200 p-4 w-full border border-zinc-300 rounded-2xl">
+          {order.customer && (
+            <OrderCustomerInfo className="p-2" customer={order.customer} />
           )}
-          <OrderTracker className="p-2" orderStatus={status.toString()} />
+          <OrderTracker className="p-2" orderStatus={order.status.toString()} />
           <div className="w-full animate-fill p-2 bg-white border border-zinc-200 rounded-md">
             <h1 className="my-2 font-bold">All Items</h1>
             <Items
-              itemsList={orderItems.map((item) => ({
+              itemsList={order.orderItems.map((item) => ({
                 ...item,
                 productImages: item.productImages || "",
               }))}
             />
           </div>
           {user?.isAdmin &&
-            (status.toString() === "PENDING" ||
-              status.toString() === "SHIPPED") && (
+            (order.status.toString() === "PENDING" ||
+              order.status.toString() === "SHIPPED") && (
               <div className="flex items-center gap-2 my-2">
                 <button
-                  className={` duration-150 px-4 py-1 rounded-md bg-green-500 hover:bg-green-700 text-white cursor-pointer disabled:bg-zinc-600 disabled:cursor-not-allowed`}
-                  disabled={status.toString() !== "SHIPPED" || completePending}
+                  className="duration-150 px-4 py-1 rounded-md bg-green-500 hover:bg-green-700 text-white cursor-pointer disabled:bg-zinc-600 disabled:cursor-not-allowed"
+                  disabled={
+                    order.status.toString() !== "SHIPPED" || completePending
+                  }
                   onClick={handelUpdateOrderStatusToDelivered}
                 >
                   {completePending ? (
@@ -199,8 +363,10 @@ function ShowOrdersHistory({
                   )}
                 </button>
                 <button
-                  className={` duration-150 px-4 py-1 rounded-md bg-purple-500 hover:bg-purple-700 text-white cursor-pointer  disabled:bg-zinc-600 disabled:cursor-not-allowed`}
-                  disabled={status.toString() !== "PENDING" || shippPending}
+                  className="duration-150 px-4 py-1 rounded-md bg-purple-500 hover:bg-purple-700 text-white cursor-pointer disabled:bg-zinc-600 disabled:cursor-not-allowed"
+                  disabled={
+                    order.status.toString() !== "PENDING" || shippPending
+                  }
                   onClick={handelUpdateOrderStatusToShipped}
                 >
                   {shippPending ? (
@@ -210,7 +376,7 @@ function ShowOrdersHistory({
                   )}
                 </button>
                 <button
-                  className={` duration-150 px-4 py-1 rounded-md bg-red-500 hover:bg-red-700 text-white cursor-pointer disabled:bg-red-600 disabled:cursor-not-allowed`}
+                  className="duration-150 px-4 py-1 rounded-md bg-red-500 hover:bg-red-700 text-white cursor-pointer disabled:bg-red-600 disabled:cursor-not-allowed"
                   disabled={cancelPending}
                   onClick={handelUpdateOrderStatusToCanceled}
                 >
@@ -228,164 +394,69 @@ function ShowOrdersHistory({
   );
 }
 
-function Items({ itemsList }: { itemsList: ProductInITemsList[] }) {
-  return (
-    <>
-      {itemsList.map((item) => {
-        return (
-          <div
-            key={item._id}
-            className="w-full flex justify-between items-center p-2 border border-zinc-200 cursor-pointer hover:shadow-md transition-all "
-          >
-            <div className="flex justify-start items-center gap-2">
-              <img
-                width={50}
-                height={50}
-                src={item?.productImages || ""}
-                alt={item?.productTitle}
-                className="object-cover rounded-md"
-              />
-              <h1 className="text-sm font-semibold text-zinc-700">
-                {item.productTitle}
-              </h1>
-            </div>
+function ShowOrdersHistory({
+  orders,
+  onStatusUpdate,
+}: {
+  orders: Order[];
+  onStatusUpdate?: (orderId: string, newStatus: string) => void;
+}) {
+  const [searchTerm, setSearchTerm] = useState("");
 
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-zinc-700">
-                {item.quantity <= 1
-                  ? `${item.quantity} item`
-                  : `${item.quantity} items`}
-              </div>
-              <div className=" font-semibold">
-                {(item.quantity * item.productPrice).toLocaleString()}
-              </div>
-            </div>
+  const filteredOrders = useMemo(() => {
+    if (!searchTerm.trim()) return orders;
+    const term = searchTerm.toLowerCase().trim();
+    return orders.filter((order) => {
+      const matchesId = order._id.toLowerCase().includes(term);
+      const matchesName = order.customer?.name?.toLowerCase().includes(term);
+      const matchesEmail = order.customer?.email?.toLowerCase().includes(term);
+      return matchesId || matchesName || matchesEmail;
+    });
+  }, [orders, searchTerm]);
+
+  return (
+    <div className="w-full">
+      <div className="mb-6 relative">
+        <div className="relative">
+          <IoSearchOutline
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400"
+            size={20}
+          />
+          <input
+            type="text"
+            placeholder="Search by Order ID, Customer Name, or Email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        {searchTerm && (
+          <div className="mt-2 text-sm text-zinc-600">
+            Found {filteredOrders.length} order
+            {filteredOrders.length !== 1 ? "s" : ""}
           </div>
-        );
-      })}
-    </>
-  );
-}
-
-export function Status({
-  children,
-  className,
-  statusText,
-}: {
-  children: ReactNode;
-  statusText: string;
-  className: string;
-}) {
-  return (
-    <span
-      className={`${className} px-4 py-1 rounded-2xl border flex items-center gap-2 ${
-        statusText === "PENDING"
-          ? "bg-zinc-50 border-zinc-500 text-zinc-500 "
-          : statusText === "SHIPPED"
-          ? "bg-purple-50 border-purple-500 text-purple-500 "
-          : statusText === "DELIVERED"
-          ? "bg-green-50 border-green-500  text-green-500 "
-          : statusText === "CANCELED"
-          ? "bg-red-50 border-red-500 text-red-500 "
-          : ""
-      }`}
-    >
-      <span>
-        {statusText === "PENDING" ? (
-          <MdOutlineWatchLater size={20} />
-        ) : statusText === "SHIPPED" ? (
-          <LiaShippingFastSolid size={20} />
-        ) : statusText === "DELIVERED" ? (
-          <IoMdDoneAll size={20} />
-        ) : statusText === "CANCELED" ? (
-          <LuX size={20} />
-        ) : null}
-      </span>
-      {children}
-    </span>
-  );
-}
-
-export function OrderCustomerInfo({
-  customer,
-  className,
-}: {
-  customer?: Customer;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`${className} bg-white border border-zinc-200 w-full rounded-md my-4`}
-    >
-      <h1 className="text-xl font-bold my-2">Customer Info:</h1>
-      <h1 className="text-lg font-semibold pl-2">{customer?.name}</h1>
-      <div className="p-2 text-sm text-zinc-600">
-        <p>{customer?.email}</p>
-        {customer?.phone && <h1>phone:{customer?.phone} </h1>}
-        <h1>Address: {customer?.address}</h1>
-        <h1>Payment: Cash on Delivery</h1>
-        <h1>Postal Code: 21519</h1>
+        )}
       </div>
-    </div>
-  );
-}
-export function OrderTracker({
-  className,
-  orderStatus,
-}: {
-  className?: string;
-  orderStatus: string;
-}) {
-  return (
-    <>
-      {orderStatus.toString() === "CANCELED" ? (
-        <div className="p-2 border rounded-md text-red-500 bg-red-100 border-red-500 my-4">
-          This order it's been cancled
+      {filteredOrders.length > 0 ? (
+        <div className="w-full flex flex-col-reverse justify-start items-start gap-4">
+          {filteredOrders.map((order) => (
+            <OrderItem
+              key={order._id}
+              order={order}
+              onStatusUpdate={onStatusUpdate}
+            />
+          ))}
         </div>
       ) : (
-        <>
-          <div
-            className={`${className} p-4  w-full flex flex-col justify-start items-start gap-2 bg-white border border-zinc-200  rounded-md my-4`}
-          >
-            <div className="w-full h-2 bg-gray-200 rounded-2xl">
-              <span
-                className={`flex h-full rounded-2xl 
-            ${
-              orderStatus === "PENDING"
-                ? "w-[10%] bg-zinc-600"
-                : orderStatus === "SHIPPED"
-                ? "w-[50%] bg-purple-500"
-                : orderStatus === "DELIVERED"
-                ? "w-full bg-green-300"
-                : ""
-            }
-          `}
-              ></span>
-            </div>
-            {/* <div className="text-zinc-600 font-semibold">
-        {orderStatus === "CANCELED" && "text-purple-500"}
-      </div> */}
-            <div className="w-full flex justify-between items-center">
-              <span
-                className={`${orderStatus === "PENDING" && "text-zinc-500"}`}
-              >
-                Pending
-              </span>
-              <span
-                className={`${orderStatus === "SHIPPED" && "text-purple-500"}`}
-              >
-                Shipped
-              </span>
-              <span
-                className={`${orderStatus === "DELIVERED" && "text-green-500"}`}
-              >
-                Completed
-              </span>
-            </div>
-          </div>
-        </>
+        <div className="w-full flex justify-center items-center p-12 bg-zinc-50 border border-zinc-200 rounded-lg">
+          <p className="text-lg text-gray-500 font-semibold">
+            {searchTerm
+              ? "No orders found matching your search"
+              : "No orders available"}
+          </p>
+        </div>
       )}
-    </>
+    </div>
   );
 }
 

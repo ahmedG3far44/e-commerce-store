@@ -12,7 +12,6 @@ function FeaturedProducts() {
       try {
         setIsLoading(true);
         const product = await getAllProducts();
-        console.log(product);
         setDisplayProducts(product as IProduct[]);
       } catch (err: unknown) {
         console.error(err);
@@ -39,7 +38,7 @@ function FeaturedProducts() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-2 lg:gap-2">
                 {displayProducts.map((product) => (
                   <ProductCard key={product._id} {...product} />
                 ))}

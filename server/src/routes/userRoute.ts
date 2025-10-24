@@ -1,13 +1,17 @@
 import { Router } from "express";
 import {
   addUserAddress,
+  deleteUserStatus,
   getUserAddressesList,
   getUserOrders,
   login,
   register,
+  updateUserStatus,
 } from "../services/userService";
 import verifyToken from "../middlewares/verifyToken";
 import { ExtendedRequest } from "../utils/types";
+import verifyAdmin from "../middlewares/verifyAdmin";
+import { string } from "zod";
 
 const router = Router();
 
@@ -60,5 +64,6 @@ router.get("/address", verifyToken, async (req: ExtendedRequest, res) => {
     res.status(500).json(err.message);
   }
 });
+
 
 export default router;

@@ -1,14 +1,79 @@
 import { useState, useMemo, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import Header from "../components/landing/Header";
+import { BiChevronDown, BiPackage, BiX } from "react-icons/bi";
+import { FiAlertCircle, FiFilter } from "react-icons/fi";
 import { getAllProducts } from "../utils/handlers";
 import { IProduct } from "../utils/types";
-import ProductCard from "../components/ProductCard";
+import { useNavigate, useParams } from "react-router-dom";
+import Header from "../components/landing/Header";
+import useAuth from "../context/auth/AuthContext";
+import useCart from "../context/cart/CartContext";
 
 interface FilterState {
   priceRange: [number, number];
   inStock: boolean | null;
   sortBy: "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
+}
+
+function ProductCard(product: IProduct) {
+  const navigate = useNavigate();
+
+  const { addItemToCart } = useCart();
+  const { user, isAuthenticated, token } = useAuth();
+  return (
+    <div className="group bg-white rounded-xl border border-zinc-300 overflow-hidden hover:shadow-xl transition-all duration-300  hover:-translate-y-1">
+      <div className="relative aspect-square overflow-hidden bg-zinc-100">
+        <img
+          src={product.images[0] || product.thumbnail || ""}
+          alt={product.description as string}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+        <p className="text-sm line-clamp-2 text-zinc-400">
+          {product.description as string}
+        </p>
+        {product.stock === 0 && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <span className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold text-sm">
+              Out of Stock
+            </span>
+          </div>
+        )}
+        {product.stock > 0 && product.stock < 10 && (
+          <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            Only {product.stock} left
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold text-zinc-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+          {product.title}
+        </h3>
+        <div className="flex items-center justify-between">
+          <span className="text-2xl font-bold text-blue-600">
+            $
+            {product.price.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+          {isAuthenticated && !user?.isAdmin && (
+            <button
+              onClick={() => {
+                if (!token) {
+                  navigate("/loin");
+                } else {
+                  addItemToCart({ productId: product._id, quantity: 1, token });
+                }
+              }}
+              disabled={product.stock === 0}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-zinc-300 disabled:cursor-not-allowed text-sm"
+            >
+              {product.stock === 0 ? "Unavailable" : "Add to Cart"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function FilterSidebar({
@@ -50,67 +115,71 @@ function FilterSidebar({
 
   return (
     <>
-      {/* Mobile Filter Toggle */}
-      <div className="lg:hidden mb-4 flex items-center justify-between">
+      <div className="lg:hidden mb-6 flex items-center justify-between gap-4">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 bg-white border border-zinc-300 rounded-lg px-4 py-2.5 font-medium text-sm hover:bg-zinc-50 transition"
+          className="flex items-center gap-2 bg-white border-2 border-zinc-200 rounded-xl px-5 py-3 font-semibold text-sm hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-            />
-          </svg>
-          Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
+          <FiFilter className="w-5 h-5" />
+          Filters{" "}
+          {activeFilterCount > 0 && (
+            <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+              {activeFilterCount}
+            </span>
+          )}
         </button>
-        <span className="text-sm text-zinc-600">
-          {filteredCount} of {totalProducts} products
-        </span>
+        <div className="bg-white border-2 border-zinc-200 rounded-xl px-4 py-3 shadow-sm">
+          <span className="text-sm font-semibold text-zinc-900">
+            {filteredCount}
+            <span className="text-zinc-500 font-normal">
+              {" "}
+              / {totalProducts}
+            </span>
+          </span>
+        </div>
       </div>
+
+      {/* Backdrop */}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
         className={`
-        lg:block bg-white rounded-xl border border-zinc-200 p-6 space-y-6 h-fit lg:sticky lg:top-4
-        ${isOpen ? "block fixed inset-0 z-50 overflow-y-auto" : "hidden"}
+        lg:block bg-white rounded-2xl border-2 border-zinc-200 p-6 space-y-6 h-fit lg:sticky lg:top-4 shadow-lg
+        ${
+          isOpen
+            ? "block fixed inset-y-0 left-0 right-16 z-50 overflow-y-auto"
+            : "hidden"
+        }
       `}
       >
-        {/* Mobile Close Button */}
+        {/* Mobile Header */}
         {isOpen && (
-          <button
-            onClick={() => setIsOpen(false)}
-            className="lg:hidden absolute top-4 right-4 p-2 hover:bg-zinc-100 rounded-lg transition"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div className="lg:hidden flex items-center justify-between pb-4 border-b border-zinc-200">
+            <h2 className="text-xl font-bold text-zinc-900">Filter Products</h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-2 hover:bg-zinc-100 rounded-lg transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <BiX className="w-6 h-6" />
+            </button>
+          </div>
         )}
 
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-zinc-900">Filters</h2>
+          <h2 className="text-lg font-bold text-zinc-900 hidden lg:block">
+            Filters
+          </h2>
           {activeFilterCount > 0 && (
             <button
               onClick={resetFilters}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-semibold hover:underline"
             >
               Reset All
             </button>
@@ -118,16 +187,21 @@ function FilterSidebar({
         </div>
 
         {/* Results Count */}
-        <div className="hidden lg:block p-3 bg-blue-50 rounded-lg border border-blue-100">
-          <p className="text-sm text-blue-900">
-            Showing <span className="font-bold">{filteredCount}</span> of{" "}
-            <span className="font-bold">{totalProducts}</span> products
-          </p>
+        <div className="hidden lg:block p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-100">
+          <div className="flex items-center gap-2 text-blue-900">
+            <BiPackage className="w-5 h-5" />
+            <p className="text-sm font-medium">
+              <span className="font-bold text-lg">{filteredCount}</span> of{" "}
+              <span className="font-bold text-lg">{totalProducts}</span>{" "}
+              products
+            </p>
+          </div>
         </div>
 
         {/* Sort By */}
         <div className="space-y-3">
-          <label className="block text-sm font-semibold text-zinc-900">
+          <label className="flex items-center gap-2 text-sm font-bold text-zinc-900">
+            <BiChevronDown className="w-4 h-4" />
             Sort By
           </label>
           <select
@@ -137,80 +211,88 @@ function FilterSidebar({
                 sortBy: e.target.value as FilterState["sortBy"],
               })
             }
-            className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium bg-white hover:border-zinc-300 transition-colors"
           >
-            <option value="newest">Newest First</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name-asc">Name: A to Z</option>
-            <option value="name-desc">Name: Z to A</option>
+            <option value="newest"> Newest First</option>
+            <option value="price-asc">Low to High</option>
+            <option value="price-desc"> High to Low</option>
+            <option value="name-asc"> A to Z</option>
+            <option value="name-desc">Z to A</option>
           </select>
         </div>
 
         {/* Price Range */}
         <div className="space-y-3">
-          <label className="block text-sm font-semibold text-zinc-900">
+          <label className="block text-sm font-bold text-zinc-900">
             Price Range
           </label>
           <div className="flex items-center gap-3">
-            <input
-              type="number"
-              value={filters.priceRange[0]}
-              onChange={(e) => handlePriceChange(0, e.target.value)}
-              placeholder="Min"
-              className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
-            <span className="text-zinc-400">-</span>
-            <input
-              type="number"
-              value={filters.priceRange[1]}
-              onChange={(e) => handlePriceChange(1, e.target.value)}
-              placeholder="Max"
-              className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
+            <div className="flex-1">
+              <input
+                type="number"
+                value={filters.priceRange[0]}
+                onChange={(e) => handlePriceChange(0, e.target.value)}
+                placeholder="Min"
+                className="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium"
+              />
+            </div>
+            <div className="w-8 h-0.5 bg-zinc-300 flex-shrink-0" />
+            <div className="flex-1">
+              <input
+                type="number"
+                value={filters.priceRange[1]}
+                onChange={(e) => handlePriceChange(1, e.target.value)}
+                placeholder="Max"
+                className="w-full px-4 py-3 border-2 border-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium"
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-zinc-500">
-            <span>${filters.priceRange[0]}</span>
-            <span>${filters.priceRange[1]}</span>
+          <div className="flex items-center justify-between px-1">
+            <span className="text-sm font-bold text-zinc-900">
+              ${filters.priceRange[0]}
+            </span>
+            <span className="text-sm font-bold text-zinc-900">
+              ${filters.priceRange[1]}
+            </span>
           </div>
         </div>
 
         {/* Stock Status */}
         <div className="space-y-3">
-          <label className="block text-sm font-semibold text-zinc-900">
+          <label className="block text-sm font-bold text-zinc-900">
             Availability
           </label>
           <div className="space-y-2">
-            <label className="flex items-center gap-2 cursor-pointer group">
+            <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg hover:bg-zinc-50 transition-colors">
               <input
                 type="radio"
                 checked={filters.inStock === null}
                 onChange={() => onFilterChange({ inStock: null })}
-                className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                className="w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
               />
-              <span className="text-sm text-zinc-700 group-hover:text-zinc-900">
+              <span className="text-sm font-medium text-zinc-700 group-hover:text-zinc-900">
                 All Products
               </span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer group">
+            <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg hover:bg-green-50 transition-colors">
               <input
                 type="radio"
                 checked={filters.inStock === true}
                 onChange={() => onFilterChange({ inStock: true })}
-                className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                className="w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
               />
-              <span className="text-sm text-zinc-700 group-hover:text-zinc-900">
+              <span className="text-sm font-medium text-zinc-700 group-hover:text-green-900">
                 In Stock Only
               </span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer group">
+            <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg hover:bg-red-50 transition-colors">
               <input
                 type="radio"
                 checked={filters.inStock === false}
                 onChange={() => onFilterChange({ inStock: false })}
-                className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                className="w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
               />
-              <span className="text-sm text-zinc-700 group-hover:text-zinc-900">
+              <span className="text-sm font-medium text-zinc-700 group-hover:text-red-900">
                 Out of Stock
               </span>
             </label>
@@ -221,7 +303,7 @@ function FilterSidebar({
         {isOpen && (
           <button
             onClick={() => setIsOpen(false)}
-            className="lg:hidden w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            className="lg:hidden w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
           >
             Apply Filters
           </button>
@@ -234,31 +316,32 @@ function FilterSidebar({
 function CategoryPage() {
   const { categoryName } = useParams();
 
-  const [category] = useState(categoryName);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 1000],
     inStock: null,
     sortBy: "newest",
   });
 
-  const [allProducts, setDisplayProducts] = useState<IProduct[] | []>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [allProducts, setAllProducts] = useState<IProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function handleGetProducts() {
       try {
         setIsLoading(true);
-        const products: IProduct[] = await getAllProducts();
-        if (products) {
-          console.log(products);
-          const filterCategoryProducts = products.filter(
-            (product) =>
-              (product.catergoryId ?? "").toLocaleLowerCase() ===
-              (categoryName ?? "").toLocaleLowerCase()
-          );
-          setDisplayProducts(filterCategoryProducts as IProduct[]);
-        }
-      } catch (err: unknown) {
+
+        const products = await getAllProducts();
+
+        const filterCategoryProducts = products.filter(
+          (product) =>
+            product.categoryName ===
+              categoryName?.split(" ").join("-").trim().toLocaleLowerCase() ||
+            product.categoryName.toLocaleUpperCase() ===
+              categoryName?.split("-").join(" ").toUpperCase()
+        );
+
+        setAllProducts(filterCategoryProducts);
+      } catch (err) {
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -267,36 +350,32 @@ function CategoryPage() {
     handleGetProducts();
   }, [categoryName]);
 
-  // Calculate price range from all products
   const absolutePriceRange = useMemo<[number, number]>(() => {
     if (allProducts.length === 0) return [0, 1000];
     const prices = allProducts.map((p) => p.price);
     return [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))];
   }, [allProducts]);
 
-  // Initialize price range filter
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, priceRange: absolutePriceRange }));
-  }, [absolutePriceRange]);
+    if (allProducts.length > 0) {
+      setFilters((prev) => ({ ...prev, priceRange: absolutePriceRange }));
+    }
+  }, [allProducts.length]);
 
-  // Filter and sort products
   const filteredProducts = useMemo(() => {
     let filtered = [...allProducts];
 
-    // Filter by price
     filtered = filtered.filter(
       (p) =>
         p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
     );
 
-    // Filter by stock
     if (filters.inStock === true) {
       filtered = filtered.filter((p) => p.stock > 0);
     } else if (filters.inStock === false) {
       filtered = filtered.filter((p) => p.stock === 0);
     }
 
-    // Sort
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
         case "price-asc":
@@ -325,31 +404,34 @@ function CategoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Header />
-      <header className="bg-white border-b border-zinc-200 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className=" border-b-2 border-zinc-200 sticky top-0 z-40 shadow-md backdrop-blur-lg bg-white/95">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900">
-                {category}
+              <h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                {categoryName?.toUpperCase()}
               </h1>
-              <p className="text-sm text-zinc-600 mt-1">
+              <p className="text-sm text-zinc-600 mt-2 font-medium">
                 {filteredProducts.length}{" "}
                 {filteredProducts.length === 1 ? "product" : "products"}{" "}
                 available
               </p>
             </div>
-            <nav className="hidden sm:flex items-center gap-2 text-sm text-zinc-600">
-              <a href="/" className="hover:text-zinc-900">
+            <nav className="hidden sm:flex items-center gap-2 text-sm font-medium">
+              <a
+                href="/"
+                className="text-zinc-600 hover:text-blue-600 transition-colors"
+              >
                 Home
               </a>
-              <span>/</span>
-              <a href="/categories" className="hover:text-zinc-900">
+              <span className="text-zinc-400">/</span>
+              <span className="text-zinc-600 hover:text-blue-600 transition-colors">
                 Categories
-              </a>
-              <span>/</span>
-              <span className="text-zinc-900 font-medium">{category}</span>
+              </span>
+              <span className="text-zinc-400">/</span>
+              <span className="text-blue-600 font-bold">{categoryName}</span>
             </nav>
           </div>
         </div>
@@ -357,7 +439,7 @@ function CategoryPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-64 flex-shrink-0">
+          <div className="lg:w-72 flex-shrink-0">
             <FilterSidebar
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -369,31 +451,28 @@ function CategoryPage() {
 
           <div className="flex-1">
             {isLoading ? (
-              <div className="w-full min-h-screen flex items-start justify-center">
-                <div className="mt-20 w-8 h-8 rounded-full border-2 border-r-transparent border-t-transparent bg-transparent animate-spin duration-300"></div>
+              <div className="w-full min-h-[60vh] flex flex-col items-center justify-center">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
+                  <BiPackage className="w-6 h-6 text-blue-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                </div>
+                <p className="mt-4 text-zinc-600 font-medium">
+                  Loading products...
+                </p>
               </div>
             ) : (
               <>
                 {filteredProducts.length === 0 ? (
-                  <div className="bg-white rounded-xl border border-zinc-200 p-12 text-center">
-                    <svg
-                      className="w-16 h-16 text-zinc-300 mx-auto mb-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                      />
-                    </svg>
-                    <h3 className="text-xl font-semibold text-zinc-900 mb-2">
+                  <div className="bg-white rounded-2xl border-2 border-zinc-200 p-12 text-center shadow-lg">
+                    <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FiAlertCircle className="w-10 h-10 text-zinc-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-zinc-900 mb-2">
                       No products found
                     </h3>
-                    <p className="text-zinc-600 mb-4">
-                      Try adjusting your filters to see more results
+                    <p className="text-zinc-600 mb-6 max-w-md mx-auto">
+                      We couldn't find any products matching your filters. Try
+                      adjusting your criteria to see more results.
                     </p>
                     <button
                       onClick={() =>
@@ -402,7 +481,7 @@ function CategoryPage() {
                           inStock: null,
                         })
                       }
-                      className="text-blue-600 hover:text-blue-700 font-medium"
+                      className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
                     >
                       Clear all filters
                     </button>

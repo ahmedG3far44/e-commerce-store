@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useAuth from "../context/auth/AuthContext";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { BiHomeSmile } from "react-icons/bi";
+import { BiBarChartSquare, BiHomeSmile } from "react-icons/bi";
 import {
   LuChartColumnBig,
   LuBox,
@@ -13,6 +13,9 @@ import { FiLogOut } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
 import { LiaUserCircleSolid, LiaShippingFastSolid } from "react-icons/lia";
 import { OrdersCountType } from "../utils/types";
+import { TbShoppingCartCopy, TbSitemap } from "react-icons/tb";
+import { AiOutlineProduct } from "react-icons/ai";
+import { PiUsersDuotone } from "react-icons/pi";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -58,7 +61,6 @@ function Dashboard() {
       name: "Home",
       link: "home",
       path: "/",
-
       icon: <BiHomeSmile size={20} />,
     },
     {
@@ -66,42 +68,42 @@ function Dashboard() {
       name: "Insight",
       link: "insights",
       path: "/dashboard/insights",
-      icon: <LuChartColumnBig size={20} />,
+      icon: <BiBarChartSquare size={20} />,
     },
     {
       id: 3,
       name: "Categories",
       link: "categories",
       path: "/dashboard/categories",
-      icon: <LuLayoutPanelTop size={20} />,
+      icon: <TbSitemap size={20} />,
     },
     {
       id: 4,
       name: "Products",
       link: "products",
       path: "/dashboard/products",
-      icon: <LuBox size={20} />,
+      icon: <AiOutlineProduct size={20} />,
     },
     {
       id: 5,
       name: "Users",
       link: "users",
       path: "/dashboard/users",
-      icon: <LiaUserCircleSolid size={20} />,
+      icon: <PiUsersDuotone size={20} />,
     },
     {
       id: 6,
       name: "All Orders",
       link: "all-orders",
       path: "/dashboard/all-orders",
-      icon: <LuBoxes size={20} />,
+      icon: <LuBox size={20} />,
     },
     {
       id: 7,
       name: "Delivered Orders",
       link: "delivered-orders",
       path: "/dashboard/delivered-orders",
-      icon: <LuBoxes size={20} />,
+      icon: <TbShoppingCartCopy size={20} />,
     },
     {
       id: 8,
@@ -141,19 +143,6 @@ function Dashboard() {
 
 export default Dashboard;
 
-function Skeleton() {
-  return (
-    <span className={"w-6 h-6 bg-zinc-300 rounded-full animate-pulse"}></span>
-  );
-}
-function Notification({ number }: { number: number }) {
-  return (
-    <div className="p-2 w-5 h-5 font-semibold bg-blue-500 text-white rounded-full text-[10px] flex items-center justify-center">
-      <span>{number}</span>
-    </div>
-  );
-}
-
 interface DashboardSidebarProps {
   dashboardList: any[];
   activeLink: string;
@@ -176,7 +165,6 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   return (
     <aside className="min-h-screen h-full w-[280px] bg-gradient-to-b from-gray-50 to-gray-100 border-r border-gray-200 p-6 flex flex-col justify-between items-start fixed left-0 top-0 max-md:hidden max-sm:hidden shadow-sm">
-      {/* Logo/Brand Section */}
       <div className="w-full mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
@@ -189,19 +177,13 @@ export function DashboardSidebar({
         </div>
       </div>
 
-      {/* Navigation Menu */}
       <nav className="w-full flex-1 overflow-y-auto">
         <ul className="w-full flex flex-col items-start gap-2">
           {dashboardList.map((url) => {
             const isActive = url.link === activeLink;
-            const isOrderLink = url.link.includes("orders");
-
-            // Determine notification count
             let notificationCount = 0;
             if (url.link === "pending-orders") {
               notificationCount = orderStatus.pending;
-            } else if (url.link === "delivered-orders") {
-              notificationCount = orderStatus.delivered;
             } else if (url.link === "shipped-orders") {
               notificationCount = orderStatus.shipped;
             } else if (url.link === "all-orders") {
@@ -222,13 +204,11 @@ export function DashboardSidebar({
                     }
                   `}
                 >
-                  {/* Active Indicator Bar */}
                   {isActive && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full" />
                   )}
 
                   <div className="flex items-center gap-3 flex-1">
-                    {/* Icon */}
                     <span
                       className={`
                         text-xl transition-transform duration-200
@@ -238,7 +218,6 @@ export function DashboardSidebar({
                       {url.icon}
                     </span>
 
-                    {/* Label */}
                     <span
                       className={`
                         font-medium text-sm
@@ -249,7 +228,6 @@ export function DashboardSidebar({
                     </span>
                   </div>
 
-                  {/* Notification Badge / Count */}
                   {pending ? (
                     <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse" />
                   ) : (
@@ -257,7 +235,6 @@ export function DashboardSidebar({
                       {notificationCount > 0 && (
                         <>
                           {url.link === "all-orders" ? (
-                            // Simple count for all orders
                             <span
                               className={`
                                 text-xs font-semibold px-2 py-1 rounded-md
@@ -271,7 +248,6 @@ export function DashboardSidebar({
                               {notificationCount}
                             </span>
                           ) : (
-                            // Notification badge for specific order types
                             <span className="relative flex items-center justify-center">
                               <span
                                 className={`
@@ -289,7 +265,7 @@ export function DashboardSidebar({
                                   ? "99+"
                                   : notificationCount}
                               </span>
-                              {/* Pulse animation for active notifications */}
+
                               {!isActive && notificationCount > 0 && (
                                 <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping" />
                               )}
@@ -306,7 +282,6 @@ export function DashboardSidebar({
         </ul>
       </nav>
 
-      {/* User Info Section (Optional) */}
       <div className="w-full pt-6 border-t border-gray-200 mb-4">
         <div className="flex items-center gap-3 px-2 py-2">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
@@ -316,12 +291,13 @@ export function DashboardSidebar({
             <p className="text-sm font-semibold text-gray-900 truncate">
               Admin User
             </p>
-            <p className="text-xs text-gray-500 truncate">admin@example.com</p>
+            <p className="text-xs text-gray-500 truncate">
+              adminuser@techbad.com
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Logout Button */}
       <button
         onClick={handelLogout}
         className="

@@ -1,17 +1,13 @@
-// hooks 
 import { useEffect, useState } from "react";
 import useAuth from "../../context/auth/AuthContext";
 
-// components
 import InsightsCard from "./InsightsCard";
 import { SalesInsightsType } from "./Insights";
 
-// icons 
 import { FaRegUserCircle } from "react-icons/fa";
 import { LuWallet } from "react-icons/lu";
 import { MdDoneAll } from "react-icons/md";
 import { PiChartLineUp } from "react-icons/pi";
-
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -55,24 +51,28 @@ function SalesInsights() {
   }, [token]);
   const info = [
     {
+      id: "0",
       name: "Total Sales",
       icon: <PiChartLineUp color="#2196F3" size={25} />,
       money: salesInsights.totalSales,
       prefix: "EGP",
     },
     {
+      id: "1",
       name: "Confirmed Orders",
       icon: <MdDoneAll color="green" size={25} />,
       money: salesInsights.totalOrders,
       prefix: salesInsights.totalOrders <= 1 ? "order" : "orders",
     },
     {
+      id: "2",
       name: "Most Spent",
       icon: <LuWallet color="gray" size={25} />,
       money: salesInsights.mostSpent,
       prefix: "EGP",
     },
     {
+      id: "3",
       name: "Active Customers",
       icon: <FaRegUserCircle color="gray" size={25} />,
       money: salesInsights.activeCustomers,
@@ -83,13 +83,14 @@ function SalesInsights() {
     <div className="p-4 w-full flex justify-between gap-1 items-center flex-wrap max-sm:flex-wrap max-md:flex-wrap max-sm:justify-center max-md:justify-center">
       {info.map((card) => {
         return (
-          <>
+          <div key={card.id}>
             {pending ? (
               <>
                 <InsightsCardSkeleton />
               </>
             ) : (
               <InsightsCard
+                key={card.id}
                 name={card.name}
                 icon={card.icon}
                 money={card.money}
@@ -97,7 +98,7 @@ function SalesInsights() {
                 prefix={card.prefix}
               />
             )}
-          </>
+          </div>
         );
       })}
     </div>

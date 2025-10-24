@@ -28,7 +28,7 @@ export const login = async ({ email, password }: loginUserParams) => {
     }
     const { user, token } = data;
 
-    console.log(user);
+
 
     return { user, token };
   } catch (err) {
@@ -82,6 +82,21 @@ export const getAllProducts = async (): Promise<IProduct[]> => {
   }
 };
 
+
+export const getProductsByCategoryName = async (categoryName:string) =>{
+  try {
+    const response = await fetch(`${BASE_URL}/product/category/${categoryName}`);
+    if (!response.ok) {
+      throw new Error("can't get a product please check your connection!!");
+    }
+    const products: IProduct[] = await response.json();
+    return products;
+  } catch (err) {
+    console.error(err);
+    return [] as IProduct[];
+  }
+}
+
 export const getUserCartItem = async ({ token }: OnlyTokenParams) => {
   try {
     if (!token) return;
@@ -119,7 +134,6 @@ export const getAllUserOrders = async ({ token }: OnlyTokenParams) => {
       throw new Error("can't get user orders,  please check your connection!!");
     }
     const { orders } = await response.json();
-    console.log(orders);
     return orders;
   } catch (err) {
     console.error(err);

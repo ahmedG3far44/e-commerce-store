@@ -107,11 +107,9 @@ export const addUserAddress = async ({
     const user = await userModel.findById(userId);
     user?.addresses.push(address);
     await user?.save();
-    console.log();
     if (!user?.addresses) {
       return { data: "addresses list not found", statusCode: 400 };
     }
-    // userAddressesList?.push(address);
     return { data: user, statusCode: 200 };
   } catch (err: any) {
     return { data: err?.message, statusCode: 400 };
@@ -129,6 +127,38 @@ export const getUserAddressesList = async ({
     const addresses = user?.addresses;
 
     return { data: addresses, statusCode: 200 };
+  } catch (err: any) {
+    return { data: err?.message, statusCode: 400 };
+  }
+};
+interface UpdateUserStatusPramsType {
+  userId: string;
+  newStatus:"active" | "blocked"
+}
+export const updateUserStatus = async ({
+  userId,
+  newStatus
+}: UpdateUserStatusPramsType) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(userId, {
+      status: newStatus,
+    });
+    await user?.save()
+    return { data: user, statusCode: 200 };
+  } catch (err: any) {
+    return { data: err?.message, statusCode: 400 };
+  }
+};
+interface DeleteUserStatusPramsType {
+  userId: string;
+}
+export const deleteUserStatus = async ({
+  userId
+}: DeleteUserStatusPramsType) => {
+  try {
+    const user = await userModel.findByIdAndDelete(userId);
+    await user?.save()
+    return { data: user, statusCode: 200 };
   } catch (err: any) {
     return { data: err?.message, statusCode: 400 };
   }

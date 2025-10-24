@@ -20,11 +20,9 @@ interface AddProductParams {
 
 export const addNewProduct = async ({ productData }: AddProductParams) => {
   try {
-
-    console.log(productData)
     const validProductData = productSchema.safeParse(productData);
     if (!validProductData.success) {
-      console.log(validProductData.error.flatten().fieldErrors);
+
       return {
         data: `the product data are not valid => ${validProductData.error.message}`,
         statusCode: 400,
@@ -39,8 +37,10 @@ export const addNewProduct = async ({ productData }: AddProductParams) => {
       };
     }
 
+
     const newProduct = await product.insertOne({
       ...validProductData.data,
+      categoryName:validProductData.data.categoryName.split(" ").join("-").toLocaleLowerCase().trim(),
       totalSales: 0, 
       ordersCount: 0, 
     });
@@ -106,6 +106,24 @@ export const updateNewProduct = async ({
   }
 };
 
+
+interface GetProductByCategoryNameParams{
+  categoryName:string;
+}
+export const getProductsByCategoryName = async({ categoryName }: GetProductByCategoryNameParams)=> {
+  try{
+    const products = await productModel.find({
+      categoryName
+    })
+    if(!products) throw new Error("no products found !!")
+
+      return {data:products, statusCode:200}
+    }catch(error){
+    return {data:`Error: ${(error as Error).message }`, statusCode:400}
+
+  }
+}
+
 interface GetProductByIdParams {
   productId: string;
 }
@@ -131,18 +149,17 @@ export const deleteProductById = async ({ productId }: GetProductByIdParams) => 
         statusCode: 404 
       };
     }
-    // Delete images from S3
     for (const img of product?.images as string[]){
       const deletedKey = img.split(".com/")[1].trim();
-      console.log(deletedKey)
+
       const command = new DeleteObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET,
         Key: deletedKey
       });
-      // Note: You'll need to execute the command with S3 client
+    
 
       await s3Client.send(command).then(()=>{
-        console.log("all images deleted success", img.split(".com/")[1].trim())
+
       }).catch((error)=> {
         return { data: "can't delete product by Id", statusCode: 400 };
       })

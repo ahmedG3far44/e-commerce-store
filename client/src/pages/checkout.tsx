@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import { BiPackage } from "react-icons/bi";
 import { MdOutlineLocalShipping } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -58,6 +59,8 @@ function CheckoutPage() {
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const shippingCost = 0; // Free shipping
   const finalTotal = totalAmount + shippingCost;
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -121,67 +124,76 @@ function CheckoutPage() {
                 )}
               </div>
             </div>
-
-            {/* Shipping Address Section */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <FiMapPin className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Shipping Address
-                  </h2>
-                </div>
-                <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors">
-                  <FiPlus className="w-4 h-4" />
-                  Add New
-                </button>
-              </div>
-
-              {pending ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                </div>
-              ) : addresses.length > 0 ? (
-                <div className="space-y-3">
-                  {addresses.map((address, index) => (
-                    <div
-                      key={index}
-                      onClick={() => setSelectedAddress(address)}
-                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                        selectedAddress === address
-                          ? "border-blue-600 bg-blue-50"
-                          : "border-gray-200 hover:border-gray-300 bg-white"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
-                            selectedAddress === address
-                              ? "border-blue-600 bg-blue-600"
-                              : "border-gray-300"
-                          }`}
-                        >
-                          {selectedAddress === address && (
-                            <FiCheck className="w-3 h-3 text-white" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-gray-900 font-medium">{address}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
-                  <FiMapPin className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600 mb-4">No addresses found</p>
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                    Add Address
+            {cartItems.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-md p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <FiMapPin className="w-6 h-6 text-blue-600" />
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Shipping Address
+                    </h2>
+                  </div>
+                  <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                    <FiPlus className="w-4 h-4" />
+                    Add New
                   </button>
                 </div>
-              )}
-            </div>
+
+                {pending ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : addresses.length > 0 ? (
+                  <>
+                    {cartItems.length > 0 && (
+                      <div className="space-y-3">
+                        {addresses.map((address, index) => (
+                          <div
+                            key={index}
+                            onClick={() => setSelectedAddress(address)}
+                            className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                              selectedAddress === address
+                                ? "border-blue-600 bg-blue-50"
+                                : "border-gray-200 hover:border-gray-300 bg-white"
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                                  selectedAddress === address
+                                    ? "border-blue-600 bg-blue-600"
+                                    : "border-gray-300"
+                                }`}
+                              >
+                                {selectedAddress === address && (
+                                  <FiCheck className="w-3 h-3 text-white" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-gray-900 font-medium">
+                                  {address}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
+                    <FiMapPin className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-4">No addresses found</p>
+                    <button
+                      onClick={() => navigate("/add-address")}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                    >
+                      Add Address
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Order Summary Sidebar */}
@@ -190,8 +202,6 @@ function CheckoutPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-6">
                 Order Summary
               </h2>
-
-              {/* Price Breakdown */}
               <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal ({itemCount} items)</span>
@@ -208,8 +218,6 @@ function CheckoutPage() {
                   <span className="font-medium">Included</span>
                 </div>
               </div>
-
-              {/* Total */}
               <div className="flex justify-between items-center mb-6">
                 <span className="text-lg font-bold text-gray-900">Total</span>
                 <span className="text-2xl font-bold text-blue-600">
@@ -217,11 +225,10 @@ function CheckoutPage() {
                 </span>
               </div>
 
-              {/* Place Order Button */}
               <button
                 onClick={() => {
                   if (token) {
-                    createOrder({ token, address: addresses[0] });
+                    createOrder({ token, address: selectedAddress });
                   }
                 }}
                 disabled={!selectedAddress || cartItems.length === 0}
@@ -231,7 +238,6 @@ function CheckoutPage() {
                 Place Order
               </button>
 
-              {/* Security Badge */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <FiLock className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -246,8 +252,6 @@ function CheckoutPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Additional Info */}
               <div className="mt-6 pt-6 border-t border-gray-200 space-y-3 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <MdOutlineLocalShipping className="w-5 h-5 text-blue-600" />

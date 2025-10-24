@@ -5,6 +5,7 @@ import productModel from "../models/product";
 import orderModel from "../models/order";
 
 import { CheckoutCartParams, CartProduct, IProductItem, ICart } from "../utils/types";
+import { updateProductSales } from "./productService";
 
 interface CreateCartParams {
   userId: string;
@@ -129,9 +130,12 @@ export const updateItemsInCart = async ({
       };
     }
 
-    updatedItem.quantity = quantity;
+    console.log(updatedItem)
 
-    // Recalculate total for ALL items (including the updated one)
+    updatedItem.quantity = quantity;
+    
+    updateProductSales(productId, updatedItem.quantity)
+
     cart.totalAmount = calculateItemsInCartTotalPrice(cart.items);
 
     const updatedCart = await cart.save();

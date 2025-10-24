@@ -25,7 +25,7 @@ function TotalOrder({ total, addresses }: TotalOrderProps) {
 
       if (!address) throw new Error("address not added!!");
       const result = await createOrder({ token, address });
-      console.log(result);
+
       toast.success("Congrats order was created successfully!! ");
       navigate("/success");
       return;

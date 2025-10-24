@@ -2,23 +2,10 @@ import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
 import ItemCart from "../components/ItemCart";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import ShoppingCart from "../components/ShoppingCart";
 import { CgShoppingCart } from "react-icons/cg";
 import { BsArrowRight, BsTrash2 } from "react-icons/bs";
 import { BiPackage } from "react-icons/bi";
-
-interface IProduct {
-  _id: string;
-  title: string;
-  description: string | null;
-  categoryName: string | null;
-  image: string;
-  price: number;
-  stock: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { useEffect } from "react";
 
 function CartPage() {
   const { token } = useAuth();
@@ -67,6 +54,7 @@ function CartPage() {
                   stock={product.stock}
                   price={product.price}
                   updatedAt={updatedAt}
+                  checkoutState={true}
                 />
               ))}
             </div>
@@ -157,7 +145,7 @@ function CartPage() {
               shopping to find amazing products!
             </p>
             <button
-              onClick={() => navigate("/products")}
+              onClick={() => navigate("/")}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-8 rounded-xl transition-all duration-200 inline-flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               Continue Shopping

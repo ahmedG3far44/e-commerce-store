@@ -7,7 +7,7 @@ const BUCKET_NAME = process.env.AWS_S3_BUCKET as string;
 
 export const uploadFiles = async (buffer: any) => {
   try {
-    console.log(buffer);
+
     if (buffer.length <= 1) {
       const command = new PutObjectCommand({
         Body: buffer,
@@ -35,7 +35,6 @@ export const uploadFiles = async (buffer: any) => {
       return { data: "uploaded multiple files success", statusCode: 201 };
     }
   } catch (err: any) {
-    console.log(err?.message);
     return { data: err?.message, statusCode: 400 };
   }
 };

@@ -1,35 +1,48 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IUser extends Document {
+enum UserStatus {
+  ACTIVE = "active",
+  BLOCKED = "blocked",
+}
+
+export interface IUser extends Document {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   isAdmin: boolean;
+  status: UserStatus;
   addresses: string[];
 }
 
-const userSchema = new Schema(
+const userSchema = new Schema<IUser>(
   {
     firstName: {
       type: String,
-      require: true,
+      required: true,
     },
     lastName: {
       type: String,
-      require: true,
+      required: true,
     },
     email: {
       type: String,
-      require: true,
+      required: true,
+      unique: true,
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     isAdmin: {
       type: Boolean,
       default: false,
+    },
+    status: {
+      type: String,
+      enum: Object.values(UserStatus), // ✅ Fix enum usage
+      required: true,
+      default: UserStatus.ACTIVE,
     },
     addresses: {
       type: [String],

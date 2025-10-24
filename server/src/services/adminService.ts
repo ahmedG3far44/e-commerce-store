@@ -126,8 +126,6 @@ export const getAdminInsights = async ({
         break;
     }
 
-    console.log(activeDate);
-
     const statsResult = { count: 0, totalRevenue: 0 };
 
     return { data: statsResult, statusCode: 200 };

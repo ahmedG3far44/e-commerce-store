@@ -46,24 +46,28 @@ function StatusOrders() {
 
   const ordersInfo = [
     {
+      id: "0",
       name: "Pending Orders",
       icon: <LuTimer color="gray" size={25} />,
       money: statusOrders.pending,
       prefix: statusOrders.pending <= 1 ? "order" : "orders",
     },
     {
+      id: "1",
       name: "Shipped Orders",
       icon: <HiOutlineTruck color="gray" size={25} />,
       money: statusOrders.shipped,
       prefix: statusOrders.shipped <= 1 ? "order" : "orders",
     },
     {
+      id: "2",
       name: "Delivered Orders",
       icon: <FcShipped color="green" size={25} />,
       money: statusOrders.delivered,
       prefix: statusOrders.delivered <= 1 ? "order" : "orders",
     },
     {
+      id: "3",
       name: "Total Orders",
       icon: <HiOutlineCash color="green" size={25} />,
       money: statusOrders.totalOrders,
@@ -74,7 +78,7 @@ function StatusOrders() {
     <div className="p-4 w-full flex justify-between gap-1 items-center flex-wrap max-sm:flex-wrap max-md:flex-wrap max-sm:justify-center max-md:justify-center">
       {ordersInfo.map((card) => {
         return (
-          <>
+          <div key={card.id}>
             {pending ? (
               <InsightsCardSkeleton />
             ) : (
@@ -86,7 +90,7 @@ function StatusOrders() {
                 prefix={card.prefix}
               />
             )}
-          </>
+          </div>
         );
       })}
     </div>

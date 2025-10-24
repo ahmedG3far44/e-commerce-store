@@ -3,8 +3,6 @@ import guestImg from "../../public/guestImg.jpg";
 import useAuth from "../context/auth/AuthContext";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import useCart from "../context/cart/CartContext";
-import ShoppingCart from "./ShoppingCart";
 import { CgProfile } from "react-icons/cg";
 import { LuHistory } from "react-icons/lu";
 import { RxDashboard } from "react-icons/rx";
@@ -12,7 +10,6 @@ import "../index.css";
 
 function User() {
   const { user, logOut } = useAuth();
-  const { cartItems, totalCartItems } = useCart();
   const [isOpen, setOpen] = useState(false);
   const navigate = useNavigate();
   const handelLogout = () => {
@@ -20,11 +17,7 @@ function User() {
     navigate("/");
   };
 
-  console.log(cartItems, totalCartItems);
 
-  const totalItems = cartItems.reduce((curr, acc) => {
-    return curr + acc.quantity;
-  }, 0);
 
   return (
     <div className="relative  ">

@@ -6,6 +6,7 @@ import {
   deleteProductById,
   getAllProducts,
   getProductById,
+  getProductsByCategoryName,
   updateNewProduct,
 } from "../services/productService";
 
@@ -14,6 +15,16 @@ const router = Router();
 router.get("/product", async (req, res) => {
   try {
     const result = await getAllProducts();
+    res.status(result.statusCode).json(result.data);
+  } catch (err: any) {
+    res.status(500).json(err.message);
+  }
+});
+
+router.get("/product/category/:categoryName", async (req, res) => {
+  try {
+    const { categoryName } = req.params;
+    const result = await getProductsByCategoryName({ categoryName });
     res.status(result.statusCode).json(result.data);
   } catch (err: any) {
     res.status(500).json(err.message);

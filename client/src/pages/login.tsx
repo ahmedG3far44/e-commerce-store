@@ -27,7 +27,6 @@ function LoginPage() {
     setPending(true);
     try {
       const data = await login(userLogin);
-      console.log(data);
       const { user, token } = data;
 
       logUser({ user, token });

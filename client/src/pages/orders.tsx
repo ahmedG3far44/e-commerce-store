@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { getAllUserOrders } from "../utils/handlers";
-import useAuth from "../context/auth/AuthContext";
 import { Order } from "../utils/types";
+
+import useAuth from "../context/auth/AuthContext";
 import ShowOrdersHistory from "../components/ShowOrdersHistory";
 
 function OrdersHistory() {
@@ -13,7 +14,6 @@ function OrdersHistory() {
 
     getAllUserOrders({ token })
       .then((ordersList) => {
-        console.log(ordersList);
         setOrders(ordersList);
       })
       .catch((err) => {
@@ -41,21 +41,8 @@ function OrdersHistory() {
           </p>
         </div>
       ) : (
-        <div className="w-full b min-w-full flex flex-col-reverse justify-start items-start p-4 rounded-md mt-4">
-          {ordersList.map((order) => {
-            return (
-              <ShowOrdersHistory
-                key={order._id}
-                _id={order._id}
-                userId={order.userId}
-                customer={order.customer}
-                totalOrderPrice={order.totalOrderPrice}
-                status={order.status as string}
-                orderItems={order?.orderItems}
-                createdAt={order?.createdAt}
-              />
-            );
-          })}
+        <div className="w-full min-w-full p-4 rounded-md mt-4">
+          <ShowOrdersHistory orders={ordersList} />
         </div>
       )}
     </div>

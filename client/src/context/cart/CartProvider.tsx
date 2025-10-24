@@ -100,9 +100,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || "Failed to add product to cart"
-        );
+        throw new Error(errorData.message || "Failed to add product to cart");
       }
 
       const cart = await response.json();
@@ -163,7 +161,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       const cart = await response.json();
 
       setCartItems(cart.items);
-      setTotalAmount(cart.totalAmount || 0);
+      setTotalAmount(cart.totalAmount);
 
       toast.success("Product quantity updated successfully");
       return cart;
@@ -246,9 +244,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || "Failed to clear cart"
-        );
+        throw new Error(errorData.message || "Failed to clear cart");
       }
 
       const cart = await response.json();
@@ -303,13 +299,12 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || "Failed to create order"
-        );
+        throw new Error(errorData.message || "Failed to create order");
       }
 
       const order = await response.json();
 
+      console.log(order);
       setCartItems([]);
       setTotalAmount(0);
 

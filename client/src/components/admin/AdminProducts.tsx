@@ -94,9 +94,6 @@ function AdminProducts() {
       const response = await fetch(`${BASE_URL}/product`);
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
-
-      console.log(products);
-
       setProducts(data);
     } catch (err: any) {
       toast.error(err?.message || "Failed to load products");

@@ -28,8 +28,6 @@ function TopRatedCustomers() {
         if (!response.ok)
           throw new Error("can't get top rated customer's list!!!");
         const data = await response.json();
-        console.log(data);
-        // set data
         setTopCustomers(data);
         return data;
       } catch (err) {

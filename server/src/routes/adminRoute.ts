@@ -18,6 +18,7 @@ import {
 
 import verifyToken from "../middlewares/verifyToken";
 import verifyAdmin from "../middlewares/verifyAdmin";
+import { deleteUserStatus, updateUserStatus } from "../services/userService";
 
 const router = Router();
 
@@ -74,7 +75,7 @@ router.get(
 
       if (!duration) throw new Error("can't get the insights!!");
       const result = await getAdminInsights({ duration });
-      console.log(result);
+
       res.status(result?.statusCode || 200).json(result?.data);
     } catch (err: any) {
       res.status(500).json(err?.message);
@@ -99,6 +100,27 @@ router.put(
 
 router.get("/orders/status-counts", verifyToken, verifyAdmin, getOrderCount);
 router.get("/revenue/:period", verifyToken, verifyAdmin, getRevenueByTime);
-router.get("/customers/top", verifyToken, verifyAdmin, getTopCustomers);;
+router.get("/customers/top", verifyToken, verifyAdmin, getTopCustomers);
 
+
+router.patch("/users/:userId/block", verifyAdmin, async (req: ExtendedRequest, res) => {
+  try {
+    const payload = req.body;
+    const {userId} = req.params;
+    const result = await updateUserStatus({ userId, newStatus:payload.newStatus });
+    res.status(result.statusCode).json(result.data);
+  } catch (err: any) {
+    res.status(500).json(err.message);
+  }
+});
+router.delete("/users/:userId", verifyAdmin, async (req: ExtendedRequest, res) => {
+  try {
+    const { userId } = req.params;
+    if(!userId)throw new Error("userId is required !!")
+    const result = await deleteUserStatus({ userId });
+    res.status(result.statusCode).json(result.data);
+  } catch (err: any) {
+    res.status(500).json(err.message);
+  }
+});
 export default router;
