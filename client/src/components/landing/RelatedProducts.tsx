@@ -6,11 +6,11 @@ import { IProduct } from "../../utils/types";
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 interface RelatedProductsProps {
-  category: string;
+  categoryName: string;
   currentProductId: string;
 }
 
-function RelatedProducts({ category }: RelatedProductsProps) {
+function RelatedProducts({ categoryName }: RelatedProductsProps) {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -20,7 +20,7 @@ function RelatedProducts({ category }: RelatedProductsProps) {
       try {
         setLoading(true);
         const response = await fetch(
-          `${BASE_URL}/product?category=${category}&limit=10`
+          `${BASE_URL}/product?category=${categoryName}&limit=10`
         );
 
         if (!response.ok) {
@@ -29,7 +29,7 @@ function RelatedProducts({ category }: RelatedProductsProps) {
 
         const data = await response.json();
         const filteredProducts = data.filter(
-          (product: IProduct) => product.category === category
+          (product: IProduct) => product.categoryName === categoryName
         );
         setProducts(filteredProducts);
       } catch (err: any) {
@@ -45,7 +45,7 @@ function RelatedProducts({ category }: RelatedProductsProps) {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 320;
+      const scrollAmount = 280;
       const newScrollLeft =
         direction === "left"
           ? scrollContainerRef.current.scrollLeft - scrollAmount
@@ -64,11 +64,11 @@ function RelatedProducts({ category }: RelatedProductsProps) {
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           Related Products
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="flex gap-4 overflow-hidden">
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="bg-gray-200 rounded-lg h-80 animate-pulse"
+              className="bg-gray-200 rounded-lg h-72 w-52 flex-shrink-0 animate-pulse"
             ></div>
           ))}
         </div>
@@ -83,7 +83,8 @@ function RelatedProducts({ category }: RelatedProductsProps) {
   return (
     <div className="py-8">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Related Products in <span className="text-blue-600">{category}</span>
+        Related Products in{" "}
+        <span className="text-blue-600">{categoryName}</span>
       </h2>
 
       <div className="relative group">
@@ -111,11 +112,13 @@ function RelatedProducts({ category }: RelatedProductsProps) {
         {/* Products Container */}
         <div
           ref={scrollContainerRef}
-          className="flex items-center justify-start gap-2 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+          className="flex items-stretch gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {products.map((product) => (
-            <ProductCard key={product._id} {...product} />
+            <div key={product._id} className="flex-shrink-0 w-52">
+              <ProductCard {...product} />
+            </div>
           ))}
         </div>
 
@@ -141,7 +144,6 @@ function RelatedProducts({ category }: RelatedProductsProps) {
         </button>
       </div>
 
-      {/* Add CSS to hide scrollbar */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;

@@ -1,11 +1,11 @@
 
+import { CheckoutCartParams, IProductItem } from "../utils/types";
+
 import cartModel from "./../models/cart";
 import userModel from "../models/user";
 import productModel from "../models/product";
 import orderModel from "../models/order";
-
-import { CheckoutCartParams, CartProduct, IProductItem, ICart } from "../utils/types";
-import { updateProductSales } from "./productService";
+import categoryModel from "../models/category";
 
 interface CreateCartParams {
   userId: string;
@@ -134,8 +134,6 @@ export const updateItemsInCart = async ({
 
     updatedItem.quantity = quantity;
     
-    updateProductSales(productId, updatedItem.quantity)
-
     cart.totalAmount = calculateItemsInCartTotalPrice(cart.items);
 
     const updatedCart = await cart.save();
@@ -221,17 +219,16 @@ export const clearCart = async ({ userId }: ClearCartParams) => {
 export const checkout = async ({ userId, shipInfo }: CheckoutCartParams) => {
   try {
     const cart = await getActiveCart({ userId });
-
     if ("statusCode" in cart) {
       return cart;
     }
-
     if (!cart.items.length) {
       return { data: "can't checkout cart is empty", statusCode: 400 };
     }
 
     let orderItems = [];
-    let updatedProductStock;
+
+    const categorySalesMap = new Map<string, number>();
 
     for (const item of cart.items) {
       const product = await productModel.findById(item.productId);
@@ -239,33 +236,65 @@ export const checkout = async ({ userId, shipInfo }: CheckoutCartParams) => {
         return { data: "error products order not found!!", statusCode: 400 };
       }
 
-      const productOrder = {
-        productTitle: product?.title || "",
-        productDescription: product?.description || null,
-        productImages: product?.images?.[0] || "",
-        productPrice: product?.price,
-        quantity: item.quantity,
-      };
-
-      orderItems.push(productOrder);
-
-      if (product?.stock < item.quantity) {
-        return { data: "there is no enough stock in ", statusCode: 400 };
+      if (product.stock < item.quantity) {
+        return { 
+          data: `Not enough stock for ${product.title}. Available: ${product.stock}, Requested: ${item.quantity}`, 
+          statusCode: 400 
+        };
       }
 
-      updatedProductStock = await productModel.findByIdAndUpdate(product?.id, {
-        stock: (product?.stock - item?.quantity) as number,
-      });
+ 
+      const productOrder = {
+        productTitle: product.title || "",
+        productDescription: product.description || null,
+        productImages: product.images?.[0] || "",
+        productPrice: product.price,
+        quantity: item.quantity,
+      };
+      orderItems.push(productOrder);
+
+      const itemTotalPrice = product.price * item.quantity;
+
+    
+      await productModel.findByIdAndUpdate(
+        item.productId,
+        {
+          $inc: {
+            stock: -item.quantity,           
+            totalSales: itemTotalPrice,     
+            ordersCount: 1                    
+          }
+        },
+        { new: true }
+      );
+
+      const categoryId = product.categoryId.toString();
+      const currentCategorySales = categorySalesMap.get(categoryId) || 0;
+      categorySalesMap.set(categoryId, currentCategorySales + itemTotalPrice);
+    }
+
+ 
+    for (const [categoryId, salesAmount] of categorySalesMap.entries()) {
+      await categoryModel.findByIdAndUpdate(
+        categoryId,
+        {
+          $inc: {
+            categorySales: salesAmount  
+          }
+        },
+        { new: true }
+      );
     }
 
     const customer = await userModel.findById(userId);
-
-    if (!customer) throw new Error("not foud user !!");
+    if (!customer) {
+      return { data: "User not found!", statusCode: 404 };
+    }
 
     const order = await orderModel.create({
       orderItems,
       customer: {
-        name: `${customer?.firstName} ${customer?.lastName}`,
+        name: `${customer.firstName} ${customer.lastName}`,
         email: customer.email,
         address: shipInfo?.address,
         area: `${shipInfo?.state} | ${shipInfo?.country}`,
@@ -275,18 +304,18 @@ export const checkout = async ({ userId, shipInfo }: CheckoutCartParams) => {
       totalOrderPrice: cart.totalAmount,
     });
 
-    const updateCartStatus = await cartModel.findByIdAndUpdate(userId, {
+
+    await cartModel.findByIdAndUpdate(cart._id, {
       status: "COMPLETED",
     });
-
-    const userOrder = await order.save();
-    await updateCartStatus?.save();
-    await updatedProductStock?.save();
     await clearCart({ userId });
 
-    return { data: userOrder, statusCode: 201 };
+    return { data: order, statusCode: 201 };
   } catch (err) {
-    return { data: err, statusCode: 400 };
+    console.error("Checkout error:", err);
+    return { 
+      data: err instanceof Error ? err.message : "Checkout failed", 
+      statusCode: 400 
+    };
   }
 };
-

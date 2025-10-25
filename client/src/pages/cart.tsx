@@ -6,11 +6,17 @@ import { CgShoppingCart } from "react-icons/cg";
 import { BsArrowRight, BsTrash2 } from "react-icons/bs";
 import { BiPackage } from "react-icons/bi";
 import { useEffect } from "react";
+import { handlePrice } from "../utils/handlers";
 
 function CartPage() {
   const { token } = useAuth();
-  const { cartItems, totalAmount, getUserCart, clearAllItemsFromCart } =
-    useCart();
+  const {
+    cartItems,
+    totalAmount,
+    getUserCart,
+    clearAllItemsFromCart,
+    shippingCost,
+  } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +29,6 @@ function CartPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <CgShoppingCart className="w-8 h-8 text-blue-600" />
@@ -40,7 +45,6 @@ function CartPage() {
 
         {cartItems.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items Section */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map(({ product, productId, quantity, updatedAt }) => (
                 <ItemCart
@@ -59,24 +63,24 @@ function CartPage() {
               ))}
             </div>
 
-            {/* Order Summary Sidebar */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">
                   Order Summary
                 </h2>
 
-                {/* Summary Details */}
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({itemCount} items)</span>
                     <span className="font-medium">
-                      {totalAmount.toFixed(2)} EGP
+                      {handlePrice(totalAmount)}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span className="font-medium text-green-600">Free</span>
+                    <span className="font-medium text-green-600">
+                      {shippingCost <= 0 ? "Free" : handlePrice(shippingCost)}
+                    </span>
                   </div>
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between items-center">
@@ -84,13 +88,11 @@ function CartPage() {
                         Total
                       </span>
                       <span className="text-2xl font-bold text-blue-600">
-                        {totalAmount.toFixed(2)} EGP
+                        {handlePrice(totalAmount + shippingCost)}
                       </span>
                     </div>
                   </div>
                 </div>
-
-                {/* Action Buttons */}
                 <div className="space-y-3">
                   <button
                     onClick={() => navigate("/checkout")}
@@ -117,8 +119,6 @@ function CartPage() {
                     Clear Cart
                   </button>
                 </div>
-
-                {/* Additional Info */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="flex items-start gap-3 text-sm text-gray-600">
                     <BiPackage className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -132,7 +132,6 @@ function CartPage() {
             </div>
           </div>
         ) : (
-          /* Empty Cart State */
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center max-w-2xl mx-auto">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
               <CgShoppingCart className="w-10 h-10 text-gray-400" />

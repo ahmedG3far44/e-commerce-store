@@ -421,9 +421,9 @@ const CategoryListTable: React.FC = () => {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-16 w-16">
+                        <div className="flex-shrink-0 h-16 w-16 p-1 rounded-lg border border-zinc-300">
                           <img
-                            className="h-16 w-16 rounded-lg object-cover border border-gray-200"
+                            className="h-16 w-16 rounded-lg object-contain border border-gray-200"
                             src={category.image}
                             alt={category.name}
                           />

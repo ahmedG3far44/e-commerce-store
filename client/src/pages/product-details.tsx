@@ -1,18 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import Header from "../components/landing/Header";
 import Container from "../components/Container";
-import handelDates from "../utils/handelDates";
-import ProductInfo, { ProductInfoProps } from "../components/ProductInfo";
+import ProductInfo from "../components/ProductInfo";
 import RelatedProducts from "../components/landing/RelatedProducts";
+import { IProduct } from "../utils/types";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function ProductDetails() {
   const { id } = useParams();
-  const [productInfo, setProductInfo] = useState<ProductInfoProps | null>(null);
+  const [productInfo, setProductInfo] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,27 +61,14 @@ function ProductDetails() {
     );
   }
 
-  const date = handelDates(productInfo?.createdAt);
-
   return (
     <Container>
       <Header />
       <div className="py-8">
-        <ProductInfo
-          productId={id!}
-          title={productInfo.title}
-          description={productInfo.description}
-          category={productInfo.category}
-          images={productInfo.images}
-          price={productInfo.price}
-          stock={productInfo.stock}
-          createdAt={date}
-        />
-
-        {/* Related Products Section */}
+        <ProductInfo {...productInfo} />
         <div className="mt-16">
           <RelatedProducts
-            category={productInfo.category}
+            categoryName={productInfo.categoryName}
             currentProductId={id!}
           />
         </div>

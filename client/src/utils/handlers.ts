@@ -200,3 +200,11 @@ export const categories = [
     description: "Complete your workstation",
   },
 ];
+
+
+export function handlePrice(price:number|string){
+  return `${price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} USD`
+}

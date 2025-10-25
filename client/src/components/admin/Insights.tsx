@@ -12,8 +12,6 @@ export interface SalesInsightsType {
   activeCustomers: number;
 }
 function Insights() {
-  // const { token } = useAuth();
-
   return (
     <div className="min-w-full min-h-full">
       <div className="w-full  p-4 flex justify-between items-center">

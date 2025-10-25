@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IProduct } from "../utils/types";
 import { HiShoppingCart } from "react-icons/hi";
 import useAuth from "../context/auth/AuthContext";
 import useCart from "../context/cart/CartContext";
+import { handlePrice } from "../utils/handlers";
 
 function ImageSlider({ images }: { images: string[] }) {
   const [active, setActive] = useState(0);
@@ -132,11 +133,7 @@ function ProductCard(product: IProduct) {
         <div className="mb-2 flex items-center justify-between gap-3 pt-3 border-t border-zinc-100 mt-auto">
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-blue-600">
-              $
-              {product.price.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+              ${handlePrice(product.price)}
             </span>
             {!isOutOfStock && (
               <span className="text-xs text-zinc-500">
@@ -148,7 +145,7 @@ function ProductCard(product: IProduct) {
           {!isOutOfStock && isAuthenticated && !user?.isAdmin && (
             <button
               onClick={handleAddToCart}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 font-medium text-sm flex items-center gap-2 transition-colors shadow-sm active:scale-95"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2.5 font-medium text-sm flex items-center gap-2 transition-colors shadow-sm active:scale-95 cursor-pointer"
               aria-label={`Add ${title} to cart`}
             >
               <HiShoppingCart className="w-5 h-5" />
@@ -156,9 +153,12 @@ function ProductCard(product: IProduct) {
             </button>
           )}
         </div>
-        <h3 className="font-bold text-zinc-900 text-base mb-2 line-clamp-2 min-h-[3rem]">
+        <Link
+          to={`/product/${product._id}`}
+          className="font-bold text-zinc-900 text-base mb-2 line-clamp-2 min-h-[3rem] hover:underline hover:text-blue-500 duration-300 cursor-pointer"
+        >
           {title}
-        </h3>
+        </Link>
       </div>
     </article>
   );

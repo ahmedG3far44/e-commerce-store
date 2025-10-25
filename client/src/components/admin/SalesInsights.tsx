@@ -55,7 +55,7 @@ function SalesInsights() {
       name: "Total Sales",
       icon: <PiChartLineUp color="#2196F3" size={25} />,
       money: salesInsights.totalSales,
-      prefix: "EGP",
+      prefix: "USD",
     },
     {
       id: "1",
@@ -69,7 +69,7 @@ function SalesInsights() {
       name: "Most Spent",
       icon: <LuWallet color="gray" size={25} />,
       money: salesInsights.mostSpent,
-      prefix: "EGP",
+      prefix: "USD",
     },
     {
       id: "3",

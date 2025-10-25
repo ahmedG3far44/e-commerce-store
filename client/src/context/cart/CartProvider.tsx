@@ -1,13 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
+
 import {
   AddAndUpdateItemsToCartParamsType,
   ClearCartParamsType,
   DeleteItemCartParamsType,
 } from "../../utils/types";
+
 import { FC, PropsWithChildren } from "react";
 import { IProductItem } from "../../utils/types";
 import { CartContext } from "./CartContext";
+
 import toast from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
@@ -17,8 +19,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const shippingCost = 23;
 
-  // Calculate total cart items dynamically using useMemo
   const totalCartItems = useMemo(() => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   }, [cartItems]);
@@ -162,8 +164,6 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       setCartItems(cart.items);
       setTotalAmount(cart.totalAmount);
-
-      toast.success("Product quantity updated successfully");
       return cart;
     } catch (err: any) {
       const errorMessage = err?.message || "Failed to update product";
@@ -304,11 +304,11 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const order = await response.json();
 
-      console.log(order);
       setCartItems([]);
       setTotalAmount(0);
 
       toast.success("Order placed successfully! 🎉");
+
       return order;
     } catch (err: any) {
       const errorMessage = err?.message || "Failed to create order";
@@ -333,6 +333,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         clearAllItemsFromCart,
         createOrder,
         totalCartItems,
+        shippingCost,
         error,
         pending,
       }}

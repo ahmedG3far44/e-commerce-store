@@ -22,7 +22,6 @@ export const addNewProduct = async ({ productData }: AddProductParams) => {
   try {
     const validProductData = productSchema.safeParse(productData);
     if (!validProductData.success) {
-
       return {
         data: `the product data are not valid => ${validProductData.error.message}`,
         statusCode: 400,
@@ -33,20 +32,27 @@ export const addNewProduct = async ({ productData }: AddProductParams) => {
     if (!category) {
       return {
         data: "Category not found",
-        statusCode: 400,
+        statusCode: 404,
       };
     }
 
-
-    const newProduct = await product.insertOne({
+    const newProduct = await productModel.create({
       ...validProductData.data,
-      categoryName:validProductData.data.categoryName.split(" ").join("-").toLocaleLowerCase().trim(),
-      totalSales: 0, 
-      ordersCount: 0, 
+      totalSales: 0,
+      ordersCount: 0,
     });
-    await newProduct.save();
+
+    await categoryModel.findByIdAndUpdate(
+      validProductData.data.categoryId,
+      {
+        $inc: { numberOfProducts: 1 }
+      },
+      { new: true }
+    );
+
     return { data: newProduct, statusCode: 201 };
   } catch (err) {
+    console.error("Error creating product:", err);
     return { data: "can't create a product", statusCode: 400 };
   }
 };
@@ -130,9 +136,9 @@ interface GetProductByIdParams {
 
 export const getProductById = async ({ productId }: GetProductByIdParams) => {
   try {
-    const productDetails = await productModel.findById(productId); // Simplified
+    const productDetails = await productModel.findById(productId); 
     if (!productDetails) {
-      return { data: "The product doesn't found!!", statusCode: 404 }; // Changed to 404
+      return { data: "The product doesn't found!!", statusCode: 404 }; 
     }
     return { data: productDetails, statusCode: 200 };
   } catch (err) {
@@ -165,8 +171,15 @@ export const deleteProductById = async ({ productId }: GetProductByIdParams) => 
       })
     }
     
-    // Delete the product from database
     await productModel.findByIdAndDelete(productId);
+
+    await categoryModel.findByIdAndUpdate(
+      product.categoryId,
+      {
+        $inc: { numberOfProducts: -1 }
+      },
+      { new: true }
+    );
     return { data: product, statusCode: 200, message:"product deleted success!!" };
   } catch (err) {
     return { data: "can't delete product by Id", statusCode: 400 };
@@ -174,12 +187,3 @@ export const deleteProductById = async ({ productId }: GetProductByIdParams) => 
 };
 
 
-export const updateProductSales = async (productId: string, quantity: number) => {
-  return await productModel.findByIdAndUpdate(
-    productId,
-    {
-      $inc: { totalSales: quantity, ordersCount: 1 }
-    },
-    { new: true }
-  );
-};

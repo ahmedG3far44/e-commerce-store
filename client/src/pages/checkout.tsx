@@ -12,13 +12,21 @@ import {
 import { BiPackage } from "react-icons/bi";
 import { MdOutlineLocalShipping } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { handlePrice } from "../utils/handlers";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
 function CheckoutPage() {
   const { token } = useAuth();
-  const { cartItems, totalAmount, getUserCart, createOrder } = useCart();
-  const [pending, setPending] = useState(false);
+  const {
+    cartItems,
+    totalAmount,
+    getUserCart,
+    createOrder,
+    shippingCost,
+    pending,
+  } = useCart();
+  const [pendingAddress, setPending] = useState(false);
   const [addresses, setAddressesList] = useState<string[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
 
@@ -57,7 +65,6 @@ function CheckoutPage() {
   }, [token]);
 
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const shippingCost = 0; // Free shipping
   const finalTotal = totalAmount + shippingCost;
 
   const navigate = useNavigate();
@@ -65,7 +72,6 @@ function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <FiShoppingCart className="w-8 h-8 text-blue-600" />
@@ -78,9 +84,7 @@ function CheckoutPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Cart Items Section */}
             <div className="bg-white rounded-2xl shadow-md p-6">
               <div className="flex items-center gap-2 mb-6">
                 <BiPackage className="w-6 h-6 text-blue-600" />
@@ -133,13 +137,15 @@ function CheckoutPage() {
                       Shipping Address
                     </h2>
                   </div>
-                  <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors">
-                    <FiPlus className="w-4 h-4" />
-                    Add New
+                  <button
+                    onClick={() => navigate("/add-address")}
+                    className="flex items-center gap-2 text-blue-600 duration-300 font-medium transition-colors cursor-pointer hover:text-blue-400"
+                  >
+                    <FiPlus className="w-4 h-4" /> Add Address
                   </button>
                 </div>
 
-                {pending ? (
+                {pendingAddress ? (
                   <div className="flex items-center justify-center py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                   </div>
@@ -186,7 +192,7 @@ function CheckoutPage() {
                     <p className="text-gray-600 mb-4">No addresses found</p>
                     <button
                       onClick={() => navigate("/add-address")}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors cursor-pointer hover:underline"
                     >
                       Add Address
                     </button>
@@ -195,8 +201,6 @@ function CheckoutPage() {
               </div>
             )}
           </div>
-
-          {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
               <h2 className="text-xl font-bold text-gray-900 mb-6">
@@ -206,12 +210,16 @@ function CheckoutPage() {
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal ({itemCount} items)</span>
                   <span className="font-medium">
-                    {totalAmount.toFixed(2)} EGP
+                    {handlePrice(totalAmount)}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span className="font-medium text-green-600">Free</span>
+                  <span className="font-medium text-green-600">
+                    {shippingCost <= 0
+                      ? "Free"
+                      : `${handlePrice(shippingCost)}`}
+                  </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Tax</span>
@@ -221,7 +229,7 @@ function CheckoutPage() {
               <div className="flex justify-between items-center mb-6">
                 <span className="text-lg font-bold text-gray-900">Total</span>
                 <span className="text-2xl font-bold text-blue-600">
-                  {finalTotal.toFixed(2)} EGP
+                  {handlePrice(finalTotal)}
                 </span>
               </div>
 
@@ -231,11 +239,11 @@ function CheckoutPage() {
                     createOrder({ token, address: selectedAddress });
                   }
                 }}
-                disabled={!selectedAddress || cartItems.length === 0}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none mb-4"
+                disabled={!selectedAddress || cartItems.length === 0 || pending}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-none mb-4 cursor-pointer"
               >
                 <FiLock className="w-5 h-5" />
-                Place Order
+                {pending ? "Confirming Order..." : "Place Order"}
               </button>
 
               <div className="bg-gray-50 rounded-lg p-4">

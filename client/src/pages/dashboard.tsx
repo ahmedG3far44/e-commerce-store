@@ -308,7 +308,7 @@ export function DashboardSidebar({
           hover:bg-red-50 hover:text-red-600 hover:border-red-200
           transition-all duration-200
           shadow-sm hover:shadow-md
-          group
+          group cursor-pointer
         "
       >
         <FiLogOut className="text-lg transition-transform duration-200 group-hover:translate-x-1" />

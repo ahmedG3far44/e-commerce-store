@@ -1,6 +1,7 @@
 import { ReactNode, useState, useMemo } from "react";
 import { Customer, Order, ProductInITemsList } from "../utils/types";
 
+import { handlePrice } from "../utils/handlers";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import { IoSearchOutline } from "react-icons/io5";
 
@@ -9,11 +10,6 @@ import toast from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
-interface ShowOrdersHistoryProps extends Order {
-  onStatusUpdate?: (orderId: string, newStatus: string) => void;
-}
-
-// Status component
 function Status({
   statusText,
   className,
@@ -85,7 +81,6 @@ function OrderCustomerInfo({
   );
 }
 
-// OrderTracker component
 function OrderTracker({
   orderStatus,
   className,
@@ -132,7 +127,6 @@ function OrderTracker({
   );
 }
 
-// Items component
 function Items({
   itemsList,
   className,
@@ -150,14 +144,16 @@ function Items({
           <img
             src={item.productImages}
             alt={item.productTitle}
-            className="w-12 h-12 object-cover rounded"
+            className="w-12 h-12 object-contain p-1 rounded-md border border-zinc-300"
           />
           <div className="flex-1">
             <h4 className="font-semibold text-sm">{item.productTitle}</h4>
-            <p className="text-xs text-gray-600">{item.productDescription}</p>
+            <p className="w-3/5 overflow-x-hidden  text-xs  text-gray-600">
+              {item.productDescription}
+            </p>
           </div>
           <div className="text-right">
-            <p className="font-bold">${item.productPrice.toFixed(2)}</p>
+            <p className="font-bold">{handlePrice(item.productPrice)}</p>
             <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
           </div>
         </div>
@@ -293,15 +289,13 @@ function OrderItem({
     <div className="w-full flex flex-col justify-start items-start gap-4">
       <div
         role="button"
-        className="w-full flex justify-between items-center p-2 border-zinc-200 border-t border-b cursor-pointer hover:shadow-md transition-all max-sm:flex-col max-md:flex-col max-sm:justify-start max-md:justify-start max-sm:items-start max-md:items-start"
+        className="w-full flex justify-around items-center p-2 border-zinc-200 border-t border-b cursor-pointer hover:shadow-md transition-all max-sm:flex-col max-md:flex-col max-sm:justify-start max-md:justify-start max-sm:items-start max-md:items-start"
         onClick={() => setOpen(!isOpen)}
       >
-        <div className="w-full flex items-center justify-center gap-2">
-          <span>Reference:</span>
-          <span className="text-sm underline text-blue-500 font-semibold">
-            #{order._id}
-          </span>
-        </div>
+        <span className="text-sm underline text-blue-500 font-semibold">
+          #-{order._id}
+        </span>
+
         <div className="w-full flex items-center justify-center gap-2 mx-4">
           <span className="w-full text-sm text-nowrap text-zinc-600 font-semibold">
             {date.toLocaleDateString()} | {date.toLocaleTimeString()}
@@ -313,10 +307,8 @@ function OrderItem({
           </Status>
         </div>
         <div className="w-full flex items-center justify-center gap-2">
-          <span>Total:</span>
           <span className="text-zinc-800 font-black text-xl">
-            {order.totalOrderPrice.toFixed(2).toLocaleString()}{" "}
-            <span className="text-sm text-zinc-800">EGP</span>
+            {handlePrice(order.totalOrderPrice)}
           </span>
         </div>
 

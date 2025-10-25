@@ -11,6 +11,7 @@ export const CartContext = createContext<CartContextType>({
   clearAllItemsFromCart: () => {},
   getUserCart: () => {},
   createOrder: () => {},
+  shippingCost:0,
   pending:false,
   error:null,
 });

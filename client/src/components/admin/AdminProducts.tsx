@@ -1,8 +1,12 @@
+import { handlePrice } from "../../utils/handlers";
 import { useRef, useState, useEffect } from "react";
+import { FiCheck, FiAlertCircle } from "react-icons/fi";
 import { useCategory } from "../../context/category/CategoryContext";
+
 import toast from "react-hot-toast";
-import UploadedImages from "./UploadedImages";
 import useAuth from "../../context/auth/AuthContext";
+
+import UploadedImages from "./UploadedImages";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -39,17 +43,11 @@ function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [uploadedResults, setUploadResult] = useState<{
-    success?: boolean;
-    url?: string[];
-    error?: string | null;
-  } | null>({
-    success: false,
-    url: [""],
-    error: "",
-  });
+  const [selectedThumbnailIndex, setSelectedThumbnailIndex] =
+    useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
   const titleRef = useRef<any>(null);
   const addProductFormRef = useRef<any>(null);
   const descriptionRef = useRef<any>(null);
@@ -57,14 +55,11 @@ function AdminProducts() {
   const imagesRef = useRef<any>(null);
   const priceRef = useRef<any>("0");
   const stockRef = useRef<any>("0");
-
   useEffect(() => {
     fetchProducts();
   }, []);
-
   useEffect(() => {
     if (editingProduct) {
-      // Populate form with editing product data
       if (titleRef.current) titleRef.current.value = editingProduct.title;
       if (descriptionRef.current)
         descriptionRef.current.value = editingProduct.description;
@@ -74,20 +69,26 @@ function AdminProducts() {
         priceRef.current.value = editingProduct.price.toString();
       if (stockRef.current)
         stockRef.current.value = editingProduct.stock.toString();
-
-      // Scroll to form
+      const thumbnailIndex = editingProduct.images.findIndex(
+        (img) => img === editingProduct.thumbnail
+      );
+      setSelectedThumbnailIndex(thumbnailIndex >= 0 ? thumbnailIndex : 0);
       addProductFormRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
   }, [editingProduct]);
-
   const handleRemoveSelectedFile = (removedFile: File) => {
     const filterFiles = files.filter((file) => file !== removedFile);
     setFiles(filterFiles);
+    if (
+      selectedThumbnailIndex >= filterFiles.length &&
+      filterFiles.length > 0
+    ) {
+      setSelectedThumbnailIndex(filterFiles.length - 1);
+    }
   };
-
   const fetchProducts = async () => {
     try {
       setLoadingProducts(true);
@@ -101,7 +102,6 @@ function AdminProducts() {
       setLoadingProducts(false);
     }
   };
-
   const handelAddNewProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
@@ -112,47 +112,51 @@ function AdminProducts() {
 
       setPending(true);
       setError(null);
+      setUploadError(null);
 
-      // Check if we're updating or creating
       let imagesUpload: string[] = [];
 
       if (files.length > 0) {
-        // Upload new images
-        const filesArray: CustomFile[] = imagesRef?.current
-          ?.files as CustomFile[];
-        imagesUpload = await uploadImages(filesArray as File[]);
+        setIsUploading(true);
+        const filesArray: File[] = Array.from(imagesRef?.current?.files || []);
 
-        if (!imagesUpload || imagesUpload.length <= 0) {
-          throw new Error("Can't upload files to S3!");
+        try {
+          imagesUpload = await uploadImages(filesArray);
+
+          if (!imagesUpload || imagesUpload.length <= 0) {
+            throw new Error("Failed to upload images to server");
+          }
+        } catch (uploadErr: any) {
+          setUploadError(uploadErr.message || "Image upload failed");
+          throw uploadErr;
+        } finally {
+          setIsUploading(false);
         }
-
-        setUploadResult({
-          success: true,
-          url: imagesUpload,
-        });
       } else if (editingProduct) {
-        // Keep existing images if updating and no new images
         imagesUpload = editingProduct.images;
       } else {
         throw new Error("Please upload at least one image");
       }
+
+      const thumbnailIdx = Math.min(
+        selectedThumbnailIndex,
+        imagesUpload.length - 1
+      );
 
       const selectedCategoryId = categoryRef.current?.value as string;
       const categoryName = categories.find(
         (category) => category._id === selectedCategoryId
       )?.name as string;
 
-      const product: Product = {
+      const product = {
         categoryId: selectedCategoryId,
         categoryName: categoryName,
         title: titleRef?.current?.value as string,
         description: descriptionRef?.current?.value as string,
-        thumbnail: imagesUpload[0],
+        thumbnail: imagesUpload[thumbnailIdx],
         images: imagesUpload,
         price: parseFloat(priceRef?.current?.value),
         stock: parseInt(stockRef?.current?.value),
-        ordersCount: editingProduct?.ordersCount || 0,
-        totalSales: editingProduct?.totalSales || 0,
       };
 
       const url = editingProduct
@@ -174,7 +178,7 @@ function AdminProducts() {
         const errorData = await response.json();
         throw new Error(
           errorData.message ||
-            `Can't ${editingProduct ? "update" : "add"} product!`
+            `Failed to ${editingProduct ? "update" : "add"} product`
         );
       }
 
@@ -182,15 +186,16 @@ function AdminProducts() {
 
       if (!data)
         throw new Error(
-          `Can't get ${editingProduct ? "updated" : "new"} product!`
+          `Failed to get ${editingProduct ? "updated" : "new"} product`
         );
 
-      // Reset form
       if (addProductFormRef.current) {
         setError(null);
+        setUploadError(null);
         addProductFormRef?.current?.reset();
         setFiles([]);
         setEditingProduct(null);
+        setSelectedThumbnailIndex(0);
       }
 
       toast.success(
@@ -200,22 +205,14 @@ function AdminProducts() {
     } catch (err: any) {
       console.error(err?.message);
       setError(err?.message);
-      setUploadResult({
-        success: false,
-        error: err?.message,
-      });
       toast.error(err?.message);
     } finally {
       setPending(false);
+      setIsUploading(false);
     }
   };
-
-  const uploadImages = async (files: File[]) => {
+  const uploadImages = async (files: File[]): Promise<string[]> => {
     try {
-      setUploadResult({
-        success: true,
-        error: null,
-      });
       const formData = new FormData();
 
       for (const file of files) {
@@ -231,31 +228,22 @@ function AdminProducts() {
       });
 
       if (!response.ok) {
-        throw new Error("Connection failed, please check your connection!");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to upload images");
       }
 
       const data = await response.json();
 
-      if (!data) throw new Error("Can't get data!");
+      if (!data || !data.images) {
+        throw new Error("Invalid response from server");
+      }
 
-      const { images } = data;
-      return images;
+      return data.images;
     } catch (err: any) {
-      console.error(err?.message);
-      toast.error(err?.message);
-      setUploadResult({
-        error: (err as Error).message,
-        success: false,
-      });
+      console.error("Upload error:", err?.message);
       throw err;
-    } finally {
-      setUploadResult((prev) => ({
-        ...prev,
-        success: false,
-      }));
     }
   };
-
   const deleteProduct = async (productId: string) => {
     try {
       if (!token) {
@@ -283,21 +271,21 @@ function AdminProducts() {
       toast.error(err?.message || "Failed to delete product");
     }
   };
-
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setError(null);
+    setUploadError(null);
   };
-
   const handleCancelEdit = () => {
     setEditingProduct(null);
     setError(null);
+    setUploadError(null);
     setFiles([]);
+    setSelectedThumbnailIndex(0);
     if (addProductFormRef.current) {
       addProductFormRef.current.reset();
     }
   };
-
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -306,16 +294,14 @@ function AdminProducts() {
       filterCategory === "all" || product.categoryId === filterCategory;
     return matchesSearch && matchesCategory;
   });
-
+  const previewImages = files.map((file) => URL.createObjectURL(file as any));
   return (
     <div className="w-full min-h-screen py-8 px-4">
-      <div className="max-w-7xl h-screen mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-600 mt-1">Manage your product inventory</p>
         </div>
-
-        {/* Add/Edit Product Form */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
           <div className="border-b border-gray-200 px-6 py-4">
             <div className="flex items-center justify-between">
@@ -341,24 +327,23 @@ function AdminProducts() {
             {error && (
               <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
                 <div className="flex items-center">
-                  <svg
-                    className="w-5 h-5 text-red-500 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <FiAlertCircle className="w-5 h-5 text-red-500 mr-2 flex-shrink-0" />
                   <span className="text-red-800 font-medium">{error}</span>
                 </div>
               </div>
             )}
 
+            {uploadError && (
+              <div className="mb-6 p-4 rounded-lg bg-orange-50 border border-orange-200">
+                <div className="flex items-center">
+                  <FiAlertCircle className="w-5 h-5 text-orange-500 mr-2 flex-shrink-0" />
+                  <span className="text-orange-800 font-medium">
+                    Upload Error: {uploadError}
+                  </span>
+                </div>
+              </div>
+            )}
             <div className="space-y-6">
-              {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Title
@@ -373,8 +358,6 @@ function AdminProducts() {
                   disabled={pending}
                 />
               </div>
-
-              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
@@ -389,11 +372,9 @@ function AdminProducts() {
                   disabled={pending}
                 />
               </div>
-
-              {/* Images Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Media{" "}
+                  Product Images{" "}
                   {editingProduct && (
                     <span className="text-gray-500 text-xs">
                       (Leave empty to keep existing images)
@@ -409,17 +390,21 @@ function AdminProducts() {
                     multiple
                     accept="image/*"
                     ref={imagesRef}
-                    disabled={pending}
+                    disabled={pending || isUploading}
                     onChange={(e) => {
                       if (e.target.files) {
                         setFiles(Array.from(e.target.files));
+                        setSelectedThumbnailIndex(0);
+                        setUploadError(null);
                       }
                     }}
                   />
                   <label
                     htmlFor="image"
                     className={`flex flex-col items-center justify-center ${
-                      pending ? "cursor-not-allowed" : "cursor-pointer"
+                      pending || isUploading
+                        ? "cursor-not-allowed"
+                        : "cursor-pointer"
                     }`}
                   >
                     <svg
@@ -442,42 +427,117 @@ function AdminProducts() {
                       or drag and drop
                     </p>
                     <p className="text-xs text-gray-500">
-                      PNG, JPG, GIF up to 10MB
+                      PNG, JPG, GIF up to 10MB (multiple files supported)
                     </p>
                   </label>
                 </div>
-                {files.length > 0 && (
-                  <div className="mt-4">
-                    <UploadedImages
-                      uploadStatus={uploadedResults?.success as boolean}
-                      removeFiles={handleRemoveSelectedFile}
-                      uploaded={files as File[]}
-                    />
-                    {uploadedResults?.success && (
-                      <div className="flex items-center justify-start gap-2">
-                        <span className="w-2 h-2 border-r-transparent border-t-transparent rounded-full border-2 border-zinc-500 animate-spin"></span>{" "}
-                        <p className="text-sm text-zinc-500 font-semibold">
-                          uploading...
-                        </p>
-                      </div>
-                    )}
+                {isUploading && (
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm text-blue-700 font-medium">
+                        Uploading images to server...
+                      </span>
+                    </div>
                   </div>
                 )}
-                {editingProduct && files.length === 0 && (
+                {files.length > 0 && !isUploading && (
                   <div className="mt-4">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Current images:
-                    </p>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="mb-3">
+                      <UploadedImages
+                        uploadStatus={false}
+                        removeFiles={handleRemoveSelectedFile}
+                        uploaded={files as File[]}
+                      />
+                    </div>
+
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-900 mb-3">
+                        Select Thumbnail Image
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                        {previewImages.map((preview, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setSelectedThumbnailIndex(idx)}
+                            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                              selectedThumbnailIndex === idx
+                                ? "border-blue-500 ring-2 ring-blue-200"
+                                : "border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            <img
+                              src={preview}
+                              alt={`Preview ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {selectedThumbnailIndex === idx && (
+                              <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                                <div className="bg-blue-500 rounded-full p-1">
+                                  <FiCheck className="w-4 h-4 text-white" />
+                                </div>
+                              </div>
+                            )}
+                            <div className="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded">
+                              {idx + 1}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Selected: Image {selectedThumbnailIndex + 1} (will be
+                        used as main product image)
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Current Images for Editing */}
+                {editingProduct && files.length === 0 && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3">
+                      Current Images
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                       {editingProduct.images.map((img, idx) => (
-                        <img
+                        <button
                           key={idx}
-                          src={img}
-                          alt={`Product ${idx + 1}`}
-                          className="w-20 h-20 object-cover rounded-lg border border-gray-200"
-                        />
+                          type="button"
+                          onClick={() => setSelectedThumbnailIndex(idx)}
+                          className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                            selectedThumbnailIndex === idx
+                              ? "border-blue-500 ring-2 ring-blue-200"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          <img
+                            src={img}
+                            alt={`Product ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {selectedThumbnailIndex === idx && (
+                            <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                              <div className="bg-blue-500 rounded-full p-1">
+                                <FiCheck className="w-4 h-4 text-white" />
+                              </div>
+                            </div>
+                          )}
+                          {img === editingProduct.thumbnail && (
+                            <div className="absolute top-1 left-1 bg-green-500 text-white text-xs px-2 py-0.5 rounded">
+                              Current
+                            </div>
+                          )}
+                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded">
+                            {idx + 1}
+                          </div>
+                        </button>
                       ))}
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Click to select a different thumbnail (currently: Image{" "}
+                      {selectedThumbnailIndex + 1})
+                    </p>
                   </div>
                 )}
               </div>
@@ -544,7 +604,7 @@ function AdminProducts() {
                   type="button"
                   onClick={handleCancelEdit}
                   className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
-                  disabled={pending}
+                  disabled={pending || isUploading}
                 >
                   Cancel
                 </button>
@@ -552,9 +612,32 @@ function AdminProducts() {
               <button
                 className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors shadow-sm"
                 type="submit"
-                disabled={pending}
+                disabled={pending || isUploading}
               >
-                {pending ? (
+                {isUploading ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Uploading Images...
+                  </span>
+                ) : pending ? (
                   <span className="flex items-center">
                     <svg
                       className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -587,7 +670,6 @@ function AdminProducts() {
           </form>
         </div>
 
-        {/* Products List */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="border-b border-gray-200 px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -719,6 +801,10 @@ function ProductItem({
   const [loading, setLoading] = useState(false);
 
   async function handleDeleteProduct() {
+    if (!confirm(`Are you sure you want to delete "${product.title}"?`)) {
+      return;
+    }
+
     try {
       setLoading(true);
       await deleteProduct(product._id as string);
@@ -733,9 +819,9 @@ function ProductItem({
     <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
-          <div className="h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+          <div className="h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 p-1 border border-zinc-300">
             <img
-              className="h-16 w-16 object-cover"
+              className="h-16 w-16 object-contain rounded-lg"
               src={product.thumbnail}
               alt={product.title}
               onError={(e) => {
@@ -743,11 +829,11 @@ function ProductItem({
               }}
             />
           </div>
-          <div className="ml-4">
+          <div className="ml-4 max-w-xs">
             <div className="text-sm font-medium text-gray-900 line-clamp-1">
               {product.title}
             </div>
-            <div className="text-gray-500 line-clamp-1 text-sm max-w-[250px] overflow-x-hidden">
+            <div className="text-gray-500 line-clamp-2 text-sm">
               {product.description}
             </div>
           </div>
@@ -759,7 +845,7 @@ function ProductItem({
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-        {product.price} USD
+        {handlePrice(product.price)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         {product.stock} items
@@ -775,24 +861,24 @@ function ProductItem({
           </span>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
         {product.totalSales > 0 ? (
           <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
-            {product.totalSales.toPrecision()}
+            {handlePrice(product.totalSales)}
           </span>
         ) : (
-          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800">
+          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-600">
             N/A
           </span>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
         {product.ordersCount > 0 ? (
           <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
-            {product.ordersCount.toPrecision()}
+            {product.ordersCount}
           </span>
         ) : (
-          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800">
+          <span className="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-600">
             N/A
           </span>
         )}
@@ -802,14 +888,14 @@ function ProductItem({
           <button
             onClick={() => editProduct(product)}
             disabled={loading}
-            className="text-blue-600 hover:text-blue-900 disabled:text-blue-300 transition-colors"
+            className="text-blue-600 hover:text-blue-900 disabled:text-blue-300 transition-colors font-medium"
           >
             Edit
           </button>
           <button
             disabled={loading}
             onClick={handleDeleteProduct}
-            className="text-red-600 hover:text-red-900 cursor-pointer duration-300 disabled:text-red-300 transition-colors"
+            className="text-red-600 hover:text-red-900 cursor-pointer duration-300 disabled:text-red-300 transition-colors font-medium"
           >
             {loading ? "Deleting..." : "Delete"}
           </button>

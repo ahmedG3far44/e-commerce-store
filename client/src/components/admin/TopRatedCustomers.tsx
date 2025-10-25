@@ -5,6 +5,7 @@ import notionAvatar1 from "../../../public/notion-avatar-1.png";
 import notionAvatar2 from "../../../public/notion-avatar-2.png";
 import notionAvatar3 from "../../../public/notion-avatar-3.png";
 import { TopCustomer } from "../../utils/types";
+import { handlePrice } from "../../utils/handlers";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -97,10 +98,7 @@ function TopCustomerCard({
           <span>{orderCount}</span>
           <span>{orderCount <= 1 ? "order" : "orders"}</span>
         </div>
-        <div>
-          {totalSpent.toLocaleString()}{" "}
-          <span className="text-sm text-zinc-700 font-light">EGP</span>
-        </div>
+        <div>{handlePrice(totalSpent)}</div>
       </div>
     </div>
   );

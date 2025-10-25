@@ -49,6 +49,7 @@ export interface CartContextType {
   cartItems: IProductItem[];
   totalAmount: number;
   totalCartItems:number;
+  shippingCost:number;
   addItemToCart: ({
     productId,
     quantity,
