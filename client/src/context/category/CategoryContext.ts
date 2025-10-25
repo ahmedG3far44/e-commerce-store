@@ -7,8 +7,8 @@ export interface CategoryContextType {
     getAllCategories:()=> Promise<Category[]|null>;
     pending:boolean;
     error:string | null;
- 
 }
+
 export const CategoryContext = createContext<CategoryContextType>({
     categories:[],
     setCategories:()=>{},

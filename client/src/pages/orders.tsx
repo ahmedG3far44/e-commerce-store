@@ -1,6 +1,6 @@
+import { Order } from "../utils/types";
 import { useEffect, useState } from "react";
 import { getAllUserOrders } from "../utils/handlers";
-import { Order } from "../utils/types";
 
 import useAuth from "../context/auth/AuthContext";
 import ShowOrdersHistory from "../components/ShowOrdersHistory";

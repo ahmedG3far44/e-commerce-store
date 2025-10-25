@@ -1,11 +1,13 @@
 import { useState } from "react";
-import noValidImage from "../../public/placeholder.png";
-import useAuth from "../context/auth/AuthContext";
-import useCart from "../context/cart/CartContext";
-import handelDates from "../utils/handelDates";
 import { BiLoader } from "react-icons/bi";
 import { FiTrash2, FiMinus, FiPlus } from "react-icons/fi";
 import { handlePrice } from "../utils/handlers";
+
+import useAuth from "../context/auth/AuthContext";
+import useCart from "../context/cart/CartContext";
+
+import handelDates from "../utils/handelDates";
+import noValidImage from "../../public/placeholder.png";
 
 interface ItemCart {
   productId: string;
@@ -36,12 +38,9 @@ function ItemCart({
   const { updateItemInCart, deleteOneItemFromCart, pending } = useCart();
   const [newQuantity, setNewQuantity] = useState(quantity);
   const [isDeleting, setIsDeleting] = useState(false);
-
   const date = new Date(updatedAt);
 
   if (!token) return null;
-
-  // Fixed: Use functional setState to get current value
   const handleIncrement = () => {
     setNewQuantity((prev) => {
       const updated = prev + 1;
@@ -204,8 +203,6 @@ function ItemCart({
           </div>
         </div>
       </div>
-
-      {/* Mobile Quantity Controls */}
       {checkoutState && (
         <div className="flex sm:hidden items-center justify-between mt-3 pt-3 border-t border-zinc-200">
           <div className="flex items-center gap-2 bg-zinc-50 rounded-lg p-1 border border-zinc-200">
@@ -260,8 +257,6 @@ function ItemCart({
           </button>
         </div>
       )}
-
-      {/* Desktop Remove Button */}
       {checkoutState && (
         <button
           onClick={handleDelete}

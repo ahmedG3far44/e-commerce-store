@@ -1,8 +1,3 @@
-import { useState } from "react";
-import { register } from "../utils/handlers";
-import { Navigate } from "react-router-dom";
-import useAuth from "../context/auth/AuthContext";
-
 import {
   LuMail,
   LuLock,
@@ -13,6 +8,12 @@ import {
   LuShoppingBag,
   LuSparkles,
 } from "react-icons/lu";
+import { useState } from "react";
+import { register } from "../utils/handlers";
+import { Navigate } from "react-router-dom";
+
+
+import useAuth from "../context/auth/AuthContext";
 
 interface UserRegisterInputsType {
   firstName: string;
@@ -337,45 +338,6 @@ function SignUpPage() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          25% {
-            transform: translate(20px, -50px) scale(1.1);
-          }
-          50% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          75% {
-            transform: translate(50px, 10px) scale(1.05);
-          }
-        }
-
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-        }
-
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-
-        .animate-shake {
-          animation: shake 0.4s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }

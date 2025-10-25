@@ -15,8 +15,6 @@ function ImageSlider({
   const [loadedImages, setLoadedImages] = useState<Map<number, boolean>>(new Map());
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
-  // Validate and preload images
   useEffect(() => {
     const newLoadedImages = new Map<number, boolean>();
     const newFailedImages = new Set<number>();
@@ -42,14 +40,12 @@ function ImageSlider({
     });
 
     return () => {
-      // Cleanup: abort any pending image loads
       images.forEach((_, index) => {
         newLoadedImages.delete(index);
       });
     };
   }, [images]);
 
-  // Auto-advance slides
   useEffect(() => {
     if (!isAutoPlaying || images.length <= 1) return;
 
@@ -65,8 +61,6 @@ function ImageSlider({
   const goToSlide = useCallback((index: number) => {
     setActiveIndex(index);
     setIsAutoPlaying(false);
-    
-    // Resume autoplay after 5 seconds of manual interaction
     setTimeout(() => setIsAutoPlaying(true), 5000);
   }, []);
 
@@ -92,12 +86,10 @@ function ImageSlider({
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center overflow-hidden relative rounded-2xl bg-zinc-100">
-      {/* Loading skeleton */}
       {currentImageLoaded === undefined && !currentImageFailed && (
         <div className="absolute inset-0 bg-zinc-200 animate-pulse" />
       )}
 
-      {/* Image or placeholder */}
       {currentImageFailed || !images[activeIndex] ? (
         placeholderSrc ? (
           <img
@@ -119,8 +111,6 @@ function ImageSlider({
           }}
         />
       )}
-
-      {/* Navigation dots */}
       {images.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 border border-zinc-300/50 px-3 py-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg">
           {images.map((_, index) => {
@@ -147,8 +137,6 @@ function ImageSlider({
           })}
         </div>
       )}
-
-      {/* Pause indicator (optional) */}
       {!isAutoPlaying && images.length > 1 && (
         <div className="absolute top-4 right-4 px-2 py-1 bg-black/50 text-white text-xs rounded backdrop-blur-sm">
           Paused

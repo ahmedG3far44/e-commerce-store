@@ -1,5 +1,8 @@
-import { categories } from "../../utils/handlers";
+import { Link } from "react-router-dom";
+import { useCategory } from "../../context/category/CategoryContext";
+
 function Footer() {
+  const { categories } = useCategory();
   return (
     <footer className="bg-gray-800 text-gray-300">
       <div className="container mx-auto px-4 py-12">
@@ -46,13 +49,16 @@ function Footer() {
             <ul className="space-y-2">
               {categories.map((category) => {
                 return (
-                  <li key={category.id}>
-                    <a
-                      href={`${category.path}`}
+                  <li key={category._id}>
+                    <Link
+                      to={`/category/${category.name
+                        .toLocaleLowerCase()
+                        .split(" ")
+                        .join("-")}`}
                       className="hover:text-white transition"
                     >
-                      {category.categoryName}
-                    </a>
+                      {category.name}
+                    </Link>
                   </li>
                 );
               })}

@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
-import useAuth from "../context/auth/AuthContext";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { BiBarChartSquare, BiHomeSmile } from "react-icons/bi";
-import {
-  LuChartColumnBig,
-  LuBox,
-  LuBoxes,
-  LuLayoutPanelTop,
-} from "react-icons/lu";
+import { LuBox } from "react-icons/lu";
 import { FiLogOut } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
-import { LiaUserCircleSolid, LiaShippingFastSolid } from "react-icons/lia";
-import { OrdersCountType } from "../utils/types";
-import { TbShoppingCartCopy, TbSitemap } from "react-icons/tb";
-import { AiOutlineProduct } from "react-icons/ai";
 import { PiUsersDuotone } from "react-icons/pi";
+import { OrdersCountType } from "../utils/types";
+import { AiOutlineProduct } from "react-icons/ai";
+import { LiaShippingFastSolid } from "react-icons/lia";
+import { BiBarChartSquare, BiHomeSmile } from "react-icons/bi";
+import { TbShoppingCartCopy, TbSitemap } from "react-icons/tb";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+
+import useAuth from "../context/auth/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 

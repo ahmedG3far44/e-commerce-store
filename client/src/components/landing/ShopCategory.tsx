@@ -1,10 +1,9 @@
+import { Link } from "react-router-dom";
 import { BiChevronRight } from "react-icons/bi";
 import { useCategory } from "../../context/category/CategoryContext";
-import { Link } from "react-router-dom";
 
 function ShopCategory() {
   const { categories, error } = useCategory();
-
   if (error)
     return (
       <div className="p-2 rounded-md border-rose-500 bg-rose-200 text-red-500 ">
@@ -44,7 +43,8 @@ function ShopCategory() {
                     .trim()}`}
                   className="flex items-center hover:text-blue-500 duration-300 underline font-medium text-white p-2 rounded-md w-fit"
                 >
-                  Shop Now <BiChevronRight className="ml-1 h-4 w-4" />
+                  Shop Now 
+                  <BiChevronRight className="ml-1 h-4 w-4" />
                 </Link>
               </div>
             </div>

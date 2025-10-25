@@ -108,8 +108,6 @@ function RelatedProducts({ categoryName }: RelatedProductsProps) {
             />
           </svg>
         </button>
-
-        {/* Products Container */}
         <div
           ref={scrollContainerRef}
           className="flex items-stretch gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
@@ -121,8 +119,6 @@ function RelatedProducts({ categoryName }: RelatedProductsProps) {
             </div>
           ))}
         </div>
-
-        {/* Right Arrow */}
         <button
           onClick={() => scroll("right")}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 -mr-4"
@@ -143,12 +139,6 @@ function RelatedProducts({ categoryName }: RelatedProductsProps) {
           </svg>
         </button>
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 }

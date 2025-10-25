@@ -6,6 +6,7 @@ interface UserListProps {
   isAdmin: boolean;
   joinUs: string;
 }
+
 function UsersList({
   id,
   firstName,

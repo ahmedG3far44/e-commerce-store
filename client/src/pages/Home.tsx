@@ -6,18 +6,18 @@ import Header from "../components/landing/Header";
 import Hero from "../components/landing/Hero";
 import ShopCategory from "../components/landing/ShopCategory";
 
-function landingPage() {
+function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <Hero />
       <ShopCategory />
       <FeaturedProducts />
-      <Features/>
+      <Features />
       <Feedbacks />
       <Footer />
     </div>
   );
 }
 
-export default landingPage;
+export default Home;

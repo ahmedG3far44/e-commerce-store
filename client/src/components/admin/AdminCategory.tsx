@@ -67,7 +67,6 @@ const AdminCategory: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-   
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -77,7 +76,6 @@ const AdminCategory: React.FC = () => {
     }
   };
 
- 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -160,7 +158,7 @@ const AdminCategory: React.FC = () => {
         );
       }
 
-      const result = await response.json();
+      await response.json();
 
       setSuccessMessage("Category created successfully!");
       setFormData({
@@ -208,7 +206,6 @@ const AdminCategory: React.FC = () => {
             </p>
           </div>
 
-          {/* Success Message */}
           {successMessage && (
             <div className="mx-6 mt-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
               <BiCheck className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -226,7 +223,6 @@ const AdminCategory: React.FC = () => {
             </div>
           )}
 
-          {/* Submit Error */}
           {errors.submit && (
             <div className="mx-6 mt-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
               <FiAlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -246,9 +242,7 @@ const AdminCategory: React.FC = () => {
             </div>
           )}
 
-          {/* Form */}
           <div className="p-6 space-y-6">
-            {/* Category Name */}
             <div>
               <label
                 htmlFor="name"
@@ -276,7 +270,6 @@ const AdminCategory: React.FC = () => {
               )}
             </div>
 
-            {/* Description */}
             <div>
               <label
                 htmlFor="description"
@@ -304,7 +297,6 @@ const AdminCategory: React.FC = () => {
               )}
             </div>
 
-            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category Image
@@ -364,7 +356,6 @@ const AdminCategory: React.FC = () => {
               )}
             </div>
 
-            {/* Form Actions */}
             <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
               <button
                 type="button"

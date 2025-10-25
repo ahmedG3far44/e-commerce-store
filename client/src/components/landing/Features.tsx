@@ -1,7 +1,7 @@
-import { LiaShippingFastSolid } from "react-icons/lia";
 import { TbBuildingCog } from "react-icons/tb";
 import { GiSilverBullet } from "react-icons/gi";
 import { AiTwotoneThunderbolt } from "react-icons/ai";
+import { LiaShippingFastSolid } from "react-icons/lia";
 function Features() {
   return (
     <section className="py-16 bg-white">
@@ -9,7 +9,6 @@ function Features() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="flex flex-col items-center text-center p-6">
             <div className="bg-blue-100 p-4 rounded-full mb-4 text-blue-500">
-              {/* <Package className="h-8 w-8 text-blue-600" /> */}
               <span>
                 <TbBuildingCog size={30} />
               </span>
@@ -22,7 +21,6 @@ function Features() {
 
           <div className="flex flex-col items-center text-center p-6">
             <div className="bg-blue-100 p-4 rounded-full mb-4 text-blue-500">
-              {/* <Award className="h-8 w-8 text-blue-600" /> */}
               <GiSilverBullet size={30} />
             </div>
             <h3 className="font-bold text-lg mb-2">Premium Materials</h3>
@@ -45,7 +43,6 @@ function Features() {
 
           <div className="flex flex-col items-center text-center p-6">
             <div className="bg-blue-100 p-4 rounded-full mb-4 text-blue-500">
-              {/* <Truck className="h-8 w-8 text-blue-600" /> */}
               <span>
                 <LiaShippingFastSolid size={30} />
               </span>

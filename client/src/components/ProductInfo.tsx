@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import useAuth from "../context/auth/AuthContext";
-import useCart from "../context/cart/CartContext";
-import ProductImage from "./ProductImage";
 import { IProduct } from "../utils/types";
 import { handlePrice } from "../utils/handlers";
+import { useNavigate } from "react-router-dom";
+
+import ProductImage from "./ProductImage";
+import useAuth from "../context/auth/AuthContext";
+import useCart from "../context/cart/CartContext";
 
 export interface ProductInfoProps {
   productId: string;

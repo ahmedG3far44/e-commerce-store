@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react";
-import useCart from "../context/cart/CartContext";
-import useAuth from "../context/auth/AuthContext";
-import ItemCart from "../components/ItemCart";
 import {
   FiShoppingCart,
   FiMapPin,
@@ -13,6 +10,10 @@ import { BiPackage } from "react-icons/bi";
 import { MdOutlineLocalShipping } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { handlePrice } from "../utils/handlers";
+
+import useCart from "../context/cart/CartContext";
+import useAuth from "../context/auth/AuthContext";
+import ItemCart from "../components/ItemCart";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 

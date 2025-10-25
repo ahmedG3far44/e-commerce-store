@@ -1,12 +1,13 @@
 import { useState } from "react";
-import guestImg from "../../public/guestImg.jpg";
-import useAuth from "../context/auth/AuthContext";
 import { MdKeyboardArrowUp } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
 import { LuHistory } from "react-icons/lu";
 import { RxDashboard } from "react-icons/rx";
-import "../index.css";
+
+import guestImg from "../../public/guestImg.jpg";
+import useAuth from "../context/auth/AuthContext";
+
 
 function User() {
   const { user, logOut } = useAuth();

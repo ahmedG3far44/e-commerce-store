@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import useAuth from "../../context/auth/AuthContext";
 
-import InsightsCard from "./InsightsCard";
 import { SalesInsightsType } from "./Insights";
 
 import { FaRegUserCircle } from "react-icons/fa";
 import { LuWallet } from "react-icons/lu";
 import { MdDoneAll } from "react-icons/md";
 import { PiChartLineUp } from "react-icons/pi";
+
+import useAuth from "../../context/auth/AuthContext";
+
+import InsightsCard from "./InsightsCard";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 

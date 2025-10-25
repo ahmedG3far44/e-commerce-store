@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useRef, useState } from "react";
-import { FaMapMarkerAlt, FaPlus, FaExclamationCircle } from "react-icons/fa";
-import useAuth from "../context/auth/AuthContext";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { FaMapMarkerAlt, FaPlus, FaExclamationCircle } from "react-icons/fa";
+
+import useAuth from "../context/auth/AuthContext";
+
+import toast from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
@@ -51,7 +53,6 @@ function AddAddress() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
-        {/* Header Section */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
             <FaMapMarkerAlt className="text-blue-600 text-2xl" />
@@ -63,8 +64,6 @@ function AddAddress() {
             Please enter your delivery address details
           </p>
         </div>
-
-        {/* Error Alert */}
         {error && (
           <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-r-lg p-4 shadow-sm animate-fadeIn">
             <div className="flex items-start">
@@ -75,11 +74,8 @@ function AddAddress() {
             </div>
           </div>
         )}
-
-        {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <form onSubmit={handelAddNewAddress} className="space-y-6">
-            {/* Address Field */}
             <div>
               <label
                 htmlFor="address"
@@ -105,8 +101,6 @@ function AddAddress() {
                 Make sure to include all relevant details for accurate delivery
               </p>
             </div>
-
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={pending}
@@ -145,8 +139,6 @@ function AddAddress() {
             </button>
           </form>
         </div>
-
-        {/* Additional Info */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
             Your address information is secure and will only be used for
@@ -154,22 +146,6 @@ function AddAddress() {
           </p>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

@@ -12,6 +12,7 @@ const Navigation: React.FC<NavigationProps> = ({ categories }) => {
 
   const visibleCategories = categories.slice(0, 3);
   const dropdownCategories = categories.slice(3);
+  
   const getCategoryUrl = (categoryName: string) => {
     return `/category/${categoryName
       .toLowerCase()
@@ -25,7 +26,6 @@ const Navigation: React.FC<NavigationProps> = ({ categories }) => {
       <div className="flex items-center justify-between h-16 lg:h-20">
         <div className="flex items-center space-x-8 flex-1">
           <nav className="hidden lg:flex items-center space-x-1">
-            {/* First 3 Categories */}
             {visibleCategories.map((category) => (
               <Link
                 key={category._id}
@@ -42,7 +42,6 @@ const Navigation: React.FC<NavigationProps> = ({ categories }) => {
                 onMouseEnter={() => setIsDropdownOpen(true)}
                 onMouseLeave={() => setIsDropdownOpen(false)}
               >
-                {/* More Button */}
                 <button className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 flex items-center gap-1">
                   More
                   <FiChevronDown
@@ -51,8 +50,6 @@ const Navigation: React.FC<NavigationProps> = ({ categories }) => {
                     }`}
                   />
                 </button>
-
-                {/* Dropdown Menu */}
                 {isDropdownOpen && (
                   <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 animate-fadeIn">
                     {dropdownCategories.map((category) => (

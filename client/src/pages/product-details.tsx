@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { IProduct } from "../utils/types";
+
 import toast from "react-hot-toast";
 import Header from "../components/landing/Header";
 import Container from "../components/Container";
 import ProductInfo from "../components/ProductInfo";
 import RelatedProducts from "../components/landing/RelatedProducts";
-import { IProduct } from "../utils/types";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 

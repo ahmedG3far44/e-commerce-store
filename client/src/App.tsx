@@ -11,7 +11,7 @@ import OrdersHistory from "./pages/orders";
 import CheckoutPage from "./pages/checkout";
 import AddAddress from "./pages/add-address";
 import CategoryPage from "./pages/categories";
-import LandingPage from "./pages/landing-page";
+import LandingPage from "./pages/Home";
 import SuccessOrder from "./pages/success-order";
 import Insights from "./components/admin/Insights";
 import AdminRoutes from "./components/AdminRoutes";
@@ -39,10 +39,8 @@ function App() {
                 path="/category/:categoryName"
                 element={<CategoryPage />}
               />
-
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
-
               <Route element={<ProtectedRoutes />}>
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/cart" element={<CartPage />} />
@@ -51,7 +49,6 @@ function App() {
                 <Route path="/orders-history" element={<OrdersHistory />} />
                 <Route path="/success" element={<SuccessOrder />} />
               </Route>
-
               <Route element={<AdminRoutes />}>
                 <Route path="/dashboard" element={<Dashboard />}>
                   <Route path="categories" element={<AdminCategory />} />

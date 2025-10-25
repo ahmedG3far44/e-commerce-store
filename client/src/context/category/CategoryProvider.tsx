@@ -8,8 +8,6 @@ const CategoryProvider: FC<PropsWithChildren> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [pending, setPending] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [categoryByName, setCategoryByName] = useState<Category | null>(null);
-
   const getAllCategories = async (): Promise<Category[] | null> => {
     try {
       setPending(true);
@@ -24,11 +22,8 @@ const CategoryProvider: FC<PropsWithChildren> = ({ children }) => {
             `Failed to fetch categories: ${response.statusText}`
         );
       }
-
       const result = await response.json();
-
       setCategories(result.data);
-
       return result.data;
     } catch (error) {
       console.log((error as Error).message);
@@ -38,34 +33,6 @@ const CategoryProvider: FC<PropsWithChildren> = ({ children }) => {
       setPending(false);
     }
   };
-
-  const getCategoryByName = async (id: string): Promise<Category[] | null> => {
-    try {
-      setPending(true);
-      setError(null);
-      const response = await fetch(`${BASE_URL}/category/${id}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message ||
-            `Failed to fetch categories: ${response.statusText}`
-        );
-      }
-
-      const result = await response.json();
-
-      setCategoryByName(result.data);
-
-      return result.data;
-    } catch (error) {
-      console.log((error as Error).message);
-      setError((error as Error).message);
-      return null;
-    } finally {
-      setPending(false);
-    }
-  };
-
   useEffect(() => {
     getAllCategories();
   }, []);

@@ -170,37 +170,6 @@ export const createOrder = async ({
   }
 };
 
-export const categories = [
-  {
-    id: 1,
-    categoryName: "Gaming Mouse Pads",
-    path: "/category/gaming-mouse-pads",
-    image: "./mouse-2.jpg",
-    description: "Precision-engineered for gamers",
-  },
-  {
-    id: 2,
-    categoryName: "Extended Desk Mats",
-    path: "/category/extended-desk-mats",
-    image: "./keyboard.jpg",
-    description: "Full desk coverage for your setup",
-  },
-  {
-    id: 3,
-    categoryName: "Designer Collections",
-    path: "/category/designer-collections",
-    image: "./headset.jpg",
-    description: "Unique patterns for creative professionals",
-  },
-  {
-    id: 4,
-    categoryName: "PC Accessories",
-    path: "/category/pc-accessories",
-    image: "./monitor.jpg",
-    description: "Complete your workstation",
-  },
-];
-
 
 export function handlePrice(price:number|string){
   return `${price.toLocaleString("en-US", {

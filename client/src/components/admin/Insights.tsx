@@ -1,10 +1,8 @@
 import Charts from "./Charts";
-import TopRatedCustomers from "./TopRatedCustomers";
 import StatusOrders from "./StatusOrders";
-// import useAuth from "../../context/auth/AuthContext";
 import SalesInsights from "./SalesInsights";
+import TopRatedCustomers from "./TopRatedCustomers";
 
-// const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 export interface SalesInsightsType {
   totalSales: number;
   totalOrders: number;

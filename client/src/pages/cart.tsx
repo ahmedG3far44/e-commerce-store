@@ -1,12 +1,13 @@
+import { useEffect } from "react";
+import { BiPackage } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
+import { CgShoppingCart } from "react-icons/cg";
+import { handlePrice } from "../utils/handlers";
+import { BsArrowRight, BsTrash2 } from "react-icons/bs";
+
 import useCart from "../context/cart/CartContext";
 import useAuth from "../context/auth/AuthContext";
 import ItemCart from "../components/ItemCart";
-import { useNavigate } from "react-router-dom";
-import { CgShoppingCart } from "react-icons/cg";
-import { BsArrowRight, BsTrash2 } from "react-icons/bs";
-import { BiPackage } from "react-icons/bi";
-import { useEffect } from "react";
-import { handlePrice } from "../utils/handlers";
 
 function CartPage() {
   const { token } = useAuth();

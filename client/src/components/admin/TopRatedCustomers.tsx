@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import useAuth from "../../context/auth/AuthContext";
 
 import notionAvatar1 from "../../../public/notion-avatar-1.png";
 import notionAvatar2 from "../../../public/notion-avatar-2.png";
 import notionAvatar3 from "../../../public/notion-avatar-3.png";
+
+import useAuth from "../../context/auth/AuthContext";
+
 import { TopCustomer } from "../../utils/types";
 import { handlePrice } from "../../utils/handlers";
 

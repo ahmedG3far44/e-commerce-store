@@ -1,6 +1,4 @@
 import { useState } from "react";
-// import useAuth from "../context/auth/AuthContext";
-import Container from "../components/Container";
 import {
   FaUser,
   FaPhone,
@@ -14,6 +12,8 @@ import {
   FaMailBulk,
 } from "react-icons/fa";
 import { FaX } from "react-icons/fa6";
+
+import Container from "../components/Container";
 
 function ProfilePage() {
   const [user, setUser] = useState({
@@ -52,7 +52,6 @@ function ProfilePage() {
       },
     ],
   });
-
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [tempProfile, setTempProfile] = useState({ ...user });
   const [newAddress, setNewAddress] = useState({
@@ -61,8 +60,6 @@ function ProfilePage() {
     city: "",
     isAdding: false,
   });
-
-  // Handle profile image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -75,26 +72,18 @@ function ProfilePage() {
       reader.readAsDataURL(file);
     }
   };
-
-  // Toggle editing mode for profile
   const toggleProfileEdit = () => {
     if (isEditingProfile) {
-      // Cancel editing
       setTempProfile({ ...user });
     } else {
-      // Start editing
       setTempProfile({ ...user });
     }
     setIsEditingProfile(!isEditingProfile);
   };
-
-  // Save profile changes
   const saveProfileChanges = () => {
     setUser({ ...tempProfile });
     setIsEditingProfile(false);
   };
-
-  // Toggle editing mode for address
   const toggleAddressEdit = (id: number) => {
     setUser({
       ...user,
@@ -103,8 +92,6 @@ function ProfilePage() {
       ),
     });
   };
-
-  // Update address being edited
   const updateAddress = (id: number, field: string, value: string) => {
     setUser({
       ...user,
@@ -113,19 +100,15 @@ function ProfilePage() {
       ),
     });
   };
-  // Save address changes
   const saveAddressChanges = (id: number) => {
     toggleAddressEdit(id);
   };
-  // Remove address
   const removeAddress = (id: number) => {
     setUser({
       ...user,
       addresses: user.addresses.filter((addr) => addr.id !== id),
     });
   };
-
-  // Toggle adding new address
   const toggleAddAddress = () => {
     setNewAddress({
       type: "",
@@ -134,15 +117,12 @@ function ProfilePage() {
       isAdding: !newAddress.isAdding,
     });
   };
-  // Update new address form
   const updateNewAddress = (field: string, value: string) => {
     setNewAddress({
       ...newAddress,
       [field]: value,
     });
   };
-
-  // Add new address
   const addNewAddress = () => {
     if (newAddress.type && newAddress.street && newAddress.city) {
       const newId = Math.max(...user.addresses.map((a) => a.id), 0) + 1;
@@ -165,11 +145,10 @@ function ProfilePage() {
 
   return (
     <Container>
-      <div className="min-h-screen ">
-        {/* Main Content */}
+      <div className="min-h-screen">
         <div className="container mx-auto px-4 py-8">
           <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="p-6 border border-zinc-200 border border-zinc-200-zinc-200-b">
+            <div className="p-6  border-zinc-200 border">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Profile Information</h2>
                 <button
@@ -186,9 +165,7 @@ function ProfilePage() {
               </div>
             </div>
 
-            {/* Profile */}
             <div className="p-6 flex flex-col md:flex-row">
-              {/* Profile Image */}
               <div className="mb-6 md:mb-0 md:mr-6 flex flex-col items-center">
                 <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                   {(
@@ -225,8 +202,6 @@ function ProfilePage() {
                   </div>
                 )}
               </div>
-
-              {/* Profile Details */}
               <div className="flex-1">
                 {isEditingProfile ? (
                   <div className="space-y-4">
@@ -236,7 +211,7 @@ function ProfilePage() {
                       </label>
                       <input
                         type="text"
-                        className="w-full px-3 py-2 border border-zinc-200 border border-zinc-200-zinc-200 border border-zinc-200 border border-zinc-200-zinc-200-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border-zinc-200-zinc-200 border border-zinc-200  border-zinc-200-zinc-200-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={tempProfile.name}
                         onChange={(e) =>
                           setTempProfile({
@@ -252,7 +227,7 @@ function ProfilePage() {
                       </label>
                       <input
                         type="email"
-                        className="w-full px-3 py-2 border border-zinc-200 border border-zinc-200-zinc-200 border border-zinc-200 border border-zinc-200-zinc-200-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2  border border-zinc-200  border-zinc-200-zinc-200-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={tempProfile.email}
                         onChange={(e) =>
                           setTempProfile({
@@ -268,10 +243,7 @@ function ProfilePage() {
                       </label>
                       <input
                         type="tel"
-                        className="w-full px-3 py-2 
-                        
-                        
-                        border border-zinc-200 border border-zinc-200-zinc-200-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={tempProfile.phone}
                         onChange={(e) =>
                           setTempProfile({
@@ -318,9 +290,7 @@ function ProfilePage() {
                 )}
               </div>
             </div>
-
-            {/* Addresses */}
-            <div className="p-6 border border-zinc-200 border border-zinc-200-zinc-200 border border-zinc-200 border border-zinc-200-zinc-200-zinc-200-t">
+            <div className="p-6  border-zinc-200 ">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-800">
                   Addresses
@@ -332,8 +302,6 @@ function ProfilePage() {
                   {newAddress.isAdding ? "Cancel" : "Add Address"}
                 </button>
               </div>
-
-              {/* New Address Form */}
               {newAddress.isAdding && (
                 <div className="mb-6 p-4 border border-zinc-200 border border-zinc-200-zinc-200 border border-zinc-200 border border-zinc-200-zinc-200-zinc-200 rounded-md bg-gray-50">
                   <h3 className="text-md font-medium mb-4">Add New Address</h3>
@@ -345,7 +313,7 @@ function ProfilePage() {
                       <input
                         type="text"
                         placeholder="HOME, OFFICE, etc."
-                        className="w-full px-3 py-2 border border-zinc-200 border border-zinc-200-zinc-200 border border-zinc-200 border border-zinc-200-zinc-200-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={newAddress.type}
                         onChange={(e) =>
                           updateNewAddress("type", e.target.value)
@@ -389,8 +357,6 @@ function ProfilePage() {
                   </div>
                 </div>
               )}
-
-              {/* Address List */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.addresses.map((address) => (
                   <div

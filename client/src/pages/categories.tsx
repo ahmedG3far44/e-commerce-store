@@ -1,9 +1,10 @@
-import { useState, useMemo, useEffect } from "react";
-import { BiChevronDown, BiPackage, BiX } from "react-icons/bi";
-import { FiAlertCircle, FiFilter } from "react-icons/fi";
-import { getAllProducts } from "../utils/handlers";
 import { IProduct } from "../utils/types";
+import { useState, useMemo, useEffect } from "react";
+import { FiAlertCircle, FiFilter } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
+import { BiChevronDown, BiPackage, BiX } from "react-icons/bi";
+import { getAllProducts, handlePrice } from "../utils/handlers";
+
 import Header from "../components/landing/Header";
 import useAuth from "../context/auth/AuthContext";
 import useCart from "../context/cart/CartContext";
@@ -16,14 +17,14 @@ interface FilterState {
 
 function ProductCard(product: IProduct) {
   const navigate = useNavigate();
-
   const { addItemToCart } = useCart();
   const { user, isAuthenticated, token } = useAuth();
+
   return (
     <div className="group bg-white rounded-xl border border-zinc-300 overflow-hidden hover:shadow-xl transition-all duration-300  hover:-translate-y-1">
       <div className="relative aspect-square overflow-hidden bg-zinc-100">
         <img
-          src={product.images[0] || product.thumbnail || ""}
+          src={product.thumbnail}
           alt={product.description as string}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
@@ -49,11 +50,7 @@ function ProductCard(product: IProduct) {
         </h3>
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-blue-600">
-            $
-            {product.price.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {handlePrice(product.price)}
           </span>
           {isAuthenticated && !user?.isAdmin && (
             <button
@@ -138,16 +135,12 @@ function FilterSidebar({
           </span>
         </div>
       </div>
-
-      {/* Backdrop */}
       {isOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
-
-      {/* Sidebar */}
       <aside
         className={`
         lg:block bg-white rounded-2xl border-2 border-zinc-200 p-6 space-y-6 h-fit lg:sticky lg:top-4 shadow-lg
@@ -158,7 +151,6 @@ function FilterSidebar({
         }
       `}
       >
-        {/* Mobile Header */}
         {isOpen && (
           <div className="lg:hidden flex items-center justify-between pb-4 border-b border-zinc-200">
             <h2 className="text-xl font-bold text-zinc-900">Filter Products</h2>
@@ -171,7 +163,6 @@ function FilterSidebar({
           </div>
         )}
 
-        {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-zinc-900 hidden lg:block">
             Filters
@@ -186,7 +177,6 @@ function FilterSidebar({
           )}
         </div>
 
-        {/* Results Count */}
         <div className="hidden lg:block p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-100">
           <div className="flex items-center gap-2 text-blue-900">
             <BiPackage className="w-5 h-5" />
@@ -198,7 +188,6 @@ function FilterSidebar({
           </div>
         </div>
 
-        {/* Sort By */}
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-sm font-bold text-zinc-900">
             <BiChevronDown className="w-4 h-4" />
@@ -221,7 +210,6 @@ function FilterSidebar({
           </select>
         </div>
 
-        {/* Price Range */}
         <div className="space-y-3">
           <label className="block text-sm font-bold text-zinc-900">
             Price Range
@@ -257,7 +245,6 @@ function FilterSidebar({
           </div>
         </div>
 
-        {/* Stock Status */}
         <div className="space-y-3">
           <label className="block text-sm font-bold text-zinc-900">
             Availability
@@ -299,7 +286,6 @@ function FilterSidebar({
           </div>
         </div>
 
-        {/* Apply Button (Mobile) */}
         {isOpen && (
           <button
             onClick={() => setIsOpen(false)}

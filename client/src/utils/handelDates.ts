@@ -1,11 +1,7 @@
 function handelDates(oldDate: Date | string): string {
   const oldDateObj = typeof oldDate === "string" ? new Date(oldDate) : oldDate;
-
   const currentTime = Date.now();
-
   const differenceInMs = currentTime - oldDateObj.getTime();
-
-  // Convert the difference to seconds, minutes, hours, days, and weeks
   const differenceInSeconds = Math.floor(differenceInMs / 1000);
   const differenceInMinutes = Math.floor(differenceInMs / (1000 * 60));
   const differenceInHours = Math.floor(differenceInMs / (1000 * 60 * 60));
@@ -13,8 +9,7 @@ function handelDates(oldDate: Date | string): string {
   const differenceInWeeks = Math.floor(
     differenceInMs / (1000 * 60 * 60 * 24 * 7)
   );
-
-  // Determine the appropriate unit to return
+  
   if (differenceInSeconds < 60) {
     return `Last update: ${differenceInSeconds} second${
       differenceInSeconds !== 1 ? "s" : ""

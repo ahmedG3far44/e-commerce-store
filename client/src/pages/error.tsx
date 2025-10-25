@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 
 function NotFoundPage() {
   const navigate = useNavigate();
-
   return (
     <div className="w-full min-h-screen flex justify-center items-center ">
       <div className="w-[600px] p-4 border border-zinc-300 flex flex-col justify-center items-center gap-4 rounded-md">

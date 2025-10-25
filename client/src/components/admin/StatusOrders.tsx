@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import useAuth from "../../context/auth/AuthContext";
+import { LuTimer } from "react-icons/lu";
+import { FcShipped } from "react-icons/fc";
 import { HiOutlineCash } from "react-icons/hi";
 import { HiOutlineTruck } from "react-icons/hi2";
-import { FcShipped } from "react-icons/fc";
-import { LuTimer } from "react-icons/lu";
-import InsightsCard from "./InsightsCard";
 import { InsightsCardSkeleton } from "./SalesInsights";
+
+import InsightsCard from "./InsightsCard";
+
+import useAuth from "../../context/auth/AuthContext";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 
