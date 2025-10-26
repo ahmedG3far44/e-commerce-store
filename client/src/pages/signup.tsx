@@ -12,7 +12,6 @@ import { useState } from "react";
 import { register } from "../utils/handlers";
 import { Navigate } from "react-router-dom";
 
-
 import useAuth from "../context/auth/AuthContext";
 
 interface UserRegisterInputsType {
@@ -41,15 +40,15 @@ function SignUpPage() {
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     setPending(true);
+
     try {
       const data = await register(userRegister);
       const { user, token } = data;
       logUser({ user, token });
-      return <Navigate to="/" replace />;
     } catch (err: any) {
-      setError(err?.message);
-      return;
+      setError(err?.message || "An error occurred during registration");
     } finally {
       setPending(false);
     }
@@ -64,7 +63,6 @@ function SignUpPage() {
       </div>
 
       <div className="max-w-5xl w-full grid md:grid-cols-2 gap-0 bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden relative z-10 border border-white/50">
-        {/* Left side - Signup form */}
         <div className="w-full p-8 md:p-12 flex flex-col justify-center order-2 md:order-1">
           <div className="mb-8">
             <div className="inline-flex md:hidden items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl mb-4">
@@ -79,7 +77,6 @@ function SignUpPage() {
           </div>
 
           <form onSubmit={handleRegister} className="w-full space-y-4">
-          
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 block">
                 First Name
@@ -92,7 +89,7 @@ function SignUpPage() {
                   type="text"
                   className="w-full pl-12 pr-4 py-3.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-purple-600 focus:bg-white transition-all text-gray-900 placeholder-gray-400"
                   placeholder="Enter your first name"
-                  defaultValue={userRegister.firstName}
+                  value={userRegister.firstName}
                   onChange={(e) =>
                     setUserRegister({
                       ...userRegister,
@@ -103,7 +100,6 @@ function SignUpPage() {
                 />
               </div>
             </div>
-
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 block">
@@ -117,7 +113,7 @@ function SignUpPage() {
                   type="text"
                   className="w-full pl-12 pr-4 py-3.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-purple-600 focus:bg-white transition-all text-gray-900 placeholder-gray-400"
                   placeholder="Enter your last name"
-                  defaultValue={userRegister.lastName}
+                  value={userRegister.lastName}
                   onChange={(e) =>
                     setUserRegister({
                       ...userRegister,
@@ -141,7 +137,7 @@ function SignUpPage() {
                   type="email"
                   className="w-full pl-12 pr-4 py-3.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-purple-600 focus:bg-white transition-all text-gray-900 placeholder-gray-400"
                   placeholder="you@example.com"
-                  defaultValue={userRegister.email}
+                  value={userRegister.email}
                   onChange={(e) =>
                     setUserRegister({ ...userRegister, email: e.target.value })
                   }
@@ -149,6 +145,7 @@ function SignUpPage() {
                 />
               </div>
             </div>
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 block">
                 Password
@@ -161,7 +158,7 @@ function SignUpPage() {
                   type={showPassword ? "text" : "password"}
                   className="w-full pl-12 pr-12 py-3.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-purple-600 focus:bg-white transition-all text-gray-900 placeholder-gray-400"
                   placeholder="Create a strong password"
-                  defaultValue={userRegister.password}
+                  value={userRegister.password}
                   onChange={(e) =>
                     setUserRegister({
                       ...userRegister,
@@ -179,6 +176,7 @@ function SignUpPage() {
                 </button>
               </div>
             </div>
+
             {error && (
               <div className="p-4 rounded-xl bg-red-50 border-2 border-red-200 flex items-start gap-3 animate-shake">
                 <svg
@@ -195,6 +193,7 @@ function SignUpPage() {
                 <p className="text-red-700 text-sm font-medium">{error}</p>
               </div>
             )}
+
             <div className="flex items-start text-sm pt-1">
               <input
                 type="checkbox"
@@ -222,6 +221,7 @@ function SignUpPage() {
                 </a>
               </label>
             </div>
+
             <button
               type="submit"
               className="w-full mt-6 py-4 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none"
@@ -253,6 +253,7 @@ function SignUpPage() {
               )}
             </button>
           </form>
+
           <div className="mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -265,6 +266,7 @@ function SignUpPage() {
               </div>
             </div>
           </div>
+
           <div className="text-center mt-6">
             <p className="text-gray-600">
               Sign in to your existing account{" "}

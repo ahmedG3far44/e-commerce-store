@@ -16,6 +16,7 @@ import {
 
 function LoginPage() {
   const { isAuthenticated, logUser } = useAuth();
+
   const [userLogin, setUserLogin] = useState<loginUserParams>({
     email: "",
     password: "",
@@ -30,16 +31,14 @@ function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     setPending(true);
     try {
       const data = await login(userLogin);
       const { user, token } = data;
-
       logUser({ user, token });
-      return <Navigate to="/" replace />;
     } catch (err: any) {
-      setError(err?.message);
-      return;
+      setError(err?.message || "An error occurred during login");
     } finally {
       setPending(false);
     }
@@ -119,7 +118,7 @@ function LoginPage() {
                   type="email"
                   className="w-full pl-12 pr-4 py-3.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all text-gray-900 placeholder-gray-400"
                   placeholder="you@example.com"
-                  defaultValue={userLogin.email}
+                  value={userLogin.email}
                   onChange={(e) =>
                     setUserLogin({ ...userLogin, email: e.target.value })
                   }
@@ -139,7 +138,7 @@ function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   className="w-full pl-12 pr-12 py-3.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all text-gray-900 placeholder-gray-400"
                   placeholder="Enter your password"
-                  defaultValue={userLogin.password}
+                  value={userLogin.password}
                   onChange={(e) =>
                     setUserLogin({ ...userLogin, password: e.target.value })
                   }

@@ -133,7 +133,7 @@ function ProductCard(product: IProduct) {
         <div className="mb-2 flex items-center justify-between gap-3 pt-3 border-t border-zinc-100 mt-auto">
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-blue-600">
-              ${handlePrice(product.price)}
+              ${handlePrice(price)}
             </span>
             {!isOutOfStock && (
               <span className="text-xs text-zinc-500">

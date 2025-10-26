@@ -1,22 +1,14 @@
-FROM node:20-alpine AS build
-
+# Build stage
+FROM node:18 AS builder
 WORKDIR /app
-
-COPY .env /app/
-
-COPY package*.json .
-
+COPY package*.json ./
 RUN npm install
-
 COPY . .
-
 RUN npm run build
 
-
-FROM nginx:1.25-alpine
-
-COPY --from=build /app/dist /usr/share/nginx/html
-
+# Serve stage
+FROM nginx:stable
+WORKDIR /var/www/app
+COPY --from=builder /app/build .
+COPY ./.nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
