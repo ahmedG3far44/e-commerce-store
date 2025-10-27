@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IProduct } from "../utils/types";
 import { HiShoppingCart } from "react-icons/hi";
+import { handlePrice } from "../utils/handlers";
+import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
+
 import useAuth from "../context/auth/AuthContext";
 import useCart from "../context/cart/CartContext";
-import { handlePrice } from "../utils/handlers";
 
 function ImageSlider({ images }: { images: string[] }) {
   const [active, setActive] = useState(0);
@@ -18,67 +20,42 @@ function ImageSlider({ images }: { images: string[] }) {
   };
 
   return (
-    <div className="relative w-full h-full  rounded-2xl flex items-center justify-center m-auto bg-zinc-200 group">
+    <div className="relative w-[250px] h-[250px]  rounded-md overflow-hidden flex items-center justify-center bg-white border border-zinc-300 group p-2">
       <img
         src={
           images[active] ||
           "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600"
         }
         alt="Product"
-        className="w-full h-full object-cover"
+        loading="lazy"
+        className="w-full h-full object-cover rounded-md "
       />
 
       {images.length > 1 && (
         <>
-          {/* Navigation Arrows */}
           <button
             onClick={prevImage}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg cursor-pointer"
             aria-label="Previous image"
           >
-            <svg
-              className="w-5 h-5 text-zinc-800"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <BiLeftArrowAlt size={10} />
           </button>
 
           <button
             onClick={nextImage}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg cursor-pointer"
             aria-label="Next image"
           >
-            <svg
-              className="w-5 h-5 text-zinc-800"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+            <BiRightArrowAlt size={10} />
           </button>
 
-          {/* Dot Indicators */}
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
             {images.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setActive(i)}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  i === active ? "bg-white w-6" : "bg-white/60"
+                  i === active ? "bg-blue-500 w-6" : "bg-gray-500"
                 }`}
                 aria-label={`View image ${i + 1}`}
               />
@@ -91,7 +68,7 @@ function ImageSlider({ images }: { images: string[] }) {
 }
 
 function ProductCard(product: IProduct) {
-  const { _id, title, categoryName, images, price, stock } = product;
+  const { _id, title, images, price, stock } = product;
   const isOutOfStock = stock === 0;
   const isLowStock = stock > 0 && stock <= 10;
 
@@ -108,14 +85,9 @@ function ProductCard(product: IProduct) {
   };
 
   return (
-    <article className="bg-white rounded-lg border border-zinc-300 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full">
-      <div className="relative w-full aspect-square overflow-hidden bg-zinc-50">
+    <article className="p-4 rounded-lg  overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full gap-4">
+      <div className="relative overflow-hidden bg-zinc-50">
         <ImageSlider images={images} />
-        {categoryName && (
-          <div className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-            {categoryName}
-          </div>
-        )}
         {isOutOfStock && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="bg-red-500 text-white px-4 py-2 rounded-full font-bold text-sm">
@@ -129,8 +101,8 @@ function ProductCard(product: IProduct) {
           </div>
         )}
       </div>
-      <div className="p-4 flex flex-col flex-1">
-        <div className="mb-2 flex items-center justify-between gap-3 pt-3 border-t border-zinc-100 mt-auto">
+      <div className="flex flex-col">
+        <div className="flex items-center justify-between border-t border-zinc-100">
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-blue-600">
               ${handlePrice(price)}
@@ -155,7 +127,7 @@ function ProductCard(product: IProduct) {
         </div>
         <Link
           to={`/product/${product._id}`}
-          className="font-bold text-zinc-900 text-base mb-2 line-clamp-2 min-h-[3rem] hover:underline hover:text-blue-500 duration-300 cursor-pointer"
+          className="font-bold text-zinc-900 text-base mb-2 line-clamp-2 min-h-fit hover:underline hover:text-blue-500 duration-300 cursor-pointer"
         >
           {title}
         </Link>

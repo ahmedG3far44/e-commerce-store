@@ -207,6 +207,7 @@ const CategoryListTable: React.FC = () => {
       }
 
       const formDataToSend = new FormData();
+      
       formDataToSend.append("name", formData.name.trim());
       formDataToSend.append("description", formData.description.trim());
 

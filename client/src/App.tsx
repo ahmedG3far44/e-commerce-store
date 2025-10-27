@@ -1,6 +1,7 @@
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Home from "./pages/Home";
 import CartPage from "./pages/cart";
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
@@ -11,7 +12,6 @@ import OrdersHistory from "./pages/orders";
 import CheckoutPage from "./pages/checkout";
 import AddAddress from "./pages/add-address";
 import CategoryPage from "./pages/categories";
-import LandingPage from "./pages/Home";
 import SuccessOrder from "./pages/success-order";
 import Insights from "./components/admin/Insights";
 import AdminRoutes from "./components/AdminRoutes";
@@ -33,7 +33,7 @@ function App() {
           <Toaster position="bottom-center" reverseOrder={false} />
           <BrowserRouter>
             <Routes>
-              <Route index path="/" element={<LandingPage />} />
+              <Route index path="/" element={<Home />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route
                 path="/category/:categoryName"

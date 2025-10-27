@@ -73,32 +73,6 @@ function Testimonials() {
           </div>
         </div>
       </section>
-      <section className="bg-blue-600 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="mb-6 md:mb-0">
-              <h3 className="text-2xl font-bold mb-2">Join Our Newsletter</h3>
-              <p>Stay updated with new products and exclusive offers</p>
-            </div>
-            <div className="w-full md:w-1/2 lg:w-1/3">
-              <form className="flex">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="flex-grow px-4 py-3 rounded-l-lg text-gray-900 focus:outline-none"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-800 hover:bg-blue-900 px-6 py-3 rounded-r-lg font-medium transition"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

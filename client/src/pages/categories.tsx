@@ -1,76 +1,17 @@
 import { IProduct } from "../utils/types";
 import { useState, useMemo, useEffect } from "react";
 import { FiAlertCircle, FiFilter } from "react-icons/fi";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { BiChevronDown, BiPackage, BiX } from "react-icons/bi";
-import { getAllProducts, handlePrice } from "../utils/handlers";
+import { getAllProducts } from "../utils/handlers";
 
 import Header from "../components/landing/Header";
-import useAuth from "../context/auth/AuthContext";
-import useCart from "../context/cart/CartContext";
+import ProductCard from "../components/ProductCard";
 
 interface FilterState {
   priceRange: [number, number];
   inStock: boolean | null;
   sortBy: "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
-}
-
-function ProductCard(product: IProduct) {
-  const navigate = useNavigate();
-  const { addItemToCart } = useCart();
-  const { user, isAuthenticated, token } = useAuth();
-
-  return (
-    <div className="group bg-white rounded-xl border border-zinc-300 overflow-hidden hover:shadow-xl transition-all duration-300  hover:-translate-y-1">
-      <div className="relative aspect-square overflow-hidden bg-zinc-100">
-        <img
-          src={product.thumbnail}
-          alt={product.description as string}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
-        <p className="text-sm line-clamp-2 text-zinc-400">
-          {product.description as string}
-        </p>
-        {product.stock === 0 && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <span className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold text-sm">
-              Out of Stock
-            </span>
-          </div>
-        )}
-        {product.stock > 0 && product.stock < 10 && (
-          <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Only {product.stock} left
-          </div>
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-zinc-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-          {product.title}
-        </h3>
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-blue-600">
-            {handlePrice(product.price)}
-          </span>
-          {isAuthenticated && !user?.isAdmin && (
-            <button
-              onClick={() => {
-                if (!token) {
-                  navigate("/loin");
-                } else {
-                  addItemToCart({ productId: product._id, quantity: 1, token });
-                }
-              }}
-              disabled={product.stock === 0}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-zinc-300 disabled:cursor-not-allowed text-sm"
-            >
-              {product.stock === 0 ? "Unavailable" : "Add to Cart"}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
 }
 
 function FilterSidebar({
