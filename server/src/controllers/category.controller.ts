@@ -98,7 +98,6 @@ export const updateCategory = async (req: ExtendedRequest, res: Response) => {
     const { id } = req.params;
     const { name, description, removeImage } = req.body;
 
-    const newImage = req.file;
     
     const category = await Category.findById(id);
 
@@ -112,12 +111,8 @@ export const updateCategory = async (req: ExtendedRequest, res: Response) => {
     if (description) category.description = description;
 
 
-    if (removeImage === 'true' && !req.file) {
-      console.log(category.image)
-
-   
+    if (removeImage === 'true' && !req.file) { 
       await deleteFromS3(category.image);
-     
       category.image = ''; 
     }
     
@@ -125,8 +120,6 @@ export const updateCategory = async (req: ExtendedRequest, res: Response) => {
     if (req.file) {
       await deleteFromS3(category.image);
       const imageUrl = await uploadToS3(req.file);
-
-      console.log(imageUrl, "new uploaded image url")
       category.image = imageUrl;
     }
 
