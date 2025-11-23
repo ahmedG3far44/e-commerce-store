@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
 import {
   FaShippingFast,
   FaMoneyBillWave,
   FaShieldAlt,
   FaCertificate,
-  FaArrowRight,
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
+
 import { Link } from "react-router-dom";
+import  { useState, useEffect } from "react";
 import { useCategory } from "../../context/category/CategoryContext";
 import { handlePrice } from "../../utils/handlers";
 

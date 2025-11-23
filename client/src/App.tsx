@@ -1,7 +1,6 @@
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Home from "./pages/Home";
 import CartPage from "./pages/cart";
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
@@ -24,6 +23,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminProducts from "./components/admin/AdminProducts";
 import AdminCategory from "./components/admin/AdminCategory";
 import CategoryProvider from "./context/category/CategoryProvider";
+import Home from "./pages/home";
 
 function App() {
   return (
