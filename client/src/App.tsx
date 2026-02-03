@@ -23,7 +23,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminProducts from "./components/admin/AdminProducts";
 import AdminCategory from "./components/admin/AdminCategory";
 import CategoryProvider from "./context/category/CategoryProvider";
-import Home from "./pages/home";
+import Home from "./pages/Home";
 
 function App() {
   return (
